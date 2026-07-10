@@ -25,7 +25,20 @@ var (
 	policyUpdateMutex = &sync.Mutex{}
 	policyUpdateMap   = make(map[string]map[string]*pb.CompositionRequest)
 	c                 pb.RabbitMQClient
+
+	// One in-flight job per (user, requestType). Reused across policy
+	// reverification calls in the same training run so the jobName the
+	// api-gateway got back on the first approval stays the jobName the
+	// agents have registered — otherwise every training-round-preceding
+	// reverification would generate a new jobName and the training
+	// request would look it up under the wrong key.
+	activeJobsMutex = &sync.Mutex{}
+	activeJobs      = make(map[string]string)
 )
+
+func activeJobKey(userName, requestType string) string {
+	return userName + "|" + requestType
+}
 
 type validation struct {
 	response     *pb.ValidationResponse

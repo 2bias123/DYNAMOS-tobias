@@ -2,6 +2,11 @@
 # FROM python:3.9-slim-buster AS base
 FROM  python:3.12-slim
 
+# python:3.12-slim ships without setuptools, and setuptools>=80 dropped
+# pkg_resources — which opentelemetry.instrumentation.dependencies imports
+# at start-up. Pin below 80 so pkg_resources stays available.
+RUN pip install --no-cache-dir "setuptools<80"
+
 ARG NAME
 ARG WHEEL_NAME
 ENV NAME=$NAME

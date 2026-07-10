@@ -31,7 +31,8 @@ func startConsuming(serviceName string, c pb.RabbitMQClient, from string, handle
 	ctx := context.Background()
 	stream, err := c.Consume(ctx, &pb.ConsumeRequest{QueueName: from, AutoAck: true})
 	if err != nil {
-		logger.Sugar().Fatalf("Error on consume: %v", err)
+		logger.Sugar().Errorf("Error on consume: %v", err)
+		return err
 	}
 
 	for {
@@ -39,22 +40,18 @@ func startConsuming(serviceName string, c pb.RabbitMQClient, from string, handle
 		grpcMsg, err := stream.Recv()
 		receiveMutex.Unlock()
 
-		// logger.Sugar().Debugw("startConsuming receiving", "serviceName:", serviceName)
 		if err == io.EOF {
-			// The stream has ended.
-			logger.Sugar().Warnw("Stream has ended", "error:", err)
-			break
+			logger.Sugar().Warnw("Stream has ended", "error", err)
+			return nil
 		}
 
 		if err != nil {
-			logger.Sugar().Fatalf("Failed to receive: %v", err)
+			logger.Sugar().Warnw("Stream Recv failed; letting outer retry reconnect", "error", err)
+			return err
 		}
 
-		err = handler(ctx, grpcMsg)
-		if err != nil {
-			logger.Sugar().Fatalf("Failed to handle message: %v", err)
+		if err := handler(ctx, grpcMsg); err != nil {
+			logger.Sugar().Errorw("Handler failed on message; consumer continues", "error", err)
 		}
 	}
-
-	return err
 }

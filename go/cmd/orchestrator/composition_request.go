@@ -42,7 +42,11 @@ func startCompositionRequest(ctx context.Context, validationResponse *pb.Validat
 	compositionRequest.DataProviders = []string{}
 	compositionRequest.ArchetypeId = archetype
 	compositionRequest.RequestType = validationResponse.RequestType
-	compositionRequest.JobName = lib.GenerateJobName(validationResponse.User.UserName, 8)
+	// Caller may have pinned a jobName already when reusing an in-flight
+	// job across policy reverifications; only generate on first entry.
+	if compositionRequest.JobName == "" {
+		compositionRequest.JobName = lib.GenerateJobName(validationResponse.User.UserName, 8)
+	}
 
 	// Save the ActiveJob to etcd
 	// var activeJob = &pb.ActiveJob{

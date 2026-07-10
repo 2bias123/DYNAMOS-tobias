@@ -341,6 +341,21 @@ func handleRequestApproval(ctx context.Context, validationResponse *pb.Validatio
 
 	compositionRequest := &pb.CompositionRequest{}
 	compositionRequest.User = &pb.User{}
+
+	// If this user already has an in-flight job for the same request type
+	// (typical for VFL: the api-gateway calls SendRequestApproval once per
+	// round to re-verify policy), reuse the existing jobName and treat this
+	// as a redeploy so we don't push a fresh compositionRequest to agents.
+	// Otherwise startCompositionRequest generates a new jobName and this
+	// call registers it below.
+	jobKey := activeJobKey(validationResponse.User.UserName, validationResponse.RequestType)
+	activeJobsMutex.Lock()
+	if existing, ok := activeJobs[jobKey]; ok {
+		compositionRequest.JobName = existing
+		redeploy = true
+	}
+	activeJobsMutex.Unlock()
+
 	userTargets, ctx, err := startCompositionRequest(ctx, validationResponse, authorizedProviders, compositionRequest, redeploy)
 	if err != nil {
 		switch e := err.(type) {
@@ -362,6 +377,10 @@ func handleRequestApproval(ctx context.Context, validationResponse *pb.Validatio
 	result.AuthorizedProviders = make(map[string]string)
 	result.AuthorizedProviders = userTargets
 	result.JobId = compositionRequest.JobName
+
+	activeJobsMutex.Lock()
+	activeJobs[jobKey] = compositionRequest.JobName
+	activeJobsMutex.Unlock()
 
 	c.SendRequestApprovalResponse(ctx, result)
 }

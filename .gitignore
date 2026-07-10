@@ -37,3 +37,6 @@ datasets/*.csv
 
 *.drawio.bkp
 *.drawio.dtmp
+
+# Local-only implementation log (never staged)
+notes/
