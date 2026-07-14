@@ -195,6 +195,11 @@ func deployJob(ctx context.Context, msChain []mschain.MicroserviceMetadata, jobN
 				{Name: "OC_AGENT_HOST", Value: tracingHost},
 				{Name: "NR_OF_DATA_PROVIDERS", Value: strconv.Itoa(nrOfDataProviders)},
 				{Name: "ANON_DIR", Value: "/shared"},
+				{Name: "REQUEST_USER", Value: compositionRequest.GetUser().GetUserName()},
+				{Name: "REQUEST_TYPE", Value: compositionRequest.RequestType},
+				{Name: "LOCAL_JOB_NAME", Value: jobName},
+				// Port scheme: sidecar = firstPortMicroservice - 1, policy gateway = firstPortMicroservice - 2. Verify no collaborator/helper port collision before merge.
+				{Name: "GATEWAY_PORT", Value: strconv.Itoa(firstPortMicroservice - 2)},
 			},
 			VolumeMounts: []v1.VolumeMount{
 				{

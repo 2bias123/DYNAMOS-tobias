@@ -59,12 +59,20 @@ type Options struct {
 	Graph     bool `json:"graph"`
 }
 
+type StateDirectives struct {
+	Allowed          bool   `json:"allowed"`
+	RetentionSeconds int64  `json:"retentionSeconds"`
+	ResumeAllowed    bool   `json:"resumeAllowed"`
+	OnRevocation     string `json:"onRevocation"`
+}
+
 type Relation struct {
-	ID                      string   `json:"ID"`
-	RequestTypes            []string `json:"requestTypes"`
-	DataSets                []string `json:"dataSets"`
-	AllowedArchetypes       []string `json:"allowedArchetypes"`
-	AllowedComputeProviders []string `json:"allowedComputeProviders"`
+	ID                      string           `json:"ID"`
+	RequestTypes            []string         `json:"requestTypes"`
+	DataSets                []string         `json:"dataSets"`
+	AllowedArchetypes       []string         `json:"allowedArchetypes"`
+	AllowedComputeProviders []string         `json:"allowedComputeProviders"`
+	StateDirectives         *StateDirectives `json:"stateDirectives,omitempty"`
 }
 
 type Agreement struct {
