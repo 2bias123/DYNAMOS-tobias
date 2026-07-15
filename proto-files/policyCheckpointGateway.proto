@@ -1,0 +1,77 @@
+syntax = "proto3";
+
+package dynamos;
+
+option go_package = "github.com/Jorrit05/DYNAMOS/pkg/proto";
+import "google/protobuf/empty.proto";
+
+// Chain-local enforcement component for intermediate state.
+// Application-agnostic: payloads are opaque bytes.
+service PolicyCheckpointGateway {
+    rpc RequestStateWrite(StateWriteRequest) returns (StateDecision);
+    rpc ValidateStateRead(StateReadRequest) returns (StateReadResponse);
+    rpc SubscribeStateEvents(SubscribeRequest) returns (stream StateEvent);
+    rpc Shutdown(ShutdownRequest) returns (google.protobuf.Empty);
+}
+
+message Identity {
+    string steward        = 1;
+    string user           = 2;
+    string request_type   = 3;
+    string job_id         = 4;
+    string local_job_name = 5;
+}
+
+message StateWriteRequest {
+    Identity identity    = 1;
+    string   state_key   = 2;
+    string   state_class = 3;
+    bytes    payload     = 4;
+}
+
+message StateDecision {
+    bool   allowed                     = 1;
+    string reason                      = 2;
+    int64  retention_seconds_remaining = 3;
+    string agreement_hash              = 4;
+    int64  written_unix_seconds        = 5;
+}
+
+message StateReadRequest {
+    Identity identity    = 1;
+    string   state_key   = 2;
+    string   state_class = 3;
+}
+
+message StateReadResponse {
+    bool   allowed                     = 1;
+    string reason                      = 2;
+    bytes  payload                     = 3;
+    int64  retention_seconds_remaining = 4;
+    string agreement_hash              = 5;
+    int64  written_unix_seconds        = 6;
+}
+
+message SubscribeRequest {
+    Identity identity      = 1;
+    string   subscriber_id = 2;
+}
+
+message StateEvent {
+    enum Kind {
+        UNKNOWN           = 0;
+        PURGE             = 1;
+        FREEZE            = 2; // reserved; not currently emitted
+        AGREEMENT_CHANGED = 3;
+    }
+    Kind   kind           = 1;
+    string state_key      = 2; // empty = all keys
+    string state_class    = 3; // empty = all classes
+    string reason         = 4;
+    string agreement_hash = 5;
+}
+
+message ShutdownRequest {
+    Identity identity = 1;
+    string   reason   = 2;
+}
