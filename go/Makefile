@@ -1,6 +1,6 @@
 
 # Use Bash shell instead of default /bin/sh to support trap and extended features
-SHELL := /bin/bash
+SHELL := /usr/bin/env bash
 # Replace slashes in the current Git branch name with dashes (e.g., issue/123 -> issue-123)
 branch_name := $(shell git rev-parse --abbrev-ref HEAD | sed 's/\//-/g')
 # List of SQL-based microservices to build and push
@@ -8,7 +8,7 @@ sql_microservices := sql-algorithm sql-anonymize sql-aggregate sql-test
 # List of DYNAMOS core services
 dynamos := sidecar policy-enforcer orchestrator agent api-gateway policy-checkpoint-gateway
 # Docker Hub account for tagging and pushing images
-dockerhub_account := tamjiyan
+dockerhub_account := dynamos1
 
 # Prepare Go project dependencies
 # Clean and verify Go module dependencies
@@ -58,19 +58,28 @@ define build_and_push
 			-t $(dockerhub_account)/$@:latest \
 			./cmd/$@/)
 	
-	docker push $(dockerhub_account)/$@:$(branch_name)
-	docker push $(dockerhub_account)/$@:latest
+
 endef
 
 # Rule to build and push Docker images for each DYNAMOS service
 # Depends on 'prepare' and 'proto' steps
 # Use the defined build_and_push rule to build and push each service
-$(dynamos): prepare proto
+$(dynamos): prepare
 	$(call build_and_push)
 
 # Same as above, but for the SQL-based microservices
-$(sql_microservices): prepare proto
+$(sql_microservices): prepare
 	$(call build_and_push)
+
+# The agent injects chain containers under the repository name in
+# MICROSERVICE_REPOSITORY_NAME (tamjiyan on the steward deployments), so the
+# locally built gateway must also exist under that name inside the kind node.
+# Local tag + kind load only; nothing is pushed.
+chain_account := tamjiyan
+
+policy-checkpoint-gateway-kind: policy-checkpoint-gateway
+	docker tag $(dockerhub_account)/policy-checkpoint-gateway:latest $(chain_account)/policy-checkpoint-gateway:latest
+	kind load docker-image $(chain_account)/policy-checkpoint-gateway:latest --name kind
 
 # Build and push all services
 all: $(dynamos) $(sql_microservices)
@@ -82,4 +91,4 @@ sql_microservices: $(sql_microservices)
 # This prevents make from being misled by a file or directory that has the same name as the target.
 # For example, if a file named "prepare" or "proto" exists, make might think it doesn't need to run the commands again.
 # By declaring them .PHONY, make will always execute the associated commands when these targets are invoked.
-.PHONY: all prepare proto $(dynamos) $(sql_microservices)
+.PHONY: all prepare proto $(dynamos) $(sql_microservices) policy-checkpoint-gateway-kind

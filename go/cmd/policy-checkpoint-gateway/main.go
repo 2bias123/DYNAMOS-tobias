@@ -18,6 +18,8 @@ import (
 
 var logger = lib.InitLogger(logLevel)
 
+const lockCheckInterval = 10 * time.Second
+
 func newGatewayServer(store *Store, identity *pb.Identity) *gatewayServer {
 	return &gatewayServer{
 		store:    store,
@@ -55,6 +57,10 @@ func (g *gatewayServer) inactivityWatch(timeout time.Duration) {
 			}
 			timer.Reset(timeout)
 		case <-timer.C:
+			if g.subscribers.Load() > 0 {
+				timer.Reset(timeout)
+				continue
+			}
 			logger.Sugar().Infof("Inactivity timeout (%s) reached, stopping gateway", timeout)
 			g.closeStop()
 			return
@@ -137,6 +143,38 @@ func acquireLock(path string) (*os.File, error) {
 	return f, nil
 }
 
+// lockLost reports whether the held lock no longer guards the state volume.
+// A flock cannot be taken from a live fd, but if the lock file is removed or
+// replaced, another process can lock the new inode and exclusivity is gone.
+// Any stat failure counts as lost.
+func lockLost(f *os.File, path string) bool {
+	held, err := f.Stat()
+	if err != nil {
+		return true
+	}
+	current, err := os.Stat(path)
+	if err != nil {
+		return true
+	}
+	return !os.SameFile(held, current)
+}
+
+func watchLock(g *gatewayServer, f *os.File, path string, interval time.Duration) {
+	ticker := time.NewTicker(interval)
+	defer ticker.Stop()
+	for {
+		select {
+		case <-ticker.C:
+			if lockLost(f, path) {
+				g.audit(auditRecord{Op: "lock_lost", Reason: "state lock file removed or replaced", Identity: auditIdentityOf(g.identity)})
+				logger.Sugar().Fatalf("State lock lost, exiting")
+			}
+		case <-g.stop:
+			return
+		}
+	}
+}
+
 func releaseLock(f *os.File) {
 	if f == nil {
 		return
@@ -167,7 +205,8 @@ func main() {
 
 	g := newGatewayServer(store, cfg.identity)
 
-	lockFile, err := acquireLock(filepath.Join(cfg.stateDir, ".lock"))
+	lockPath := filepath.Join(cfg.stateDir, ".lock")
+	lockFile, err := acquireLock(lockPath)
 	if err != nil {
 		g.audit(auditRecord{Op: "lock_conflict", Reason: err.Error(), Identity: auditIdentityOf(cfg.identity)})
 		logger.Sugar().Fatalf("Failed to acquire state lock: %v", err)
@@ -179,6 +218,7 @@ func main() {
 	finished := make(chan struct{})
 	go stopGateway(grpcServer, g, lockFile, finished)
 	go g.inactivityWatch(cfg.inactivity)
+	go watchLock(g, lockFile, lockPath, lockCheckInterval)
 
 	if err := grpcServer.Serve(lis); err != nil {
 		logger.Sugar().Fatalw("failed to serve: %v", err)

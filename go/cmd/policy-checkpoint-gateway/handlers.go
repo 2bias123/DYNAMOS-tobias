@@ -5,6 +5,7 @@ import (
 	"errors"
 	"os"
 	"sync"
+	"sync/atomic"
 	"time"
 
 	pb "github.com/Jorrit05/DYNAMOS/pkg/proto"
@@ -22,6 +23,9 @@ type gatewayServer struct {
 	stop     chan struct{}
 	stopOnce sync.Once
 	activity chan struct{}
+	// open SubscribeStateEvents streams; the inactivity timeout must not
+	// fire while a dependent MS still holds its event stream
+	subscribers atomic.Int64
 }
 
 func (g *gatewayServer) audit(rec auditRecord) {
@@ -129,6 +133,13 @@ func (g *gatewayServer) SubscribeStateEvents(req *pb.SubscribeRequest, stream pb
 	if err := g.verifyIdentity(req.GetIdentity()); err != nil {
 		return err
 	}
+
+	g.subscribers.Add(1)
+	defer func() {
+		g.subscribers.Add(-1)
+		// restart the inactivity window from the moment the stream closes
+		g.touchActivity()
+	}()
 
 	if err := stream.Send(&pb.StateEvent{Kind: pb.StateEvent_AGREEMENT_CHANGED, Reason: "stub"}); err != nil {
 		return err

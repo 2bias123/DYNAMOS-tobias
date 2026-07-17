@@ -7,6 +7,7 @@ import (
 	"path/filepath"
 	"strings"
 	"testing"
+	"time"
 
 	pb "github.com/Jorrit05/DYNAMOS/pkg/proto"
 	"google.golang.org/grpc"
@@ -133,6 +134,37 @@ func TestSubscribeStateEventsInitialEvent(t *testing.T) {
 	ev, err := stream.Recv()
 	assert.NilError(t, err)
 	assert.Equal(t, ev.GetKind(), pb.StateEvent_AGREEMENT_CHANGED)
+}
+
+func TestInactivitySuppressedWhileSubscribed(t *testing.T) {
+	client, g := newTestServer(t)
+
+	const timeout = 50 * time.Millisecond
+	go g.inactivityWatch(timeout)
+
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	stream, err := client.SubscribeStateEvents(ctx, &pb.SubscribeRequest{
+		Identity: testIdentity(), SubscriberId: "sub1",
+	})
+	assert.NilError(t, err)
+	_, err = stream.Recv()
+	assert.NilError(t, err)
+
+	time.Sleep(4 * timeout)
+	select {
+	case <-g.stop:
+		t.Fatal("gateway stopped while a subscribe stream was open")
+	default:
+	}
+
+	cancel()
+	select {
+	case <-g.stop:
+	case <-time.After(20 * timeout):
+		t.Fatal("gateway did not stop after the last subscriber left")
+	}
 }
 
 func TestShutdownClosesStop(t *testing.T) {
