@@ -13,6 +13,7 @@ from google.protobuf.struct_pb2 import Struct
 from dynamos.ms_init import NewConfiguration
 from dynamos.signal_flow import signal_continuation, signal_wait
 from dynamos.logger import InitLogger
+from dynamos.gateway_lifecycle import connect_gateway, shutdown_gateway
 import rabbitMQ_pb2 as rabbitTypes
 
 from google.protobuf.empty_pb2 import Empty
@@ -41,6 +42,8 @@ wait_for_setup_event = threading.Event()
 wait_for_setup_condition = threading.Condition()
 
 ms_config = None
+gateway = None
+purge_pending = threading.Event()
 ANON_DIR = os.getenv("ANON_DIR", "/shared")
 DATA_CACHE = {}
 
@@ -230,6 +233,15 @@ class VFLClient():
 
 # ---  DYNAMOS Interface code At the Bottom --------
 
+# Policy purge from the gateway: drop the retained model state. The next
+# vflTrainRequest reinitializes the client from the incoming dataframe.
+def on_gateway_purge(event):
+    global vfl_client
+    purge_pending.set()
+    vfl_client = None
+    logger.warning("Policy purge: cleared in-memory client model")
+
+
 def request_handler(msComm: msCommTypes.MicroserviceCommunication,
                     ctx: Context = None):
     global ms_config
@@ -286,6 +298,7 @@ def request_handler(msComm: msCommTypes.MicroserviceCommunication,
                         logger.info("Initializing VFLClient from incoming dataframe.")
                         vfl_client = VFLClient(df)
                         vfl_client.columns = current_cols
+                        purge_pending.clear()
                     else:
                         if df.shape[1] != vfl_client.model.fc1.in_features:
                             logger.warning(f"Feature count changed {vfl_client.model.fc1.in_features} -> {df.shape[1]}. Reinitializing client model.")
@@ -304,14 +317,22 @@ def request_handler(msComm: msCommTypes.MicroserviceCommunication,
                     data = Struct()
                     data.update({"embeddings": embeddings})
                 except Exception as e:
-                    logger.error(f"Unexpected error during train_model: {e}")
+                    if purge_pending.is_set():
+                        purge_pending.clear()
+                        logger.warning("Round aborted by policy purge")
+                    else:
+                        logger.error(f"Unexpected error during train_model: {e}")
                     data = Struct()
 
                 ms_config.next_client.ms_comm.send_data(msComm, data, dict(msComm.metadata))
                 return Empty()
             elif request.type == "vflGradientDescentRequest":
                 if vfl_client is None:
-                    logger.error("Received vflGradientDescentRequest before vflTrainRequest initialized vfl_client")
+                    if purge_pending.is_set():
+                        purge_pending.clear()
+                        logger.warning("Round aborted by policy purge; awaiting next vflTrainRequest to reinitialize")
+                    else:
+                        logger.error("Received vflGradientDescentRequest before vflTrainRequest initialized vfl_client")
                     data = Struct()
                     ms_config.next_client.ms_comm.send_data(msComm, data, {})
                     return Empty()
@@ -332,7 +353,11 @@ def request_handler(msComm: msCommTypes.MicroserviceCommunication,
                 try:
                     vfl_client.gradient_descent(gradients)
                 except Exception as e:
-                    logger.error(f"Unexpected error: {e}")
+                    if purge_pending.is_set():
+                        purge_pending.clear()
+                        logger.warning("Round aborted by policy purge")
+                    else:
+                        logger.error(f"Unexpected error: {e}")
 
                 try:
                     data = Struct()
@@ -361,6 +386,7 @@ def main():
     global config
     global ms_config
     global vfl_client
+    global gateway
 
     vfl_client = None
     sidecar_port = int(os.getenv("SIDECAR_PORT", "50051"))
@@ -377,6 +403,8 @@ def main():
     ms_config = NewConfiguration(
         config.service_name, config.grpc_addr, request_handler)
 
+    gateway = connect_gateway(config.service_name, on_gateway_purge)
+
     signal_continuation(wait_for_setup_event, wait_for_setup_condition)
 
     try:
@@ -385,6 +413,7 @@ def main():
         logger.debug("KeyboardInterrupt received, stopping server...")
         signal_continuation(stop_event, stop_microservice_condition)
 
+    shutdown_gateway(gateway, "ms_exit")
     ms_config.stop(2)
     logger.debug(f"Exiting {config.service_name}")
     sys.exit(0)

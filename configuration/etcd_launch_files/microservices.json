@@ -106,13 +106,15 @@
     "name": "vfl-train-model-demo",
     "label": "computeProvider",
     "allowedOutputs": ["vfl-train-demo"],
-    "invalidArchetypes": []
+    "invalidArchetypes": [],
+    "requiresGateway": true
   },
   {
     "name": "vfl-train-demo",
     "label": "computeProvider",
     "allowedOutputs": [],
-    "invalidArchetypes": []
+    "invalidArchetypes": [],
+    "requiresGateway": true
   },
   {
     "name": "anonymize-test",

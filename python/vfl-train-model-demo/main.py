@@ -15,6 +15,7 @@ from google.protobuf.struct_pb2 import Struct
 from dynamos.ms_init import NewConfiguration
 from dynamos.signal_flow import signal_continuation, signal_wait
 from dynamos.logger import InitLogger
+from dynamos.gateway_lifecycle import connect_gateway, shutdown_gateway
 import rabbitMQ_pb2 as rabbitTypes
 
 from google.protobuf.empty_pb2 import Empty
@@ -44,6 +45,8 @@ wait_for_setup_condition = threading.Condition()
 
 ms_config = None
 vfl_server = None
+gateway = None
+purge_pending = threading.Event()
 
 # --- END DYNAMOS Interface code At the TOP ----------------------
 
@@ -289,6 +292,15 @@ class VFLServer():
         print(f"Server state loaded from {filepath}")
 
 
+# Policy purge from the gateway: drop the retained aggregator state. The next
+# vflAggregateRequest reinitializes the server model from scratch.
+def on_gateway_purge(event):
+    global vfl_server
+    purge_pending.set()
+    vfl_server = None
+    logger.warning("Policy purge: cleared in-memory server model")
+
+
 def handleAggregateRequest(msComm):
     global ms_config
     global vfl_server
@@ -332,7 +344,23 @@ def handleAggregateRequest(msComm):
     except Exception as e:
         logger.warning(f"[SERVER] Could not log DP verification stats: {e}")
 
-    data = vfl_server.aggregate_fit(clients_embeddings, backtrack)
+    if vfl_server is None:
+        if purge_pending.is_set():
+            purge_pending.clear()
+            logger.warning("Server model was purged by policy; reinitializing from scratch")
+        else:
+            logger.warning("Server model missing; reinitializing")
+        vfl_server = VFLServer(load_data())
+
+    try:
+        data = vfl_server.aggregate_fit(clients_embeddings, backtrack)
+    except Exception as e:
+        if purge_pending.is_set():
+            purge_pending.clear()
+            logger.warning("Round aborted by policy purge")
+        else:
+            logger.error(f"aggregate_fit failed: {e}")
+        data = Struct()
 
     ms_config.next_client.ms_comm.send_data(msComm, data, dict(msComm.metadata))
 
@@ -389,6 +417,7 @@ def main():
     global config
     global ms_config
     global vfl_server
+    global gateway
 
     # Wait for sidecar to be up
     sidecar_port = int(os.getenv("SIDECAR_PORT", "50051"))
@@ -409,6 +438,8 @@ def main():
     ms_config = NewConfiguration(
         config.service_name, config.grpc_addr, request_handler)
 
+    gateway = connect_gateway(config.service_name, on_gateway_purge)
+
     # Signal the message handler that all connections have been created
     signal_continuation(wait_for_setup_event, wait_for_setup_condition)
 
@@ -420,6 +451,7 @@ def main():
         logger.debug("KeyboardInterrupt received, stopping server...")
         signal_continuation(stop_event, stop_microservice_condition)
 
+    shutdown_gateway(gateway, "ms_exit")
     ms_config.stop(2)
     logger.debug(f"Exiting {config.service_name}")
     sys.exit(0)
