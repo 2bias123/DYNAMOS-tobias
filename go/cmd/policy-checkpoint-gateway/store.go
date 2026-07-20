@@ -9,6 +9,7 @@ import (
 	"path/filepath"
 	"regexp"
 	"sync"
+	"time"
 )
 
 // Store persists intermediate state and its audit records under a single
@@ -36,11 +37,15 @@ type auditIdentity struct {
 
 type auditRecord struct {
 	Op                 string        `json:"op"`
+	Decision           string        `json:"decision,omitempty"`
 	Reason             string        `json:"reason,omitempty"`
 	Identity           auditIdentity `json:"identity"`
 	StateClass         string        `json:"stateClass,omitempty"`
 	StateKey           string        `json:"stateKey,omitempty"`
 	WrittenUnixSeconds int64         `json:"writtenUnixSeconds,omitempty"`
+	AgreementHash      string        `json:"agreementHash,omitempty"`
+	PolicySource       string        `json:"policySource,omitempty"`
+	CacheAgeMs         *int64        `json:"cacheAgeMs,omitempty"`
 }
 
 // nameRe constrains a state class or key to a single safe path segment: no
@@ -112,6 +117,19 @@ func (s *Store) Read(class, key string) ([]byte, error) {
 		return nil, fmt.Errorf("%w: class=%q key=%q", errInvalidName, class, key)
 	}
 	return os.ReadFile(filepath.Join(s.dataDir, class, key+".bin"))
+}
+
+// WrittenAt returns when the key was last written, or an error matching
+// os.ErrNotExist when it was never written.
+func (s *Store) WrittenAt(class, key string) (time.Time, error) {
+	if !nameRe.MatchString(class) || !nameRe.MatchString(key) {
+		return time.Time{}, fmt.Errorf("%w: class=%q key=%q", errInvalidName, class, key)
+	}
+	fi, err := os.Stat(filepath.Join(s.dataDir, class, key+".bin"))
+	if err != nil {
+		return time.Time{}, err
+	}
+	return fi.ModTime(), nil
 }
 
 // Audit emits one NDJSON decision record to the audit sink.

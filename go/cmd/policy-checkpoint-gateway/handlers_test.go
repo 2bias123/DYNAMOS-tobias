@@ -9,6 +9,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/Jorrit05/DYNAMOS/pkg/api"
 	pb "github.com/Jorrit05/DYNAMOS/pkg/proto"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
@@ -36,6 +37,19 @@ func newTestServer(t *testing.T) (pb.PolicyCheckpointGatewayClient, *gatewayServ
 	store.auditW = &bytes.Buffer{} // keep audit lines out of test stdout
 
 	g := newGatewayServer(store, testIdentity())
+	g.policy = newPolicyCache(60 * time.Second)
+	agr := &api.Agreement{
+		Name: "uva",
+		Relations: map[string]api.Relation{
+			"u@x": {
+				RequestTypes:    []string{"sqlDataRequest"},
+				StateDirectives: &api.StateDirectives{Allowed: true, RetentionSeconds: 900, ResumeAllowed: true, OnRevocation: "purge"},
+			},
+		},
+	}
+	hash, err := canonicalHash(agr)
+	assert.NilError(t, err)
+	g.policy.update(agr, hash)
 
 	lis := bufconn.Listen(1024 * 1024)
 	srv := grpc.NewServer()
@@ -165,6 +179,69 @@ func TestInactivitySuppressedWhileSubscribed(t *testing.T) {
 	case <-time.After(20 * timeout):
 		t.Fatal("gateway did not stop after the last subscriber left")
 	}
+}
+
+func TestWriteDeniedWhenCacheStale(t *testing.T) {
+	client, g := newTestServer(t)
+
+	g.policy.mu.Lock()
+	g.policy.lastFreshRead = time.Now().Add(-2 * time.Minute)
+	g.policy.mu.Unlock()
+
+	resp, err := client.RequestStateWrite(context.Background(), &pb.StateWriteRequest{
+		Identity: testIdentity(), StateClass: "kv", StateKey: "k1", Payload: []byte{1},
+	})
+	assert.NilError(t, err)
+	assert.Equal(t, resp.Allowed, false)
+	assert.Equal(t, resp.Reason, "cache stale; fail closed")
+
+	_, readErr := g.store.Read("kv", "k1")
+	assert.Assert(t, readErr != nil) // denied payload never reached disk
+}
+
+func TestWriteDeniedAfterPolicyFlip(t *testing.T) {
+	client, g := newTestServer(t)
+
+	flipped := &api.Agreement{
+		Name: "uva",
+		Relations: map[string]api.Relation{
+			"u@x": {
+				RequestTypes:    []string{"sqlDataRequest"},
+				StateDirectives: &api.StateDirectives{Allowed: false, RetentionSeconds: 900, ResumeAllowed: true, OnRevocation: "purge"},
+			},
+		},
+	}
+	hash, err := canonicalHash(flipped)
+	assert.NilError(t, err)
+	oldHash, _ := g.policy.update(flipped, hash)
+	assert.Assert(t, oldHash != hash)
+
+	resp, err := client.RequestStateWrite(context.Background(), &pb.StateWriteRequest{
+		Identity: testIdentity(), StateClass: "kv", StateKey: "k1", Payload: []byte{1},
+	})
+	assert.NilError(t, err)
+	assert.Equal(t, resp.Allowed, false)
+	assert.Equal(t, resp.Reason, "allowed = false")
+	assert.Equal(t, resp.AgreementHash, hash)
+}
+
+func TestUnregisteredIdentityDenied(t *testing.T) {
+	client, g := newTestServer(t)
+	g.regJobName = "job-1"
+	g.source = &mockSource{} // registration key absent
+
+	_, err := client.RequestStateWrite(context.Background(), &pb.StateWriteRequest{
+		Identity: testIdentity(), StateClass: "kv", StateKey: "k1", Payload: []byte{1},
+	})
+	assert.Equal(t, status.Code(err), codes.PermissionDenied)
+
+	// registration appears (agent wrote it): the next RPC must succeed
+	g.source = &mockSource{getKvs: [][]byte{[]byte(`{}`)}}
+	resp, err := client.RequestStateWrite(context.Background(), &pb.StateWriteRequest{
+		Identity: testIdentity(), StateClass: "kv", StateKey: "k1", Payload: []byte{1},
+	})
+	assert.NilError(t, err)
+	assert.Equal(t, resp.Allowed, true)
 }
 
 func TestShutdownClosesStop(t *testing.T) {

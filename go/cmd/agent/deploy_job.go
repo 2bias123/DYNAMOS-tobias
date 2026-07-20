@@ -4,8 +4,8 @@ import (
 	"context"
 	"fmt"
 	"os"
-	"strconv"
 	"sort"
+	"strconv"
 	"strings"
 
 	"github.com/Jorrit05/DYNAMOS/pkg/etcd"
@@ -20,10 +20,10 @@ import (
 // Necessary for port selection. Original DYNAMOS just does last port +1 i think, but this caused issues for me so i hardcoded it
 func sortMicroserviceChain(msChain []mschain.MicroserviceMetadata) {
 	priority := map[string]int{
-		"anonymize-test":        0,
-		"differential-p-test":   1,
-		"vfl-train-model-demo":  2,
-		"vfl-train-demo":        3,
+		"anonymize-test":       0,
+		"differential-p-test":  1,
+		"vfl-train-model-demo": 2,
+		"vfl-train-demo":       3,
 	}
 
 	sort.SliceStable(msChain, func(i, j int) bool {
@@ -174,7 +174,7 @@ func deployJob(ctx context.Context, msChain []mschain.MicroserviceMetadata, jobN
 
 		repositoryName := os.Getenv("MICROSERVICE_REPOSITORY_NAME")
 		if repositoryName == "" {
-			repositoryName = "tamjiyan" // you changed this
+			repositoryName = "dynamos1" // you changed this
 		}
 
 		fullImage := fmt.Sprintf("%s/%s:%s", repositoryName, microservice.Name, microserviceTag)
@@ -204,7 +204,7 @@ func deployJob(ctx context.Context, msChain []mschain.MicroserviceMetadata, jobN
 			VolumeMounts: []v1.VolumeMount{
 				{
 					Name:      "shared-data",
-            		MountPath: "/shared",
+					MountPath: "/shared",
 				},
 			},
 		}
@@ -214,6 +214,21 @@ func deployJob(ctx context.Context, msChain []mschain.MicroserviceMetadata, jobN
 	}
 
 	job.Spec.Template.Spec.Containers = append(job.Spec.Template.Spec.Containers, addSidecar())
+
+	requiresGateway := false
+	for _, ms := range msChain {
+		if ms.RequiresGateway {
+			requiresGateway = true
+			break
+		}
+	}
+	if requiresGateway {
+		job.Spec.Template.Spec.Volumes = append(job.Spec.Template.Spec.Volumes, v1.Volume{
+			Name:         "gateway-state",
+			VolumeSource: v1.VolumeSource{EmptyDir: &v1.EmptyDirVolumeSource{}},
+		})
+		job.Spec.Template.Spec.Containers = append(job.Spec.Template.Spec.Containers, addGateway(dataStewardName, jobName, compositionRequest))
+	}
 
 	if clientSet == nil {
 		clientSet = getKubeClient()
@@ -262,6 +277,37 @@ func addSidecar() v1.Container {
 					},
 				},
 			},
+		},
+	}
+}
+
+func addGateway(dataStewardName, jobName string, compositionRequest *pb.CompositionRequest) v1.Container {
+	repostingName := os.Getenv("MICROSERVICE_REPOSITORY_NAME")
+	if repostingName == "" {
+		repostingName = "dynamos1"
+	}
+
+	gatewayName := "policy-checkpoint-gateway"
+	fullImage := fmt.Sprintf("%s/%s:%s", repostingName, gatewayName, getMicroserviceTag(gatewayName))
+
+	return v1.Container{
+		Name:            gatewayName,
+		Image:           fullImage,
+		ImagePullPolicy: v1.PullIfNotPresent,
+		Env: []v1.EnvVar{
+			{Name: "DATA_STEWARD_NAME", Value: strings.ToUpper(dataStewardName)},
+			{Name: "REQUEST_USER", Value: compositionRequest.GetUser().GetUserName()},
+			{Name: "REQUEST_TYPE", Value: compositionRequest.RequestType},
+			{Name: "JOB_NAME", Value: jobName},
+			{Name: "LOCAL_JOB_NAME", Value: jobName},
+			{Name: "REQUEST_JOB_NAME", Value: compositionRequest.JobName},
+			{Name: "STATE_DIR", Value: "/state"},
+			{Name: "GATEWAY_PORT", Value: strconv.Itoa(firstPortMicroservice - 2)},
+			{Name: "OC_AGENT_HOST", Value: tracingHost},
+			{Name: "INACTIVITY_TIMEOUT_SECONDS", Value: "300"},
+		},
+		VolumeMounts: []v1.VolumeMount{
+			{Name: "gateway-state", MountPath: "/state"},
 		},
 	}
 }

@@ -10,6 +10,7 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/Jorrit05/DYNAMOS/pkg/etcd"
 	"github.com/Jorrit05/DYNAMOS/pkg/lib"
 	pb "github.com/Jorrit05/DYNAMOS/pkg/proto"
 	"go.opencensus.io/plugin/ocgrpc"
@@ -71,10 +72,13 @@ func (g *gatewayServer) inactivityWatch(timeout time.Duration) {
 }
 
 type gatewayConfig struct {
-	identity   *pb.Identity
-	stateDir   string
-	port       int
-	inactivity time.Duration
+	identity     *pb.Identity
+	stateDir     string
+	port         int
+	inactivity   time.Duration
+	pollInterval time.Duration
+	maxStaleness time.Duration
+	regJobName   string
 }
 
 func mustEnv(key string) string {
@@ -108,10 +112,25 @@ func loadConfig() gatewayConfig {
 			JobId:        mustEnv("JOB_NAME"),
 			LocalJobName: mustEnv("LOCAL_JOB_NAME"),
 		},
-		stateDir:   mustEnv("STATE_DIR"),
-		port:       port,
-		inactivity: inactivity,
+		stateDir:     mustEnv("STATE_DIR"),
+		port:         port,
+		inactivity:   inactivity,
+		pollInterval: envSeconds("AGREEMENT_POLL_INTERVAL_SECONDS", 30),
+		maxStaleness: envSeconds("MAX_AGREEMENT_STALENESS_SECONDS", 60),
+		regJobName:   os.Getenv("REQUEST_JOB_NAME"),
 	}
+}
+
+func envSeconds(key string, def int) time.Duration {
+	v := os.Getenv(key)
+	if v == "" {
+		return time.Duration(def) * time.Second
+	}
+	secs, err := strconv.Atoi(v)
+	if err != nil {
+		logger.Sugar().Fatalf("Invalid %s: %v", key, err)
+	}
+	return time.Duration(secs) * time.Second
 }
 
 func setupListener(port int) net.Listener {
@@ -204,6 +223,12 @@ func main() {
 	}
 
 	g := newGatewayServer(store, cfg.identity)
+	g.policy = newPolicyCache(cfg.maxStaleness)
+	g.regJobName = cfg.regJobName
+
+	etcdClient := etcd.GetEtcdClient(etcdEndpoints)
+	g.source = etcdClient
+	go syncAgreement(g.stop, etcdClient, agreementKey(cfg.identity.GetSteward()), g.policy, cfg.pollInterval)
 
 	lockPath := filepath.Join(cfg.stateDir, ".lock")
 	lockFile, err := acquireLock(lockPath)

@@ -1,0 +1,30 @@
+{
+    "name": "clientthree",
+    "relations": {
+        "jake.jongejans@student.uva.nl": {
+            "ID": "GUID-state-aware",
+            "requestTypes": [
+                "vflTrainRequest",
+                "vflTrainModelRequest"
+            ],
+            "allowedArchetypes": [
+                "computeToData"
+            ],
+            "allowedComputeProviders": [
+                "clientthree"
+            ],
+            "stateDirectives": {
+                "allowed": true,
+                "retentionSeconds": 900,
+                "resumeAllowed": true,
+                "onRevocation": "purge"
+            }
+        }
+    },
+    "computeProviders": [
+        "clientthree"
+    ],
+    "archetypes": [
+        "computeToData"
+    ]
+}
