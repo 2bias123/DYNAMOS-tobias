@@ -100,9 +100,10 @@ type Archetype struct {
 }
 
 type MicroserviceMetadata struct {
-	Name           string   `json:"name"`
-	Label          string   `json:"label"`
-	AllowedOutputs []string `json:"allowedOutputs"`
+	Name            string   `json:"name"`
+	Label           string   `json:"label"`
+	AllowedOutputs  []string `json:"allowedOutputs"`
+	RequiresGateway bool     `json:"requiresGateway,omitempty"`
 }
 
 type OptionalServices struct {

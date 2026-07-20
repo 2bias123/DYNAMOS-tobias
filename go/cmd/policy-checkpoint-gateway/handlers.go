@@ -105,9 +105,9 @@ func (g *gatewayServer) authorize(id *pb.Identity) error {
 	return nil
 }
 
-func (g *gatewayServer) auditDecision(op, verdict string, d decision, class, key string, written int64, id *pb.Identity) {
+func decisionRecord(op, verdict string, d decision, class, key string, written int64, id *pb.Identity) auditRecord {
 	age := d.AgeMs
-	g.audit(auditRecord{
+	return auditRecord{
 		Op:                 op,
 		Decision:           verdict,
 		Reason:             d.Reason,
@@ -118,13 +118,21 @@ func (g *gatewayServer) auditDecision(op, verdict string, d decision, class, key
 		AgreementHash:      d.Hash,
 		PolicySource:       string(d.Source),
 		CacheAgeMs:         &age,
-	})
+	}
+}
+
+func (g *gatewayServer) auditDecision(op, verdict string, d decision, class, key string, written int64, id *pb.Identity) {
+	g.audit(decisionRecord(op, verdict, d, class, key, written, id))
 }
 
 func (g *gatewayServer) RequestStateWrite(ctx context.Context, req *pb.StateWriteRequest) (*pb.StateDecision, error) {
 	g.touchActivity()
 	if err := g.authorize(req.GetIdentity()); err != nil {
 		return nil, err
+	}
+
+	if err := g.store.ValidateNames(req.GetStateClass(), req.GetStateKey()); err != nil {
+		return nil, status.Error(codes.InvalidArgument, err.Error())
 	}
 
 	a, hash, src, ageMs := g.policy.snapshot()
@@ -134,16 +142,21 @@ func (g *gatewayServer) RequestStateWrite(ctx context.Context, req *pb.StateWrit
 		return &pb.StateDecision{Allowed: false, Reason: d.Reason, AgreementHash: d.Hash}, nil
 	}
 
+	// The audit record is appended and fsynced before the file appears, so
+	// every state file on disk has a preceding audit line. A crash in
+	// between leaves a recorded intent, never an unrecorded file; an
+	// unappendable audit refuses the write outright.
+	written := time.Now().Unix()
+	if err := g.store.Audit(decisionRecord("write", "ALLOW", d, req.GetStateClass(), req.GetStateKey(), written, req.GetIdentity())); err != nil {
+		logger.Sugar().Errorw("Audit append failed, refusing write", "err", err)
+		return nil, status.Error(codes.Internal, "audit unavailable; failing closed")
+	}
+
 	if err := g.store.Write(req.GetStateClass(), req.GetStateKey(), req.GetPayload()); err != nil {
-		if errors.Is(err, errInvalidName) {
-			return nil, status.Error(codes.InvalidArgument, err.Error())
-		}
 		logger.Sugar().Errorw("State write failed", "err", err)
 		return nil, status.Error(codes.Internal, "state write failed")
 	}
 
-	written := time.Now().Unix()
-	g.auditDecision("write", "ALLOW", d, req.GetStateClass(), req.GetStateKey(), written, req.GetIdentity())
 	return &pb.StateDecision{
 		Allowed:                   true,
 		RetentionSecondsRemaining: d.Retention,

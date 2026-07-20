@@ -13,15 +13,18 @@ import (
 )
 
 // Store persists intermediate state and its audit records under a single
-// state directory. In the cluster that directory is an emptyDir mount; in
-// tests it is a t.TempDir().
+// state directory. In the cluster that directory is the gateway's state
+// mount; in tests it is a t.TempDir(). State files live under data/ and the
+// audit log under audit/ — any future deletion sweep operates strictly under
+// data/ and must never touch the audit path.
 type Store struct {
-	dataDir string
-	// auditDir is created up front; the durable audit file written there is a
-	// later concern. For now audit records go to auditW only.
+	dataDir  string
 	auditDir string
-	auditW   io.Writer
-	auditMu  sync.Mutex
+	// Every audit record is dual-written: fsynced to auditF (the durable
+	// leg) and mirrored to auditW (stdout for log collection).
+	auditF  *os.File
+	auditW  io.Writer
+	auditMu sync.Mutex
 	// locks are process-local. Cross-pod exclusion on the same volume is the
 	// gateway's startup flock, not this map.
 	locks sync.Map
@@ -65,7 +68,20 @@ func NewStore(stateDir string) (*Store, error) {
 			return nil, fmt.Errorf("create state dir %s: %w", dir, err)
 		}
 	}
+	f, err := os.OpenFile(filepath.Join(s.auditDir, "audit.log"), os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0o644)
+	if err != nil {
+		return nil, fmt.Errorf("open audit log: %w", err)
+	}
+	s.auditF = f
 	return s, nil
+}
+
+// ValidateNames rejects class/key values that are not safe path segments.
+func (s *Store) ValidateNames(class, key string) error {
+	if !nameRe.MatchString(class) || !nameRe.MatchString(key) {
+		return fmt.Errorf("%w: class=%q key=%q", errInvalidName, class, key)
+	}
+	return nil
 }
 
 func (s *Store) keyLock(class, key string) *sync.Mutex {
@@ -132,7 +148,10 @@ func (s *Store) WrittenAt(class, key string) (time.Time, error) {
 	return fi.ModTime(), nil
 }
 
-// Audit emits one NDJSON decision record to the audit sink.
+// Audit emits one NDJSON decision record: appended and fsynced to the audit
+// file before the stdout mirror, so a record survives anything that happens
+// after it returns. Any failure is the caller's to treat as fatal for
+// operations that are about to create state.
 func (s *Store) Audit(rec auditRecord) error {
 	line, err := json.Marshal(rec)
 	if err != nil {
@@ -142,6 +161,14 @@ func (s *Store) Audit(rec auditRecord) error {
 
 	s.auditMu.Lock()
 	defer s.auditMu.Unlock()
+	if s.auditF != nil {
+		if _, err := s.auditF.Write(line); err != nil {
+			return fmt.Errorf("append audit: %w", err)
+		}
+		if err := s.auditF.Sync(); err != nil {
+			return fmt.Errorf("fsync audit: %w", err)
+		}
+	}
 	if _, err := s.auditW.Write(line); err != nil {
 		return fmt.Errorf("write audit: %w", err)
 	}
