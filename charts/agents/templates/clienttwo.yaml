@@ -114,18 +114,3 @@ spec:
               values:
                 - clienttwo
 
----
-
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: clienttwo-pvc
-  namespace: clienttwo
-spec:
-  volumeName: clienttwo-pv
-  accessModes:
-    - ReadWriteOnce   # Needed for multiple pods to mount simultaneously
-  resources:
-    requests:
-      storage: 5Gi    # Adjust size as needed
-  storageClassName: standard

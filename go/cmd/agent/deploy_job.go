@@ -222,16 +222,24 @@ func deployJob(ctx context.Context, msChain []mschain.MicroserviceMetadata, jobN
 			break
 		}
 	}
-	if requiresGateway {
-		job.Spec.Template.Spec.Volumes = append(job.Spec.Template.Spec.Volumes, v1.Volume{
-			Name:         "gateway-state",
-			VolumeSource: v1.VolumeSource{EmptyDir: &v1.EmptyDirVolumeSource{}},
-		})
-		job.Spec.Template.Spec.Containers = append(job.Spec.Template.Spec.Containers, addGateway(dataStewardName, jobName, compositionRequest))
-	}
 
 	if clientSet == nil {
 		clientSet = getKubeClient()
+	}
+
+	if requiresGateway {
+		pvcName := statePVCName(dataStewardName, compositionRequest.GetUser().GetUserName(), compositionRequest.RequestType)
+		if err := ensureStatePVC(ctx, clientSet.CoreV1().PersistentVolumeClaims(dataStewardName), pvcName); err != nil {
+			logger.Sugar().Errorf("failed to ensure state PVC %s: %v", pvcName, err)
+			return nil, err
+		}
+		job.Spec.Template.Spec.Volumes = append(job.Spec.Template.Spec.Volumes, v1.Volume{
+			Name: "gateway-state",
+			VolumeSource: v1.VolumeSource{
+				PersistentVolumeClaim: &v1.PersistentVolumeClaimVolumeSource{ClaimName: pvcName},
+			},
+		})
+		job.Spec.Template.Spec.Containers = append(job.Spec.Template.Spec.Containers, addGateway(dataStewardName, jobName, compositionRequest))
 	}
 
 	createdJob, err := clientSet.BatchV1().Jobs(dataStewardName).Create(ctx, job, metav1.CreateOptions{})

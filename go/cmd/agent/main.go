@@ -14,6 +14,7 @@ import (
 	"github.com/Jorrit05/DYNAMOS/pkg/lib"
 	"github.com/gorilla/handlers"
 	batchv1 "k8s.io/api/batch/v1"
+	"k8s.io/client-go/kubernetes"
 
 	clientv3 "go.etcd.io/etcd/client/v3"
 	"google.golang.org/grpc"
@@ -40,7 +41,7 @@ var (
 	queueInfoMap  = make(map[string]*pb.QueueInfo)
 	receiveMutex  = &sync.Mutex{}
 
-	clientSet = getKubeClient()
+	clientSet *kubernetes.Clientset
 )
 
 type dataResponse struct {
@@ -59,6 +60,8 @@ func main() {
 	if local && serviceName == "SURF" {
 		port = ":8083"
 	}
+
+	clientSet = getKubeClient()
 
 	_, err := lib.InitTracer(serviceName)
 	if err != nil {

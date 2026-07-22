@@ -114,18 +114,3 @@ spec:
               values:
                 - clientone
 
----
-
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: clientone-pvc
-  namespace: clientone
-spec:
-  volumeName: clientone-pv
-  accessModes:
-    - ReadWriteOnce   # Needed for multiple pods to mount simultaneously
-  resources:
-    requests:
-      storage: 5Gi    # Adjust size as needed
-  storageClassName: standard

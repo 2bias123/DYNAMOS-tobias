@@ -114,18 +114,3 @@ spec:
               values:
                 - server
 
----
-
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: server-pvc
-  namespace: server
-spec:
-  volumeName: server-pv
-  accessModes:
-    - ReadWriteOnce   # Needed for multiple pods to mount simultaneously
-  resources:
-    requests:
-      storage: 5Gi    # Adjust size as needed
-  storageClassName: standard

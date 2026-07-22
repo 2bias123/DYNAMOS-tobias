@@ -114,18 +114,3 @@ spec:
               values:
                 - clientthree
 
----
-
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: clientthree-pvc
-  namespace: clientthree
-spec:
-  volumeName: clientthree-pv
-  accessModes:
-    - ReadWriteOnce   # Needed for multiple pods to mount simultaneously
-  resources:
-    requests:
-      storage: 5Gi    # Adjust size as needed
-  storageClassName: standard
