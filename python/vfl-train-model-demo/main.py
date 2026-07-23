@@ -2,6 +2,7 @@ import pandas as pd
 import numpy as np
 import sys
 import os
+import io
 import json
 import socket
 import time
@@ -61,9 +62,11 @@ purge_pending = threading.Event()
 # --------------------------------
 
 
-DEFAULT_LEARNING_RATE = 0.1 
-DEFAULT_NOF_CLIENTS = 3  # TODO: make it dynamic 
-SERVER_CHECKPOINT_PATH = "server_checkpoint.pth"
+DEFAULT_LEARNING_RATE = 0.1
+DEFAULT_NOF_CLIENTS = 3  # TODO: make it dynamic
+# Gateway state key for the pre-shrink stash; separate from the per-round
+# "latest" slot so a backtrack stash never clobbers the resume checkpoint.
+PRESHRINK_STATE_KEY = "preshrink"
 
 # Just for testing, mark so I can see if it works
 def fp(s):
@@ -143,6 +146,7 @@ class VFLServer():
         # )
         self.optimizer = optim.Adam(self.model.parameters(), lr=DEFAULT_LEARNING_RATE, weight_decay=1e-4)  # optim.SGD(self.model.parameters(), lr=0.01)
         self.criterion = nn.MSELoss()
+        self.round_index = 0
         # Had to change this, used to only work with REL_TOTALBTU
         # Should be changed to work with any target column in the future, now just works with these two
         if "REL_TOTALBTU" in data.columns:
@@ -166,7 +170,7 @@ class VFLServer():
         if backtrack and new_nof_clients==2:  # for now hardcoded to work only when reducing size from 3 to 2 clients
             # save model state to file
             logger.info("Saving server state before shrinking...")
-            self.save_state(SERVER_CHECKPOINT_PATH)
+            self.save_state(PRESHRINK_STATE_KEY)
         self.nof_clients = new_nof_clients
         # Create the new model
         # note: this is a completely new model with random weights
@@ -185,7 +189,7 @@ class VFLServer():
             self.model = ServerModel(self.nof_clients * self.intermediate_neurons)
             self.optimizer = optim.Adam(self.model.parameters(), lr=DEFAULT_LEARNING_RATE, weight_decay=1e-4)  # optim.SGD(self.model.parameters(), lr=0.01)
             logger.info("Loading previous server state...")
-            self.load_state(SERVER_CHECKPOINT_PATH)
+            self.load_state(PRESHRINK_STATE_KEY)
         else:
             # Create the new model
             # note: this is a completely new model with random weights
@@ -276,20 +280,41 @@ class VFLServer():
 
         return data
     
-    def save_state(self, filepath):
-        """Save the state dicts for both model and optimizer to disk."""
-        torch.save({
-            'model_state_dict': self.model.state_dict(),
-            'optimizer_state_dict': self.optimizer.state_dict()
-        }, filepath)
-        print(f"Server state saved to {filepath}")
+    def save_state(self, state_key):
+        """Stash the state dicts for both model and optimizer through the gateway."""
+        if gateway is None:
+            logger.warning("No gateway; skipping server state stash")
+            return
+        try:
+            buffer = io.BytesIO()
+            torch.save({
+                'model_state_dict': self.model.state_dict(),
+                'optimizer_state_dict': self.optimizer.state_dict()
+            }, buffer)
+            decision = gateway.request_state_write("vfl_server_model", state_key, buffer.getvalue())
+            if decision.allowed:
+                logger.info(f"Server state stashed under {state_key}")
+            else:
+                logger.warning(f"Server state stash denied ({decision.reason}); nothing persisted")
+        except Exception as e:
+            logger.warning(f"Server state stash failed ({e}); nothing persisted")
 
-    def load_state(self, filepath):
-        """Load the state dicts for both model and optimizer from disk."""
-        state = torch.load(filepath)
-        self.model.load_state_dict(state['model_state_dict'])
-        self.optimizer.load_state_dict(state['optimizer_state_dict'])
-        print(f"Server state loaded from {filepath}")
+    def load_state(self, state_key):
+        """Restore the state dicts from the gateway; denied or missing keeps the fresh model."""
+        if gateway is None:
+            logger.warning("No gateway; skipping server state restore")
+            return
+        try:
+            resp = gateway.validate_state_read("vfl_server_model", state_key)
+            if not resp.allowed:
+                logger.warning(f"Server state restore denied ({resp.reason}); keeping fresh model")
+                return
+            state = torch.load(io.BytesIO(resp.payload))
+            self.model.load_state_dict(state['model_state_dict'])
+            self.optimizer.load_state_dict(state['optimizer_state_dict'])
+            logger.info(f"Server state restored from {state_key}")
+        except Exception as e:
+            logger.warning(f"Server state restore failed ({e}); keeping fresh model")
 
 
 # Policy purge from the gateway: drop the retained aggregator state. The next
@@ -299,6 +324,59 @@ def on_gateway_purge(event):
     purge_pending.set()
     vfl_server = None
     logger.warning("Policy purge: cleared in-memory server model")
+
+
+# Persist the aggregator state through the gateway after a round. A denied or
+# failed write never disturbs the round: training continues, persistence stops.
+def write_server_checkpoint():
+    if gateway is None or vfl_server is None:
+        return
+    try:
+        buffer = io.BytesIO()
+        torch.save({
+            "model_state_dict": vfl_server.model.state_dict(),
+            "optimizer_state_dict": vfl_server.optimizer.state_dict(),
+            "round_index": vfl_server.round_index,
+            "nof_clients": vfl_server.nof_clients,
+        }, buffer)
+        decision = gateway.request_state_write("vfl_server_model", "latest", buffer.getvalue())
+        if decision.allowed:
+            logger.info(f"Checkpoint write allowed: round_index={vfl_server.round_index}")
+        else:
+            logger.warning(f"Checkpoint write denied ({decision.reason}); continuing without persistence: round_index={vfl_server.round_index}")
+    except Exception as e:
+        logger.warning(f"Checkpoint write failed ({e}); continuing without persistence")
+
+
+# One-shot resume read at startup. Anything but an ALLOW with an applicable
+# payload leaves the fresh model in place. The persisted nof_clients rebuilds
+# the aggregator at the right width before the state dicts are loaded.
+def rehydrate_server():
+    global vfl_server
+    if gateway is None or vfl_server is None:
+        return
+    try:
+        resp = gateway.validate_state_read("vfl_server_model", "latest")
+    except Exception as e:
+        logger.warning(f"Resume read failed ({e}); starting fresh")
+        return
+    if not resp.allowed:
+        logger.info(f"Resume read denied ({resp.reason}); starting fresh")
+        return
+    try:
+        state = torch.load(io.BytesIO(resp.payload))
+        nof_clients = state["nof_clients"]
+        if nof_clients != vfl_server.nof_clients:
+            vfl_server.nof_clients = nof_clients
+            vfl_server.model = ServerModel(vfl_server.intermediate_neurons * nof_clients)
+            vfl_server.optimizer = optim.Adam(vfl_server.model.parameters(), lr=DEFAULT_LEARNING_RATE, weight_decay=1e-4)
+        vfl_server.model.load_state_dict(state["model_state_dict"])
+        vfl_server.optimizer.load_state_dict(state["optimizer_state_dict"])
+        vfl_server.round_index = state["round_index"]
+        logger.info(f"Resumed server model from checkpoint: round_index={vfl_server.round_index} nof_clients={nof_clients} written_unix_seconds={resp.written_unix_seconds}")
+    except Exception as e:
+        logger.warning(f"Checkpoint could not be applied ({e}); starting fresh")
+        vfl_server = VFLServer(load_data())
 
 
 def handleAggregateRequest(msComm):
@@ -354,6 +432,8 @@ def handleAggregateRequest(msComm):
 
     try:
         data = vfl_server.aggregate_fit(clients_embeddings, backtrack)
+        vfl_server.round_index += 1
+        write_server_checkpoint()
     except Exception as e:
         if purge_pending.is_set():
             purge_pending.clear()
@@ -439,6 +519,9 @@ def main():
         config.service_name, config.grpc_addr, request_handler)
 
     gateway = connect_gateway(config.service_name, on_gateway_purge)
+
+    if ds == "server":
+        rehydrate_server()
 
     # Signal the message handler that all connections have been created
     signal_continuation(wait_for_setup_event, wait_for_setup_condition)

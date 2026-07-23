@@ -2,6 +2,7 @@ import pandas as pd
 import numpy as np
 import sys
 import os
+import io
 import json
 import torch
 import time
@@ -188,10 +189,20 @@ class VFLClient():
             self.model.load_state_dict(model_state)
 
         self.optimiser = None
+        # Applied when the optimiser is lazily created; loading the state dict
+        # restores the persisted learning rate and moments.
+        self._pending_optimiser_state = optimiser_state
+        self.round_index = 0
 
     def create_optimiser(self, learning_rate):
         if self.optimiser is None:
             self.optimiser = torch.optim.Adam(self.model.parameters(), lr=learning_rate, weight_decay=DEFAULT_WEIGHT_DECAY)   #  torch.optim.SGD(self.model.parameters(), lr=learning_rate)
+            if self._pending_optimiser_state is not None:
+                try:
+                    self.optimiser.load_state_dict(self._pending_optimiser_state)
+                except Exception as e:
+                    logger.warning(f"Persisted optimiser state could not be applied ({e}); using a fresh optimiser")
+                self._pending_optimiser_state = None
 
     def train_model(self):
         self.embedding = self.model(self.data)
@@ -240,6 +251,56 @@ def on_gateway_purge(event):
     purge_pending.set()
     vfl_client = None
     logger.warning("Policy purge: cleared in-memory client model")
+
+
+# Persist the client state through the gateway after a round. A denied or
+# failed write never disturbs the round: training continues, persistence stops.
+def write_client_checkpoint():
+    if gateway is None or vfl_client is None:
+        return
+    try:
+        buffer = io.BytesIO()
+        torch.save({
+            "model_state_dict": vfl_client.model.state_dict(),
+            "optimizer_state_dict": vfl_client.optimiser.state_dict() if vfl_client.optimiser is not None else None,
+            "round_index": vfl_client.round_index,
+        }, buffer)
+        decision = gateway.request_state_write("vfl_client_model", "latest", buffer.getvalue())
+        if decision.allowed:
+            logger.info(f"Checkpoint write allowed: round_index={vfl_client.round_index}")
+        else:
+            logger.warning(f"Checkpoint write denied ({decision.reason}); continuing without persistence: round_index={vfl_client.round_index}")
+    except Exception as e:
+        logger.warning(f"Checkpoint write failed ({e}); continuing without persistence")
+
+
+# Resume read at first model construction; the model shape depends on the
+# incoming dataframe, so this cannot run at process startup. Anything but an
+# ALLOW with a matching feature width means a fresh model.
+def read_client_checkpoint(expected_features):
+    if gateway is None:
+        return None, None, 0
+    try:
+        resp = gateway.validate_state_read("vfl_client_model", "latest")
+    except Exception as e:
+        logger.warning(f"Resume read failed ({e}); starting fresh")
+        return None, None, 0
+    if not resp.allowed:
+        logger.info(f"Resume read denied ({resp.reason}); starting fresh")
+        return None, None, 0
+    try:
+        state = torch.load(io.BytesIO(resp.payload))
+        model_state = state["model_state_dict"]
+        persisted_features = model_state["fc1.weight"].shape[1]
+        if persisted_features != expected_features:
+            logger.warning(f"Persisted feature width {persisted_features} does not match dataframe width {expected_features}; starting fresh")
+            return None, None, 0
+        round_index = state["round_index"]
+        logger.info(f"Resuming client model from checkpoint: round_index={round_index} written_unix_seconds={resp.written_unix_seconds}")
+        return model_state, state["optimizer_state_dict"], round_index
+    except Exception as e:
+        logger.warning(f"Checkpoint could not be applied ({e}); starting fresh")
+        return None, None, 0
 
 
 def request_handler(msComm: msCommTypes.MicroserviceCommunication,
@@ -296,7 +357,9 @@ def request_handler(msComm: msCommTypes.MicroserviceCommunication,
                     # Had mismatch issues earlier, just as a safeguard
                     if vfl_client is None:
                         logger.info("Initializing VFLClient from incoming dataframe.")
-                        vfl_client = VFLClient(df)
+                        model_state, optimiser_state, resumed_round = read_client_checkpoint(df.shape[1])
+                        vfl_client = VFLClient(df, model_state=model_state, optimiser_state=optimiser_state)
+                        vfl_client.round_index = resumed_round
                         vfl_client.columns = current_cols
                         purge_pending.clear()
                     else:
@@ -352,6 +415,8 @@ def request_handler(msComm: msCommTypes.MicroserviceCommunication,
 
                 try:
                     vfl_client.gradient_descent(gradients)
+                    vfl_client.round_index += 1
+                    write_client_checkpoint()
                 except Exception as e:
                     if purge_pending.is_set():
                         purge_pending.clear()

@@ -228,10 +228,11 @@ func (g *gatewayServer) SubscribeStateEvents(req *pb.SubscribeRequest, stream pb
 		g.touchActivity()
 	}()
 
-	if err := stream.Send(&pb.StateEvent{Kind: pb.StateEvent_AGREEMENT_CHANGED, Reason: "stub"}); err != nil {
+	_, hash, src, _ := g.policy.snapshot()
+	if err := stream.Send(&pb.StateEvent{Kind: pb.StateEvent_AGREEMENT_CHANGED, Reason: "subscription established"}); err != nil {
 		return err
 	}
-	g.audit(auditRecord{Op: "subscribe", Reason: "stub", Identity: auditIdentityOf(req.GetIdentity())})
+	g.audit(auditRecord{Op: "subscribe", Reason: "subscription established", AgreementHash: hash, PolicySource: string(src), Identity: auditIdentityOf(req.GetIdentity())})
 
 	select {
 	case <-stream.Context().Done():
