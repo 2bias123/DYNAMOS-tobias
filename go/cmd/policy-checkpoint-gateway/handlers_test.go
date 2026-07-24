@@ -125,6 +125,39 @@ func TestValidateStateReadExistingAndMissing(t *testing.T) {
 	assert.Equal(t, string(resp.GetPayload()), "hello")
 }
 
+func TestReadDenialHidesFileExistence(t *testing.T) {
+	client, g := newTestServer(t)
+
+	_, err := client.RequestStateWrite(context.Background(), &pb.StateWriteRequest{
+		Identity: testIdentity(), StateClass: "kv", StateKey: "k1", Payload: []byte("hello"),
+	})
+	assert.NilError(t, err)
+
+	noResume := &api.Agreement{
+		Name: "uva",
+		Relations: map[string]api.Relation{
+			"u@x": {
+				RequestTypes:    []string{"sqlDataRequest"},
+				StateDirectives: &api.StateDirectives{Allowed: true, RetentionSeconds: 900, ResumeAllowed: false, OnRevocation: "purge"},
+			},
+		},
+	}
+	hash, err := canonicalHash(noResume)
+	assert.NilError(t, err)
+	g.policy.update(noResume, hash)
+
+	// same denial for an existing and a missing key: the reason must not leak existence
+	for _, key := range []string{"k1", "absent"} {
+		resp, err := client.ValidateStateRead(context.Background(), &pb.StateReadRequest{
+			Identity: testIdentity(), StateClass: "kv", StateKey: key,
+		})
+		assert.NilError(t, err)
+		assert.Equal(t, resp.GetAllowed(), false)
+		assert.Equal(t, resp.GetReason(), "resume disabled")
+		assert.Equal(t, len(resp.GetPayload()), 0)
+	}
+}
+
 func TestInvalidNamesInvalidArgument(t *testing.T) {
 	client, _ := newTestServer(t)
 

@@ -1,0 +1,39 @@
+$ docker images --digests | grep -E 'REPOSITORY|dynamos'
+REPOSITORY                           TAG                DIGEST                                                                    IMAGE ID       CREATED         SIZE
+dynamos1/vfl-train-demo              latest             <none>                                                                    a8c5166513d2   46 years ago    1.53GB
+dynamos1/vfl-train-demo              main               <none>                                                                    a8c5166513d2   46 years ago    1.53GB
+dynamos1/state-driver                main               <none>                                                                    20ade514b6dd   46 years ago    21.1MB
+dynamos1/policy-enforcer             latest             <none>                                                                    0a21f7ead6a8   46 years ago    28.1MB
+dynamos1/policy-enforcer             main               <none>                                                                    0a21f7ead6a8   46 years ago    28.1MB
+dynamos1/sidecar                     latest             <none>                                                                    c13da052cba3   46 years ago    28.9MB
+dynamos1/sidecar                     main               <none>                                                                    c13da052cba3   46 years ago    28.9MB
+dynamos1/orchestrator                latest             <none>                                                                    e03febbf40a1   46 years ago    29.6MB
+dynamos1/orchestrator                main               <none>                                                                    e03febbf40a1   46 years ago    29.6MB
+dynamos1/sql-pseudonym-stateful      latest             <none>                                                                    3b6ab1bf8f76   46 years ago    23.7MB
+dynamos1/api-gateway                 latest             <none>                                                                    a820f1d258b3   46 years ago    30.9MB
+dynamos1/api-gateway                 main               <none>                                                                    a820f1d258b3   46 years ago    30.9MB
+dynamos1/agent                       latest             <none>                                                                    eec43096b52e   46 years ago    65.2MB
+dynamos1/differential-p-test         latest             <none>                                                                    965a6b0ff715   46 years ago    1.53GB
+dynamos1/differential-p-test         main               <none>                                                                    965a6b0ff715   46 years ago    1.53GB
+dynamos1/sql-pseudonym-stateful      main               <none>                                                                    ba7282124de3   46 years ago    23.7MB
+dynamos1/anonymize-test              latest             <none>                                                                    c049c5509c34   46 years ago    1.53GB
+dynamos1/anonymize-test              main               <none>                                                                    c049c5509c34   46 years ago    1.53GB
+dynamos1/vfl-train-model-demo        latest             <none>                                                                    c2bcc2cecf52   46 years ago    1.5GB
+dynamos1/vfl-train-model-demo        main               <none>                                                                    c2bcc2cecf52   46 years ago    1.5GB
+dynamos1/agent                       main               <none>                                                                    b986a59e1482   46 years ago    183MB
+dynamos1/policy-checkpoint-gateway   latest             <none>                                                                    e7f19f8981f8   46 years ago    23.3MB
+dynamos1/policy-checkpoint-gateway   main               <none>                                                                    e7f19f8981f8   46 years ago    23.3MB
+
+$ docker exec kind-control-plane crictl images | grep -E 'IMAGE|dynamos'
+IMAGE                                                    TAG                  IMAGE ID            SIZE
+docker.io/dynamos1/agent                                 main                 88bb1f95f07a1       29.4MB
+docker.io/dynamos1/sidecar                               main                 66d6df92d55e8       14.1MB
+docker.io/dynamos1/anonymize-test                        latest               c049c5509c346       1.56GB
+docker.io/dynamos1/api-gateway                           main                 a820f1d258b32       31.5MB
+docker.io/dynamos1/differential-p-test                   latest               965a6b0ff715d       1.56GB
+docker.io/dynamos1/policy-enforcer                       main                 0a21f7ead6a80       28.7MB
+docker.io/dynamos1/vfl-train-demo                        latest               a8c5166513d23       1.56GB
+docker.io/dynamos1/vfl-train-model-demo                  latest               c2bcc2cecf522       1.53GB
+docker.io/dynamos1/policy-checkpoint-gateway             latest               e7f19f8981f87       23.9MB
+docker.io/dynamos1/policy-checkpoint-gateway             main                 e7f19f8981f87       23.9MB
+docker.io/dynamos1/orchestrator                          main                 e03febbf40a1d       30.1MB

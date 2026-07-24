@@ -70,6 +70,8 @@ func TestDecideRead(t *testing.T) {
 		reason  string
 		expired bool
 	}{
+		{"no relation for user", &api.Agreement{Relations: map[string]api.Relation{"other@x": {RequestTypes: []string{"vflTrainModelRequest"}, StateDirectives: allowAll()}}}, sourceCached, time.Minute, false, "no relation for user", false},
+		{"requestType not permitted", &api.Agreement{Relations: map[string]api.Relation{"u@x": {RequestTypes: []string{"other"}, StateDirectives: allowAll()}}}, sourceCached, time.Minute, false, "requestType not permitted by relation", false},
 		{"stateDirectives absent", testAgreement(nil), sourceCached, time.Minute, false, "stateDirectives absent", false},
 		{"allowed false", testAgreement(&api.StateDirectives{Allowed: false, ResumeAllowed: true}), sourceCached, time.Minute, false, "allowed = false", false},
 		{"resume disabled", testAgreement(noResume), sourceCached, time.Minute, false, "resume disabled", false},
@@ -79,6 +81,9 @@ func TestDecideRead(t *testing.T) {
 		{"retention exceeded cached", testAgreement(allowAll()), sourceCached, time.Hour, false, "retention exceeded", true},
 		{"stale", testAgreement(allowAll()), sourceStale, time.Minute, false, "cache stale; fail closed", false},
 		{"unavailable", nil, sourceUnavailable, time.Minute, false, "etcd unreachable; fail closed", false},
+		// source denial wins over retention: no Expired flag on a stale/unavailable deny
+		{"retention exceeded but stale", testAgreement(allowAll()), sourceStale, time.Hour, false, "cache stale; fail closed", false},
+		{"retention exceeded but unavailable", nil, sourceUnavailable, time.Hour, false, "etcd unreachable; fail closed", false},
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {

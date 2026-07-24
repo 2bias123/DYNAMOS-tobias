@@ -1,0 +1,31 @@
+$ date
+Fri Jul 24 03:18:24 PM CEST 2026
+
+$ git -C /home/onebias/School/thesis/DYNAMOS-tobias rev-parse --abbrev-ref HEAD
+main
+
+$ git -C /home/onebias/School/thesis/DYNAMOS-tobias rev-parse HEAD
+f9a83ef9a135e16a9a165369418b07ac84ed51e8
+
+$ git -C /home/onebias/School/thesis/DYNAMOS-tobias status --short
+ M python/Makefile
+?? .idea/
+?? go/agent
+?? go/cmd/Dockerfile
+?? go/policy-checkpoint-gateway
+
+$ go version
+go version go1.23.8 linux/amd64
+
+$ kind version
+kind v0.24.0 go1.23.8 linux/amd64
+
+$ kubectl version --client
+Client Version: v1.31.2
+Kustomize Version: v5.4.2
+
+$ kubectl get nodes -o wide
+NAME                 STATUS   ROLES           AGE   VERSION   INTERNAL-IP   EXTERNAL-IP   OS-IMAGE                         KERNEL-VERSION   CONTAINER-RUNTIME
+kind-control-plane   Ready    control-plane   59d   v1.31.0   172.18.0.2    <none>        Debian GNU/Linux 12 (bookworm)   6.6.94           containerd://1.7.18
+
+$ kubectl get pods -A
