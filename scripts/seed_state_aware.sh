@@ -2,11 +2,11 @@
 set -u
 
 # Seed the state-aware agreements (stateDirectives on each VFL steward) into
-# etcd through the orchestrator's /policyEnforcer PUT — the operator path, so
-# checkJobs fires like it would for a real policy change. Idempotent.
+# etcd through the orchestrator's /policyEnforcer PUT. That's the operator
+# path, so checkJobs fires like it would for a real policy change. Idempotent.
 #
 # NOTE: the orchestrator re-applies the PVC's agreements.json on every boot,
-# which OVERWRITES these keys. Re-run this script after any reset.sh.
+# which OVERWRITES these keys. Re-run this after any reset.sh.
 
 PORT="${PORT:-8082}"
 BASE="http://localhost:${PORT}/api/v1"
