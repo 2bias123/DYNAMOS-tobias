@@ -1,0 +1,112 @@
+$ date
+Sat Jul 25 01:32:42 PM CEST 2026
+
+$ git rev-parse HEAD
+9ae1ce916f9cd2cc20f2dd33cb433d8224b4d3e1
+
+$ git status --short
+ M python/Makefile
+?? .idea/
+?? go/agent
+?? go/cmd/Dockerfile
+?? go/policy-checkpoint-gateway
+?? results/e1-decision-correctness/live-chain/20260725-133242_allow-write-and-resume.txt
+
+$ kubectl config current-context
+kind-kind
+
+
+=== clean slate: reset, then delete the four state PVCs
+PREFLIGHT OK: B14, B15 applied
+[reset] deleting stale Jobs in steward namespaces
+No resources found
+No resources found
+No resources found
+No resources found
+[reset] clearing /agents/jobs/ etcd keys
+[reset] coordinated rollout of request path
+deployment.apps/api-gateway restarted
+deployment.apps/policy-enforcer restarted
+deployment.apps/orchestrator restarted
+deployment.apps/server restarted
+deployment.apps/clientone restarted
+deployment.apps/clienttwo restarted
+deployment.apps/clientthree restarted
+Waiting for deployment "api-gateway" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "api-gateway" rollout to finish: 1 old replicas are pending termination...
+deployment "api-gateway" successfully rolled out
+Waiting for deployment "policy-enforcer" rollout to finish: 1 old replicas are pending termination...
+deployment "policy-enforcer" successfully rolled out
+deployment "orchestrator" successfully rolled out
+deployment "server" successfully rolled out
+Waiting for deployment "clientone" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "clientone" rollout to finish: 1 old replicas are pending termination...
+deployment "clientone" successfully rolled out
+deployment "clienttwo" successfully rolled out
+deployment "clientthree" successfully rolled out
+[reset] settling 45s for AMQP topology to converge
+[reset] OK
+persistentvolumeclaim "state-server-ad751c18-vfltrainmodelrequest" deleted
+persistentvolumeclaim "state-clientone-ad751c18-vfltrainmodelrequest" deleted
+persistentvolumeclaim "state-clienttwo-ad751c18-vfltrainmodelrequest" deleted
+persistentvolumeclaim "state-clientthree-ad751c18-vfltrainmodelrequest" deleted
+
+=== seed canonical state-aware agreements
+[seed] server: OK
+[seed] clientone: OK
+[seed] clienttwo: OK
+[seed] clientthree: OK
+[seed] verified in etcd for all stewards: resumeAllowed=True
+
+=== run 1: cycles=3 against empty PVCs
+trigger: {"request_id":"3a9ac7f7-b2ba-419b-9f29-1174ac131367","status":"pending"}
+poll 1: pending
+poll 2: pending
+poll 3: pending
+poll 4: pending
+poll 5: pending
+poll 6: pending
+poll 7: pending
+poll 8: pending
+poll 9: pending
+poll 10: pending
+poll 11: pending
+poll 12: pending
+poll 13: pending
+poll 14: pending
+poll 15: pending
+poll 16: pending
+poll 17: pending
+poll 18: pending
+poll 19: pending
+poll 20: pending
+poll 21: pending
+poll 22: pending
+poll 23: pending
+poll 24: pending
+poll 25: pending
+poll 26: pending
+poll 27: pending
+poll 28: pending
+poll 29: pending
+poll 30: pending
+poll 31: pending
+poll 32: pending
+poll 33: pending
+poll 34: pending
+poll 35: pending
+poll 36: pending
+E1 FAIL: training not done after 36 polls
+
+
+--- server gateway audit (run 1) ---
+1.7849792264980009e+09	[34mINFO[0m	/home/onebias/School/thesis/DYNAMOS-tobias/go/cmd/policy-checkpoint-gateway/main.go:141	Serving on 50050
+1.7849792265029118e+09	[34mINFO[0m	/home/onebias/School/thesis/DYNAMOS-tobias/go/cmd/policy-checkpoint-gateway/watch.go:49	Agreement loaded 54d9c11105ec0d7535efe6f88afcc1bd5ec7ea185bdbfcda1a3ffa6f7df4bad0
+{"op":"subscribe","reason":"subscription established","identity":{"steward":"SERVER","user":"jake.jongejans@student.uva.nl","requestType":"vflTrainModelRequest","jobId":"jake-jongejans-a70a58afserver1","localJobName":"jake-jongejans-a70a58afserver1"},"agreementHash":"54d9c11105ec0d7535efe6f88afcc1bd5ec7ea185bdbfcda1a3ffa6f7df4bad0","policySource":"cached"}
+{"op":"subscribe","reason":"subscription established","identity":{"steward":"SERVER","user":"jake.jongejans@student.uva.nl","requestType":"vflTrainModelRequest","jobId":"jake-jongejans-a70a58afserver1","localJobName":"jake-jongejans-a70a58afserver1"},"agreementHash":"54d9c11105ec0d7535efe6f88afcc1bd5ec7ea185bdbfcda1a3ffa6f7df4bad0","policySource":"cached"}
+{"op":"read","decision":"DENY","reason":"not found","identity":{"steward":"SERVER","user":"jake.jongejans@student.uva.nl","requestType":"vflTrainModelRequest","jobId":"jake-jongejans-a70a58afserver1","localJobName":"jake-jongejans-a70a58afserver1"},"stateClass":"vfl_server_model","stateKey":"latest","agreementHash":"54d9c11105ec0d7535efe6f88afcc1bd5ec7ea185bdbfcda1a3ffa6f7df4bad0","policySource":"cached","cacheAgeMs":5616}
+OK: empty-PVC startup read DENY
+    {"op":"read","decision":"DENY","reason":"not found","identity":{"steward":"SERVER","user":"jake.jongejans@student.uva.nl","requestType":"vflTrainModelRequest","jobId":"jake-jongejans-a70a58afserver1","localJobName":"jake-jongejans-a70a58afserver1"},"stateClass":"vfl_server_model","stateKey":"latest","agreementHash":"54d9c11105ec0d7535efe6f88afcc1bd5ec7ea185bdbfcda1a3ffa6f7df4bad0","policySource":"cached","cacheAgeMs":5616}
+OK: read deny reason is 'not found'
+    {"op":"read","decision":"DENY","reason":"not found","identity":{"steward":"SERVER","user":"jake.jongejans@student.uva.nl","requestType":"vflTrainModelRequest","jobId":"jake-jongejans-a70a58afserver1","localJobName":"jake-jongejans-a70a58afserver1"},"stateClass":"vfl_server_model","stateKey":"latest","agreementHash":"54d9c11105ec0d7535efe6f88afcc1bd5ec7ea185bdbfcda1a3ffa6f7df4bad0","policySource":"cached","cacheAgeMs":5616}
+E1 FAIL: expected >=3 ALLOW writes in run 1, got 0

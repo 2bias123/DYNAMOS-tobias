@@ -1,0 +1,139 @@
+$ date
+Sat Jul 25 01:51:01 PM CEST 2026
+
+$ git rev-parse HEAD
+9ae1ce916f9cd2cc20f2dd33cb433d8224b4d3e1
+
+$ git status --short
+ M python/Makefile
+ M results/e1-decision-correctness/captures.md
+?? .idea/
+?? go/agent
+?? go/cmd/Dockerfile
+?? go/policy-checkpoint-gateway
+?? results/e1-decision-correctness/adversarial/20260725-135101_adversarial-battery.txt
+?? results/e1-decision-correctness/live-chain/20260725-133242_allow-write-and-resume.txt
+?? results/e1-decision-correctness/live-chain/20260725-134616_allow-write-and-resume.txt
+?? results/e1-decision-correctness/live-chain/20260725-134839_resume-disabled-deny.txt
+?? results/e1-decision-correctness/live-chain/20260725-134948_retention-expired-deny.txt
+
+$ kubectl config current-context
+kind-kind
+
+
+=== reset + canonical seed + long chain (cycles=300) so the gateway outlives the battery
+PREFLIGHT OK: B14, B15 applied
+[reset] deleting stale Jobs in steward namespaces
+job.batch "jake-jongejans-b090a20fserver1" deleted
+job.batch "jake-jongejans-b090a20fclientone1" deleted
+job.batch "jake-jongejans-b090a20fclienttwo1" deleted
+job.batch "jake-jongejans-b090a20fclientthree1" deleted
+[reset] clearing /agents/jobs/ etcd keys
+[reset] coordinated rollout of request path
+deployment.apps/api-gateway restarted
+deployment.apps/policy-enforcer restarted
+deployment.apps/orchestrator restarted
+deployment.apps/server restarted
+deployment.apps/clientone restarted
+deployment.apps/clienttwo restarted
+deployment.apps/clientthree restarted
+Waiting for deployment "api-gateway" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "api-gateway" rollout to finish: 1 old replicas are pending termination...
+deployment "api-gateway" successfully rolled out
+Waiting for deployment "policy-enforcer" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "policy-enforcer" rollout to finish: 1 old replicas are pending termination...
+deployment "policy-enforcer" successfully rolled out
+deployment "orchestrator" successfully rolled out
+deployment "server" successfully rolled out
+deployment "clientone" successfully rolled out
+deployment "clienttwo" successfully rolled out
+deployment "clientthree" successfully rolled out
+[reset] settling 45s for AMQP topology to converge
+[reset] OK
+[seed] server: OK
+[seed] clientone: OK
+[seed] clienttwo: OK
+[seed] clientthree: OK
+[seed] verified in etcd for all stewards: allowed=True
+trigger: {"request_id":"af0e67e3-ae35-402c-9449-9010dc9c3995","status":"pending"}
+
+=== wait for the server gateway container
+gateway pod: jake-jongejans-00cdac41server1-55jtq
+pod identity: {"steward": "SERVER", "user": "jake.jongejans@student.uva.nl", "request_type": "vflTrainModelRequest", "job_id": "jake-jongejans-00cdac41server1", "local_job_name": "jake-jongejans-00cdac41server1"}
+
+=== (a) identity mismatch -> strict PermissionDenied + identity_mismatch audit
+tampered identity: {"steward": "TAMPERED", "user": "jake.jongejans@student.uva.nl", "request_type": "vflTrainModelRequest", "job_id": "jake-jongejans-00cdac41server1", "local_job_name": "jake-jongejans-00cdac41server1"}
+ERROR:
+  Code: PermissionDenied
+  Message: identity mismatch
+OK: identity_mismatch audited
+    {"op":"identity_mismatch","reason":"identity does not match gateway env","identity":{"steward":"TAMPERED","user":"jake.jongejans@student.uva.nl","requestType":"vflTrainModelRequest","jobId":"jake-jongejans-00cdac41server1","localJobName":"jake-jongejans-00cdac41server1"}}
+OK: no state file from the tampered write
+
+=== (c) 8 concurrent writes to one slot through the single mediator
+/tmp/tmp.JGaGBasr7F/1.out:  "allowed": true,
+/tmp/tmp.JGaGBasr7F/2.out:  "allowed": true,
+/tmp/tmp.JGaGBasr7F/3.out:  "allowed": true,
+/tmp/tmp.JGaGBasr7F/4.out:  "allowed": true,
+/tmp/tmp.JGaGBasr7F/5.out:  "allowed": true,
+/tmp/tmp.JGaGBasr7F/6.out:  "allowed": true,
+/tmp/tmp.JGaGBasr7F/7.out:  "allowed": true,
+/tmp/tmp.JGaGBasr7F/8.out:  "allowed": true,
+-rw-------    1 root     root             3 Jul 25 11:52 /state/data/adversarial/concurrent-slot.bin
+OK: 8/8 ALLOW responses, one intact slot file, 8 audit lines
+
+=== (b) direct write bypassing the gateway; the completeness check must flag it
+state files: 3  audit lines: 42  allow-writes: 2
+MISSING audit line for state file: adversarial/rogue.bin
+COMPLETENESS FAIL: 1 unaudited state file(s)
+OK: bypass write detected (exit=1)
+planted file removed
+
+=== closing invariant: completeness PASS on all four stewards
+[server / jake-jongejans-00cdac41server1-55jtq]
+state files: 2  audit lines: 43  allow-writes: 2
+COMPLETENESS PASS: every state file has an ALLOW audit line
+[clientone / jake-jongejans-00cdac41clientone1-sm66g]
+state files: 1  audit lines: 38  allow-writes: 1
+COMPLETENESS PASS: every state file has an ALLOW audit line
+[clienttwo / jake-jongejans-00cdac41clienttwo1-q7djb]
+state files: 1  audit lines: 39  allow-writes: 1
+COMPLETENESS PASS: every state file has an ALLOW audit line
+[clientthree / jake-jongejans-00cdac41clientthree1-8fc9c]
+state files: 1  audit lines: 40  allow-writes: 1
+COMPLETENESS PASS: every state file has an ALLOW audit line
+
+=== wait for the long chain to finish
+poll 1: pending
+poll 2: pending
+poll 3: pending
+poll 4: pending
+poll 5: pending
+poll 6: pending
+poll 7: pending
+poll 8: pending
+poll 9: pending
+poll 10: pending
+poll 11: pending
+poll 12: pending
+poll 13: pending
+poll 14: pending
+poll 15: pending
+poll 16: pending
+poll 17: pending
+poll 18: pending
+poll 19: pending
+poll 20: pending
+poll 21: pending
+poll 22: pending
+poll 23: pending
+poll 24: pending
+poll 25: pending
+poll 26: pending
+poll 27: pending
+poll 28: pending
+poll 29: pending
+poll 30: pending
+poll 31: done
+status: done rounds: 300
+first r2: -2.0691850185394287 last r2: 0.4967617988586426

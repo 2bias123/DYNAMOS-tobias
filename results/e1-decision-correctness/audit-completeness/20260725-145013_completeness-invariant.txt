@@ -1,0 +1,39 @@
+$ date
+Sat Jul 25 02:50:13 PM CEST 2026
+
+$ git rev-parse HEAD
+b3dd11cc30633da6a9b85768fd8d6b3288e7c1ed
+
+$ git status --short
+ M python/Makefile
+?? .idea/
+?? go/agent
+?? go/cmd/Dockerfile
+?? go/policy-checkpoint-gateway
+?? results/e1-decision-correctness/audit-completeness/20260725-145013_completeness-invariant.txt
+
+$ kubectl config current-context
+kind-kind
+
+
+=== steward server
+[server] state PVC: state-server-ad751c18-vfltrainmodelrequest
+state files: 2  audit lines: 341  allow-writes: 2
+COMPLETENESS PASS: every state file has an ALLOW audit line
+
+=== steward clientone
+[clientone] state PVC: state-clientone-ad751c18-vfltrainmodelrequest
+state files: 1  audit lines: 337  allow-writes: 1
+COMPLETENESS PASS: every state file has an ALLOW audit line
+
+=== steward clienttwo
+[clienttwo] state PVC: state-clienttwo-ad751c18-vfltrainmodelrequest
+state files: 1  audit lines: 337  allow-writes: 1
+COMPLETENESS PASS: every state file has an ALLOW audit line
+
+=== steward clientthree
+[clientthree] state PVC: state-clientthree-ad751c18-vfltrainmodelrequest
+state files: 1  audit lines: 337  allow-writes: 1
+COMPLETENESS PASS: every state file has an ALLOW audit line
+
+OK: completeness PASS on all 4 steward PVCs

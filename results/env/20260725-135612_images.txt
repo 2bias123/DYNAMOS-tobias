@@ -1,0 +1,77 @@
+$ date
+Sat Jul 25 01:56:12 PM CEST 2026
+
+$ git rev-parse HEAD
+9ae1ce916f9cd2cc20f2dd33cb433d8224b4d3e1
+
+# Counted E1 live run day. agent+sidecar main tags reloaded to fork builds
+# (b986a59e / c13da052) after overnight containerd GC re-evicted them and
+# the main tag had flipped back to upstream 88bb1f95 / 66d6df92.
+
+$ docker exec kind-control-plane crictl images | grep -E 'dynamos1|tamjiyan'
+docker.io/dynamos1/agent                                 <none>               88bb1f95f07a1       29.4MB
+docker.io/dynamos1/sidecar                               <none>               66d6df92d55e8       14.1MB
+docker.io/dynamos1/agent                                 main                 b986a59e14823       184MB
+docker.io/dynamos1/anonymize-test                        latest               c049c5509c346       1.56GB
+docker.io/dynamos1/api-gateway                           main                 a820f1d258b32       31.5MB
+docker.io/dynamos1/differential-p-test                   latest               965a6b0ff715d       1.56GB
+docker.io/dynamos1/orchestrator                          main                 e03febbf40a1d       30.1MB
+docker.io/dynamos1/policy-checkpoint-gateway             latest               e7f19f8981f87       23.9MB
+docker.io/dynamos1/policy-checkpoint-gateway             main                 e7f19f8981f87       23.9MB
+docker.io/dynamos1/policy-enforcer                       main                 0a21f7ead6a80       28.7MB
+docker.io/dynamos1/sidecar                               main                 c13da052cba35       29.5MB
+docker.io/dynamos1/vfl-train-demo                        latest               a8c5166513d23       1.56GB
+docker.io/dynamos1/vfl-train-model-demo                  latest               c2bcc2cecf522       1.53GB
+docker.io/tamjiyan/anonymize-test                        latest               481446389f3c0       1.56GB
+docker.io/tamjiyan/differential-p-test                   latest               5a6809c2a6b50       1.56GB
+docker.io/tamjiyan/sidecar                               latest               689c380026d27       29.5MB
+docker.io/tamjiyan/policy-checkpoint-gateway             latest               436b2183bfcb7       86.8MB
+docker.io/tamjiyan/vfl-train-demo                        latest               24418a6df0b91       1.56GB
+docker.io/tamjiyan/vfl-train-model-demo                  latest               641af42473498       1.53GB
+
+$ docker images --digests | grep -E 'REPOSITORY|dynamos|tamjiyan'
+REPOSITORY                           TAG                DIGEST                                                                    IMAGE ID       CREATED         SIZE
+tamjiyan/api-gateway                 autofix-consume    <none>                                                                    13b47c4ca735   2 weeks ago     30.9MB
+tamjiyan/api-gateway                 latest             <none>                                                                    13b47c4ca735   2 weeks ago     30.9MB
+tamjiyan/agent                       autofix-consume    <none>                                                                    2a123c4d7e5a   2 weeks ago     65.1MB
+tamjiyan/orchestrator                autofix-consume    <none>                                                                    c38019f2bac6   2 weeks ago     29.5MB
+tamjiyan/orchestrator                latest             <none>                                                                    c38019f2bac6   2 weeks ago     29.5MB
+tamjiyan/policy-enforcer             autofix-consume    <none>                                                                    584574561ec4   2 weeks ago     28.1MB
+tamjiyan/policy-enforcer             latest             <none>                                                                    584574561ec4   2 weeks ago     28.1MB
+tamjiyan/sidecar                     autofix-consume    <none>                                                                    689c380026d2   2 weeks ago     28.9MB
+tamjiyan/sidecar                     latest             <none>                                                                    689c380026d2   2 weeks ago     28.9MB
+tamjiyan/differential-p-test         autofix-shutdown   <none>                                                                    5a6809c2a6b5   2 weeks ago     1.53GB
+tamjiyan/differential-p-test         latest             <none>                                                                    5a6809c2a6b5   2 weeks ago     1.53GB
+tamjiyan/anonymize-test              autofix-shutdown   <none>                                                                    481446389f3c   2 weeks ago     1.53GB
+tamjiyan/anonymize-test              latest             <none>                                                                    481446389f3c   2 weeks ago     1.53GB
+tamjiyan/differential-p-test         baseline-b14-b15   <none>                                                                    3e82217048fb   3 weeks ago     1.53GB
+tamjiyan/anonymize-test              baseline-b14-b15   <none>                                                                    aef3ed5b380f   3 weeks ago     1.53GB
+tamjiyan/vfl-train-model-demo        baseline-b14-b15   <none>                                                                    a8f0ad753337   3 weeks ago     1.5GB
+tamjiyan/vfl-train-demo              baseline-b14-b15   <none>                                                                    6b51361fee66   3 weeks ago     1.53GB
+tamjiyan/agent                       baseline-b14-b15   <none>                                                                    8088d8d6aaa1   3 weeks ago     65.1MB
+dynamos1/vfl-train-demo              latest             <none>                                                                    a8c5166513d2   46 years ago    1.53GB
+dynamos1/vfl-train-demo              main               <none>                                                                    a8c5166513d2   46 years ago    1.53GB
+tamjiyan/vfl-train-demo              latest             <none>                                                                    24418a6df0b9   46 years ago    1.53GB
+dynamos1/orchestrator                latest             <none>                                                                    e03febbf40a1   46 years ago    29.6MB
+dynamos1/orchestrator                main               <none>                                                                    e03febbf40a1   46 years ago    29.6MB
+dynamos1/differential-p-test         latest             <none>                                                                    965a6b0ff715   46 years ago    1.53GB
+dynamos1/differential-p-test         main               <none>                                                                    965a6b0ff715   46 years ago    1.53GB
+dynamos1/agent                       latest             <none>                                                                    eec43096b52e   46 years ago    65.2MB
+dynamos1/api-gateway                 latest             <none>                                                                    a820f1d258b3   46 years ago    30.9MB
+dynamos1/api-gateway                 main               <none>                                                                    a820f1d258b3   46 years ago    30.9MB
+dynamos1/state-driver                main               <none>                                                                    20ade514b6dd   46 years ago    21.1MB
+tamjiyan/policy-checkpoint-gateway   latest             <none>                                                                    436b2183bfcb   46 years ago    86.2MB
+tamjiyan/vfl-train-model-demo        latest             <none>                                                                    641af4247349   46 years ago    1.5GB
+dynamos1/policy-enforcer             latest             <none>                                                                    0a21f7ead6a8   46 years ago    28.1MB
+dynamos1/policy-enforcer             main               <none>                                                                    0a21f7ead6a8   46 years ago    28.1MB
+dynamos1/sql-pseudonym-stateful      main               <none>                                                                    ba7282124de3   46 years ago    23.7MB
+dynamos1/sidecar                     latest             <none>                                                                    c13da052cba3   46 years ago    28.9MB
+dynamos1/sidecar                     main               <none>                                                                    c13da052cba3   46 years ago    28.9MB
+dynamos1/policy-checkpoint-gateway   latest             <none>                                                                    e7f19f8981f8   46 years ago    23.3MB
+dynamos1/policy-checkpoint-gateway   main               <none>                                                                    e7f19f8981f8   46 years ago    23.3MB
+dynamos1/agent                       main               <none>                                                                    b986a59e1482   46 years ago    183MB
+dynamos1/vfl-train-model-demo        latest             <none>                                                                    c2bcc2cecf52   46 years ago    1.5GB
+dynamos1/vfl-train-model-demo        main               <none>                                                                    c2bcc2cecf52   46 years ago    1.5GB
+dynamos1/anonymize-test              latest             <none>                                                                    c049c5509c34   46 years ago    1.53GB
+dynamos1/anonymize-test              main               <none>                                                                    c049c5509c34   46 years ago    1.53GB
+dynamos1/sql-pseudonym-stateful      latest             <none>                                                                    3b6ab1bf8f76   46 years ago    23.7MB

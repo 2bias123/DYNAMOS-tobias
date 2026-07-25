@@ -1,0 +1,239 @@
+$ date
+Sat Jul 25 01:46:16 PM CEST 2026
+
+$ git rev-parse HEAD
+9ae1ce916f9cd2cc20f2dd33cb433d8224b4d3e1
+
+$ git status --short
+ M python/Makefile
+ M results/e1-decision-correctness/captures.md
+?? .idea/
+?? go/agent
+?? go/cmd/Dockerfile
+?? go/policy-checkpoint-gateway
+?? results/e1-decision-correctness/live-chain/20260725-133242_allow-write-and-resume.txt
+?? results/e1-decision-correctness/live-chain/20260725-134616_allow-write-and-resume.txt
+
+$ kubectl config current-context
+kind-kind
+
+
+=== clean slate: reset, then delete the four state PVCs
+PREFLIGHT OK: B14, B15 applied
+[reset] deleting stale Jobs in steward namespaces
+No resources found
+No resources found
+No resources found
+No resources found
+[reset] clearing /agents/jobs/ etcd keys
+[reset] coordinated rollout of request path
+deployment.apps/api-gateway restarted
+deployment.apps/policy-enforcer restarted
+deployment.apps/orchestrator restarted
+deployment.apps/server restarted
+deployment.apps/clientone restarted
+deployment.apps/clienttwo restarted
+deployment.apps/clientthree restarted
+Waiting for deployment "api-gateway" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "api-gateway" rollout to finish: 1 old replicas are pending termination...
+deployment "api-gateway" successfully rolled out
+deployment "policy-enforcer" successfully rolled out
+deployment "orchestrator" successfully rolled out
+Waiting for deployment "server" rollout to finish: 1 old replicas are pending termination...
+deployment "server" successfully rolled out
+deployment "clientone" successfully rolled out
+deployment "clienttwo" successfully rolled out
+deployment "clientthree" successfully rolled out
+[reset] settling 45s for AMQP topology to converge
+[reset] OK
+persistentvolumeclaim "state-server-ad751c18-vfltrainmodelrequest" deleted
+persistentvolumeclaim "state-clientone-ad751c18-vfltrainmodelrequest" deleted
+persistentvolumeclaim "state-clienttwo-ad751c18-vfltrainmodelrequest" deleted
+persistentvolumeclaim "state-clientthree-ad751c18-vfltrainmodelrequest" deleted
+
+=== seed canonical state-aware agreements
+[seed] server: OK
+[seed] clientone: OK
+[seed] clienttwo: OK
+[seed] clientthree: OK
+[seed] verified in etcd for all stewards: resumeAllowed=True
+
+=== run 1: cycles=3 against empty PVCs
+trigger: {"request_id":"ec9a3e4e-a9bb-4548-8f9e-ce10f27f7744","status":"pending"}
+poll 1: pending
+poll 2: pending
+poll 3: done
+{
+    "metadata": {
+        "policy_reintroduction": -1,
+        "policy_removal": -1,
+        "total_rounds": 3,
+        "training_backtrack": 0
+    },
+    "request_id": "ec9a3e4e-a9bb-4548-8f9e-ce10f27f7744",
+    "results": [
+        {
+            "accuracy": -2.1117448806762695,
+            "clients": 3,
+            "timestamp": "2026-07-25T11:47:28Z",
+            "train_round": 0
+        },
+        {
+            "accuracy": -2.109266996383667,
+            "clients": 3,
+            "timestamp": "2026-07-25T11:47:28Z",
+            "train_round": 1
+        },
+        {
+            "accuracy": -2.097269058227539,
+            "clients": 3,
+            "timestamp": "2026-07-25T11:47:29Z",
+            "train_round": 2
+        }
+    ],
+    "status": "done"
+}
+
+--- server gateway audit (run 1) ---
+1.784980041778443e+09	[34mINFO[0m	/home/onebias/School/thesis/DYNAMOS-tobias/go/cmd/policy-checkpoint-gateway/main.go:141	Serving on 50050
+1.7849800417841864e+09	[34mINFO[0m	/home/onebias/School/thesis/DYNAMOS-tobias/go/cmd/policy-checkpoint-gateway/watch.go:49	Agreement loaded 54d9c11105ec0d7535efe6f88afcc1bd5ec7ea185bdbfcda1a3ffa6f7df4bad0
+{"op":"subscribe","reason":"subscription established","identity":{"steward":"SERVER","user":"jake.jongejans@student.uva.nl","requestType":"vflTrainModelRequest","jobId":"jake-jongejans-1b253a5fserver1","localJobName":"jake-jongejans-1b253a5fserver1"},"agreementHash":"54d9c11105ec0d7535efe6f88afcc1bd5ec7ea185bdbfcda1a3ffa6f7df4bad0","policySource":"cached"}
+{"op":"subscribe","reason":"subscription established","identity":{"steward":"SERVER","user":"jake.jongejans@student.uva.nl","requestType":"vflTrainModelRequest","jobId":"jake-jongejans-1b253a5fserver1","localJobName":"jake-jongejans-1b253a5fserver1"},"agreementHash":"54d9c11105ec0d7535efe6f88afcc1bd5ec7ea185bdbfcda1a3ffa6f7df4bad0","policySource":"cached"}
+{"op":"read","decision":"DENY","reason":"not found","identity":{"steward":"SERVER","user":"jake.jongejans@student.uva.nl","requestType":"vflTrainModelRequest","jobId":"jake-jongejans-1b253a5fserver1","localJobName":"jake-jongejans-1b253a5fserver1"},"stateClass":"vfl_server_model","stateKey":"latest","agreementHash":"54d9c11105ec0d7535efe6f88afcc1bd5ec7ea185bdbfcda1a3ffa6f7df4bad0","policySource":"cached","cacheAgeMs":3278}
+{"op":"write","decision":"ALLOW","identity":{"steward":"SERVER","user":"jake.jongejans@student.uva.nl","requestType":"vflTrainModelRequest","jobId":"jake-jongejans-1b253a5fserver1","localJobName":"jake-jongejans-1b253a5fserver1"},"stateClass":"vfl_server_model","stateKey":"latest","writtenUnixSeconds":1784980046,"agreementHash":"54d9c11105ec0d7535efe6f88afcc1bd5ec7ea185bdbfcda1a3ffa6f7df4bad0","policySource":"cached","cacheAgeMs":4997}
+{"op":"write","decision":"ALLOW","identity":{"steward":"SERVER","user":"jake.jongejans@student.uva.nl","requestType":"vflTrainModelRequest","jobId":"jake-jongejans-1b253a5fserver1","localJobName":"jake-jongejans-1b253a5fserver1"},"stateClass":"vfl_server_model","stateKey":"latest","writtenUnixSeconds":1784980048,"agreementHash":"54d9c11105ec0d7535efe6f88afcc1bd5ec7ea185bdbfcda1a3ffa6f7df4bad0","policySource":"cached","cacheAgeMs":6652}
+{"op":"write","decision":"ALLOW","identity":{"steward":"SERVER","user":"jake.jongejans@student.uva.nl","requestType":"vflTrainModelRequest","jobId":"jake-jongejans-1b253a5fserver1","localJobName":"jake-jongejans-1b253a5fserver1"},"stateClass":"vfl_server_model","stateKey":"latest","writtenUnixSeconds":1784980049,"agreementHash":"54d9c11105ec0d7535efe6f88afcc1bd5ec7ea185bdbfcda1a3ffa6f7df4bad0","policySource":"cached","cacheAgeMs":7281}
+{"op":"shutdown","reason":"ms_exit","identity":{"steward":"SERVER","user":"jake.jongejans@student.uva.nl","requestType":"vflTrainModelRequest","jobId":"jake-jongejans-1b253a5fserver1","localJobName":"jake-jongejans-1b253a5fserver1"}}
+1.7849800493734314e+09	[34mINFO[0m	/home/onebias/School/thesis/DYNAMOS-tobias/go/cmd/policy-checkpoint-gateway/main.go:209	Stopping gateway, draining briefly before stop
+OK: empty-PVC startup read DENY
+    {"op":"read","decision":"DENY","reason":"not found","identity":{"steward":"SERVER","user":"jake.jongejans@student.uva.nl","requestType":"vflTrainModelRequest","jobId":"jake-jongejans-1b253a5fserver1","localJobName":"jake-jongejans-1b253a5fserver1"},"stateClass":"vfl_server_model","stateKey":"latest","agreementHash":"54d9c11105ec0d7535efe6f88afcc1bd5ec7ea185bdbfcda1a3ffa6f7df4bad0","policySource":"cached","cacheAgeMs":3278}
+OK: read deny reason is 'not found'
+    {"op":"read","decision":"DENY","reason":"not found","identity":{"steward":"SERVER","user":"jake.jongejans@student.uva.nl","requestType":"vflTrainModelRequest","jobId":"jake-jongejans-1b253a5fserver1","localJobName":"jake-jongejans-1b253a5fserver1"},"stateClass":"vfl_server_model","stateKey":"latest","agreementHash":"54d9c11105ec0d7535efe6f88afcc1bd5ec7ea185bdbfcda1a3ffa6f7df4bad0","policySource":"cached","cacheAgeMs":3278}
+OK: 3 ALLOW write audit lines in run 1
+
+--- server MS checkpoint lines (run 1) ---
+2026-07-25 11:47:26,789 - main.py - main.py:344 - INFO - Checkpoint write allowed: round_index=1
+2026-07-25 11:47:28,440 - main.py - main.py:344 - INFO - Checkpoint write allowed: round_index=2
+2026-07-25 11:47:29,070 - main.py - main.py:344 - INFO - Checkpoint write allowed: round_index=3
+OK: server wrote round_index=3
+    2026-07-25 11:47:29,070 - main.py - main.py:344 - INFO - Checkpoint write allowed: round_index=3
+OK: absent as expected: no resume on an empty PVC
+last write of run 1: writtenUnixSeconds=1784980049
+
+=== run 2: reset + re-seed + re-fire inside the retention window
+PREFLIGHT OK: B14, B15 applied
+[reset] deleting stale Jobs in steward namespaces
+job.batch "jake-jongejans-1b253a5fserver1" deleted
+job.batch "jake-jongejans-1b253a5fclientone1" deleted
+job.batch "jake-jongejans-1b253a5fclienttwo1" deleted
+job.batch "jake-jongejans-1b253a5fclientthree1" deleted
+[reset] clearing /agents/jobs/ etcd keys
+[reset] coordinated rollout of request path
+deployment.apps/api-gateway restarted
+deployment.apps/policy-enforcer restarted
+deployment.apps/orchestrator restarted
+deployment.apps/server restarted
+deployment.apps/clientone restarted
+deployment.apps/clienttwo restarted
+deployment.apps/clientthree restarted
+Waiting for deployment "api-gateway" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "api-gateway" rollout to finish: 1 old replicas are pending termination...
+deployment "api-gateway" successfully rolled out
+Waiting for deployment "policy-enforcer" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "policy-enforcer" rollout to finish: 1 old replicas are pending termination...
+deployment "policy-enforcer" successfully rolled out
+deployment "orchestrator" successfully rolled out
+deployment "server" successfully rolled out
+deployment "clientone" successfully rolled out
+deployment "clienttwo" successfully rolled out
+deployment "clientthree" successfully rolled out
+[reset] settling 45s for AMQP topology to converge
+[reset] OK
+[seed] server: OK
+[seed] clientone: OK
+[seed] clienttwo: OK
+[seed] clientthree: OK
+[seed] verified in etcd for all stewards: resumeAllowed=True
+trigger: {"request_id":"22391622-f663-4ca3-8b49-f88523c9e9e4","status":"pending"}
+poll 1: pending
+poll 2: done
+{
+    "metadata": {
+        "policy_reintroduction": -1,
+        "policy_removal": -1,
+        "total_rounds": 3,
+        "training_backtrack": 0
+    },
+    "request_id": "22391622-f663-4ca3-8b49-f88523c9e9e4",
+    "results": [
+        {
+            "accuracy": -2.0655603408813477,
+            "clients": 3,
+            "timestamp": "2026-07-25T11:48:35Z",
+            "train_round": 0
+        },
+        {
+            "accuracy": -1.9924986362457275,
+            "clients": 3,
+            "timestamp": "2026-07-25T11:48:36Z",
+            "train_round": 1
+        },
+        {
+            "accuracy": -1.8525879383087158,
+            "clients": 3,
+            "timestamp": "2026-07-25T11:48:36Z",
+            "train_round": 2
+        }
+    ],
+    "status": "done"
+}
+
+--- server gateway audit (run 2) ---
+1.7849801103735092e+09	[34mINFO[0m	/home/onebias/School/thesis/DYNAMOS-tobias/go/cmd/policy-checkpoint-gateway/main.go:141	Serving on 50050
+1.7849801103816428e+09	[34mINFO[0m	/home/onebias/School/thesis/DYNAMOS-tobias/go/cmd/policy-checkpoint-gateway/watch.go:49	Agreement loaded 54d9c11105ec0d7535efe6f88afcc1bd5ec7ea185bdbfcda1a3ffa6f7df4bad0
+{"op":"subscribe","reason":"subscription established","identity":{"steward":"SERVER","user":"jake.jongejans@student.uva.nl","requestType":"vflTrainModelRequest","jobId":"jake-jongejans-df4f9c6bserver1","localJobName":"jake-jongejans-df4f9c6bserver1"},"agreementHash":"54d9c11105ec0d7535efe6f88afcc1bd5ec7ea185bdbfcda1a3ffa6f7df4bad0","policySource":"cached"}
+{"op":"subscribe","reason":"subscription established","identity":{"steward":"SERVER","user":"jake.jongejans@student.uva.nl","requestType":"vflTrainModelRequest","jobId":"jake-jongejans-df4f9c6bserver1","localJobName":"jake-jongejans-df4f9c6bserver1"},"agreementHash":"54d9c11105ec0d7535efe6f88afcc1bd5ec7ea185bdbfcda1a3ffa6f7df4bad0","policySource":"cached"}
+{"op":"read","decision":"ALLOW","identity":{"steward":"SERVER","user":"jake.jongejans@student.uva.nl","requestType":"vflTrainModelRequest","jobId":"jake-jongejans-df4f9c6bserver1","localJobName":"jake-jongejans-df4f9c6bserver1"},"stateClass":"vfl_server_model","stateKey":"latest","writtenUnixSeconds":1784980049,"agreementHash":"54d9c11105ec0d7535efe6f88afcc1bd5ec7ea185bdbfcda1a3ffa6f7df4bad0","policySource":"cached","cacheAgeMs":2225}
+{"op":"write","decision":"ALLOW","identity":{"steward":"SERVER","user":"jake.jongejans@student.uva.nl","requestType":"vflTrainModelRequest","jobId":"jake-jongejans-df4f9c6bserver1","localJobName":"jake-jongejans-df4f9c6bserver1"},"stateClass":"vfl_server_model","stateKey":"latest","writtenUnixSeconds":1784980114,"agreementHash":"54d9c11105ec0d7535efe6f88afcc1bd5ec7ea185bdbfcda1a3ffa6f7df4bad0","policySource":"cached","cacheAgeMs":3933}
+{"op":"write","decision":"ALLOW","identity":{"steward":"SERVER","user":"jake.jongejans@student.uva.nl","requestType":"vflTrainModelRequest","jobId":"jake-jongejans-df4f9c6bserver1","localJobName":"jake-jongejans-df4f9c6bserver1"},"stateClass":"vfl_server_model","stateKey":"latest","writtenUnixSeconds":1784980116,"agreementHash":"54d9c11105ec0d7535efe6f88afcc1bd5ec7ea185bdbfcda1a3ffa6f7df4bad0","policySource":"cached","cacheAgeMs":5644}
+{"op":"write","decision":"ALLOW","identity":{"steward":"SERVER","user":"jake.jongejans@student.uva.nl","requestType":"vflTrainModelRequest","jobId":"jake-jongejans-df4f9c6bserver1","localJobName":"jake-jongejans-df4f9c6bserver1"},"stateClass":"vfl_server_model","stateKey":"latest","writtenUnixSeconds":1784980116,"agreementHash":"54d9c11105ec0d7535efe6f88afcc1bd5ec7ea185bdbfcda1a3ffa6f7df4bad0","policySource":"cached","cacheAgeMs":6215}
+{"op":"shutdown","reason":"ms_exit","identity":{"steward":"SERVER","user":"jake.jongejans@student.uva.nl","requestType":"vflTrainModelRequest","jobId":"jake-jongejans-df4f9c6bserver1","localJobName":"jake-jongejans-df4f9c6bserver1"}}
+1.7849801168429506e+09	[34mINFO[0m	/home/onebias/School/thesis/DYNAMOS-tobias/go/cmd/policy-checkpoint-gateway/main.go:209	Stopping gateway, draining briefly before stop
+OK: resume-allowed read ALLOW
+    {"op":"read","decision":"ALLOW","identity":{"steward":"SERVER","user":"jake.jongejans@student.uva.nl","requestType":"vflTrainModelRequest","jobId":"jake-jongejans-df4f9c6bserver1","localJobName":"jake-jongejans-df4f9c6bserver1"},"stateClass":"vfl_server_model","stateKey":"latest","writtenUnixSeconds":1784980049,"agreementHash":"54d9c11105ec0d7535efe6f88afcc1bd5ec7ea185bdbfcda1a3ffa6f7df4bad0","policySource":"cached","cacheAgeMs":2225}
+run 2 read ALLOW writtenUnixSeconds=1784980049 (run 1 last write was 1784980049)
+OK: read timestamp matches run 1's last write (mtime survived the PVC remount)
+
+--- server MS lines (run 2) ---
+2026-07-25 11:48:32,610 - main.py - main.py:376 - INFO - Resumed server model from checkpoint: round_index=3 nof_clients=3 written_unix_seconds=1784980049
+2026-07-25 11:48:34,325 - main.py - main.py:344 - INFO - Checkpoint write allowed: round_index=4
+2026-07-25 11:48:36,027 - main.py - main.py:344 - INFO - Checkpoint write allowed: round_index=5
+2026-07-25 11:48:36,598 - main.py - main.py:344 - INFO - Checkpoint write allowed: round_index=6
+--- clientone MS lines (run 2) ---
+2026-07-25 11:48:33,731 - main.py - main.py:299 - INFO - Resuming client model from checkpoint: round_index=3 written_unix_seconds=1784980049
+2026-07-25 11:48:35,562 - main.py - main.py:270 - INFO - Checkpoint write allowed: round_index=4
+2026-07-25 11:48:36,239 - main.py - main.py:270 - INFO - Checkpoint write allowed: round_index=5
+2026-07-25 11:48:36,743 - main.py - main.py:270 - INFO - Checkpoint write allowed: round_index=6
+OK: server resumed at round_index=3
+    2026-07-25 11:48:32,610 - main.py - main.py:376 - INFO - Resumed server model from checkpoint: round_index=3 nof_clients=3 written_unix_seconds=1784980049
+OK: server wrote round_index=6 (monotonic across runs)
+    2026-07-25 11:48:36,598 - main.py - main.py:344 - INFO - Checkpoint write allowed: round_index=6
+OK: clientone resumed at round_index=3
+    2026-07-25 11:48:33,731 - main.py - main.py:299 - INFO - Resuming client model from checkpoint: round_index=3 written_unix_seconds=1784980049
+
+--- client steward audits (run 2, read+write decisions) ---
+[clientone]
+{"op":"read","decision":"ALLOW","identity":{"steward":"CLIENTONE","user":"jake.jongejans@student.uva.nl","requestType":"vflTrainModelRequest","jobId":"jake-jongejans-df4f9c6bclientone1","localJobName":"jake-jongejans-df4f9c6bclientone1"},"stateClass":"vfl_client_model","stateKey":"latest","writtenUnixSeconds":1784980049,"agreementHash":"06afbf1e6a6a11ead36c96b5ab35dc229bc6c11b18c2c5d1dd0485653d9ad9c3","policySource":"cached","cacheAgeMs":3246}
+{"op":"write","decision":"ALLOW","identity":{"steward":"CLIENTONE","user":"jake.jongejans@student.uva.nl","requestType":"vflTrainModelRequest","jobId":"jake-jongejans-df4f9c6bclientone1","localJobName":"jake-jongejans-df4f9c6bclientone1"},"stateClass":"vfl_client_model","stateKey":"latest","writtenUnixSeconds":1784980115,"agreementHash":"06afbf1e6a6a11ead36c96b5ab35dc229bc6c11b18c2c5d1dd0485653d9ad9c3","policySource":"cached","cacheAgeMs":5078}
+{"op":"write","decision":"ALLOW","identity":{"steward":"CLIENTONE","user":"jake.jongejans@student.uva.nl","requestType":"vflTrainModelRequest","jobId":"jake-jongejans-df4f9c6bclientone1","localJobName":"jake-jongejans-df4f9c6bclientone1"},"stateClass":"vfl_client_model","stateKey":"latest","writtenUnixSeconds":1784980116,"agreementHash":"06afbf1e6a6a11ead36c96b5ab35dc229bc6c11b18c2c5d1dd0485653d9ad9c3","policySource":"cached","cacheAgeMs":5762}
+{"op":"write","decision":"ALLOW","identity":{"steward":"CLIENTONE","user":"jake.jongejans@student.uva.nl","requestType":"vflTrainModelRequest","jobId":"jake-jongejans-df4f9c6bclientone1","localJobName":"jake-jongejans-df4f9c6bclientone1"},"stateClass":"vfl_client_model","stateKey":"latest","writtenUnixSeconds":1784980116,"agreementHash":"06afbf1e6a6a11ead36c96b5ab35dc229bc6c11b18c2c5d1dd0485653d9ad9c3","policySource":"cached","cacheAgeMs":6264}
+[clienttwo]
+{"op":"read","decision":"ALLOW","identity":{"steward":"CLIENTTWO","user":"jake.jongejans@student.uva.nl","requestType":"vflTrainModelRequest","jobId":"jake-jongejans-df4f9c6bclienttwo1","localJobName":"jake-jongejans-df4f9c6bclienttwo1"},"stateClass":"vfl_client_model","stateKey":"latest","writtenUnixSeconds":1784980049,"agreementHash":"d624fdaf99bb6e81eb44b64524ec5ff825af84cc4c2f4692796773d086426c8c","policySource":"cached","cacheAgeMs":3078}
+{"op":"write","decision":"ALLOW","identity":{"steward":"CLIENTTWO","user":"jake.jongejans@student.uva.nl","requestType":"vflTrainModelRequest","jobId":"jake-jongejans-df4f9c6bclienttwo1","localJobName":"jake-jongejans-df4f9c6bclienttwo1"},"stateClass":"vfl_client_model","stateKey":"latest","writtenUnixSeconds":1784980115,"agreementHash":"d624fdaf99bb6e81eb44b64524ec5ff825af84cc4c2f4692796773d086426c8c","policySource":"cached","cacheAgeMs":5182}
+{"op":"write","decision":"ALLOW","identity":{"steward":"CLIENTTWO","user":"jake.jongejans@student.uva.nl","requestType":"vflTrainModelRequest","jobId":"jake-jongejans-df4f9c6bclienttwo1","localJobName":"jake-jongejans-df4f9c6bclienttwo1"},"stateClass":"vfl_client_model","stateKey":"latest","writtenUnixSeconds":1784980116,"agreementHash":"d624fdaf99bb6e81eb44b64524ec5ff825af84cc4c2f4692796773d086426c8c","policySource":"cached","cacheAgeMs":5826}
+{"op":"write","decision":"ALLOW","identity":{"steward":"CLIENTTWO","user":"jake.jongejans@student.uva.nl","requestType":"vflTrainModelRequest","jobId":"jake-jongejans-df4f9c6bclienttwo1","localJobName":"jake-jongejans-df4f9c6bclienttwo1"},"stateClass":"vfl_client_model","stateKey":"latest","writtenUnixSeconds":1784980116,"agreementHash":"d624fdaf99bb6e81eb44b64524ec5ff825af84cc4c2f4692796773d086426c8c","policySource":"cached","cacheAgeMs":6364}
+[clientthree]
+{"op":"read","decision":"ALLOW","identity":{"steward":"CLIENTTHREE","user":"jake.jongejans@student.uva.nl","requestType":"vflTrainModelRequest","jobId":"jake-jongejans-df4f9c6bclientthree1","localJobName":"jake-jongejans-df4f9c6bclientthree1"},"stateClass":"vfl_client_model","stateKey":"latest","writtenUnixSeconds":1784980049,"agreementHash":"df9016b7ddeea4dccef69ebd8bf223f237d6d0f5f6f172aced659ac4f16afd66","policySource":"cached","cacheAgeMs":2595}
+{"op":"write","decision":"ALLOW","identity":{"steward":"CLIENTTHREE","user":"jake.jongejans@student.uva.nl","requestType":"vflTrainModelRequest","jobId":"jake-jongejans-df4f9c6bclientthree1","localJobName":"jake-jongejans-df4f9c6bclientthree1"},"stateClass":"vfl_client_model","stateKey":"latest","writtenUnixSeconds":1784980115,"agreementHash":"df9016b7ddeea4dccef69ebd8bf223f237d6d0f5f6f172aced659ac4f16afd66","policySource":"cached","cacheAgeMs":5075}
+{"op":"write","decision":"ALLOW","identity":{"steward":"CLIENTTHREE","user":"jake.jongejans@student.uva.nl","requestType":"vflTrainModelRequest","jobId":"jake-jongejans-df4f9c6bclientthree1","localJobName":"jake-jongejans-df4f9c6bclientthree1"},"stateClass":"vfl_client_model","stateKey":"latest","writtenUnixSeconds":1784980116,"agreementHash":"df9016b7ddeea4dccef69ebd8bf223f237d6d0f5f6f172aced659ac4f16afd66","policySource":"cached","cacheAgeMs":5655}
+{"op":"write","decision":"ALLOW","identity":{"steward":"CLIENTTHREE","user":"jake.jongejans@student.uva.nl","requestType":"vflTrainModelRequest","jobId":"jake-jongejans-df4f9c6bclientthree1","localJobName":"jake-jongejans-df4f9c6bclientthree1"},"stateClass":"vfl_client_model","stateKey":"latest","writtenUnixSeconds":1784980116,"agreementHash":"df9016b7ddeea4dccef69ebd8bf223f237d6d0f5f6f172aced659ac4f16afd66","policySource":"cached","cacheAgeMs":6291}

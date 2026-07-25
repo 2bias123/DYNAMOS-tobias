@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"os"
 	"strings"
 	"time"
 
@@ -79,13 +80,25 @@ func refreshAgreement(src agreementSource, key string, cache *policyCache) {
 func syncAgreement(stop <-chan struct{}, src agreementSource, key string, cache *policyCache, pollInterval time.Duration) {
 	refreshAgreement(src, key, cache)
 
+	// Poll-only mode for the degraded-regime measurement: skip the watch so the
+	// only path to a change is the periodic re-Get.
+	watchDisabled := os.Getenv("AGREEMENT_WATCH_DISABLED") == "true"
+	if watchDisabled {
+		logger.Sugar().Warnw("Agreement watch disabled; poll-only regime", "pollInterval", pollInterval)
+	}
+
 	ticker := time.NewTicker(pollInterval)
 	defer ticker.Stop()
 
 	backoff := time.Second
 	for {
-		wctx, wcancel := context.WithCancel(context.Background())
-		wch := src.Watch(wctx, key, clientv3.WithProgressNotify())
+		var wch clientv3.WatchChan
+		wcancel := context.CancelFunc(func() {})
+		if !watchDisabled {
+			var wctx context.Context
+			wctx, wcancel = context.WithCancel(context.Background())
+			wch = src.Watch(wctx, key, clientv3.WithProgressNotify())
+		}
 
 		watching := true
 		for watching {
