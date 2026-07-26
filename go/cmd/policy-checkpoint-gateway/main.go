@@ -225,6 +225,10 @@ func main() {
 	g := newGatewayServer(store, cfg.identity)
 	g.policy = newPolicyCache(cfg.maxStaleness)
 	g.regJobName = cfg.regJobName
+	if os.Getenv("GATEWAY_PASSTHROUGH") == "true" {
+		g.passthrough = true
+		logger.Sugar().Warn("Pass-through mode: decisions and audit only, state writes skipped")
+	}
 
 	etcdClient := etcd.GetEtcdClient(etcdEndpoints)
 	g.source = etcdClient

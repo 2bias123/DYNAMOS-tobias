@@ -1,0 +1,69 @@
+$ date
+Sun Jul 26 01:26:44 PM CEST 2026
+
+$ git -C /home/onebias/School/thesis/DYNAMOS-tobias rev-parse --abbrev-ref HEAD
+main
+
+$ git -C /home/onebias/School/thesis/DYNAMOS-tobias rev-parse HEAD
+105ee3e8e616080ba4a345368ac394003da3561c
+
+$ git -C /home/onebias/School/thesis/DYNAMOS-tobias status --short
+?? results/env/20260726-132644_env-snapshot.txt
+
+$ go version
+go version go1.23.8 linux/amd64
+
+$ kind version
+kind v0.24.0 go1.23.8 linux/amd64
+
+$ kubectl version --client
+Client Version: v1.31.2
+Kustomize Version: v5.4.2
+
+$ kubectl get nodes -o wide
+NAME                 STATUS   ROLES           AGE   VERSION   INTERNAL-IP   EXTERNAL-IP   OS-IMAGE                         KERNEL-VERSION   CONTAINER-RUNTIME
+kind-control-plane   Ready    control-plane   61d   v1.31.0   172.18.0.2    <none>        Debian GNU/Linux 12 (bookworm)   6.6.94           containerd://1.7.18
+
+$ kubectl get pods -A
+NAMESPACE            NAME                                                 READY   STATUS      RESTARTS         AGE
+api-gateway          api-gateway-b5f85c788-7bjvs                          3/3     Running     3 (138m ago)     20h
+clientone            clientone-856989c6d4-h5wlm                           3/3     Running     3 (138m ago)     20h
+clientthree          clientthree-665f499ccf-7l45w                         3/3     Running     3 (138m ago)     20h
+clienttwo            clienttwo-59cffd77f4-7fhvz                           3/3     Running     3 (138m ago)     20h
+core                 debug                                                2/2     Running     334 (17m ago)    47d
+core                 etcd-0                                               2/2     Running     76 (138m ago)    41d
+core                 etcd-1                                               2/2     Running     76 (138m ago)    41d
+core                 etcd-2                                               2/2     Running     76 (138m ago)    41d
+core                 grafana-664bc9d4f7-sxc9d                             2/2     Running     98 (138m ago)    47d
+core                 loki-85444789f-f28qv                                 2/2     Running     98 (138m ago)    47d
+core                 promtail-8kxmg                                       2/2     Running     98 (138m ago)    47d
+core                 rabbitmq-7ff55c6b4b-v2nfl                            2/2     Running     76 (138m ago)    41d
+default              prometheus-alertmanager-0                            1/1     Running     49 (138m ago)    47d
+default              prometheus-kube-state-metrics-6b6b5f8c5c-gkvcc       1/1     Running     82 (138m ago)    47d
+default              prometheus-prometheus-node-exporter-5mw8v            1/1     Running     49 (138m ago)    47d
+default              prometheus-prometheus-pushgateway-79764966fb-q2clb   1/1     Running     49 (138m ago)    47d
+default              prometheus-server-659f5f956b-m6m8w                   2/2     Running     98 (138m ago)    47d
+ingress              nginx-nginx-ingress-controller-58bc7cddcc-5t5ph      1/1     Running     89 (138m ago)    47d
+kube-system          coredns-6f6b679f8f-dr2lp                             1/1     Running     70 (138m ago)    61d
+kube-system          coredns-6f6b679f8f-jbnwf                             1/1     Running     70 (138m ago)    61d
+kube-system          etcd-kind-control-plane                              1/1     Running     70 (138m ago)    61d
+kube-system          kindnet-m9vxf                                        1/1     Running     70 (138m ago)    61d
+kube-system          kube-apiserver-kind-control-plane                    1/1     Running     70 (138m ago)    61d
+kube-system          kube-controller-manager-kind-control-plane           1/1     Running     70 (138m ago)    61d
+kube-system          kube-proxy-2nfth                                     1/1     Running     70 (138m ago)    61d
+kube-system          kube-scheduler-kind-control-plane                    1/1     Running     70 (138m ago)    61d
+linkerd-jaeger       collector-8459487b75-zrpvc                           2/2     Running     139 (138m ago)   61d
+linkerd-jaeger       jaeger-77d4954795-52cw4                              2/2     Running     139 (138m ago)   61d
+linkerd-jaeger       jaeger-injector-7cb554bc64-s7tdr                     2/2     Running     140 (138m ago)   61d
+linkerd              linkerd-destination-74bbdc7579-lptd7                 4/4     Running     152 (138m ago)   41d
+linkerd              linkerd-identity-67c984c94c-6cqwr                    2/2     Running     81 (138m ago)    41d
+linkerd              linkerd-proxy-injector-5d6d4bc85-fljbd               2/2     Running     76 (138m ago)    41d
+local-path-storage   local-path-provisioner-57c5987fd4-psc95              1/1     Running     127 (138m ago)   61d
+orchestrator         init-etcd-pvc-hs7cf                                  0/1     Completed   0                47d
+orchestrator         orchestrator-7d868d8765-2vvtl                        3/3     Running     5 (137m ago)     20h
+orchestrator         policy-enforcer-567586789c-r8s2q                     3/3     Running     5 (138m ago)     20h
+server               server-c59fb8c74-cr7b5                               3/3     Running     3 (138m ago)     20h
+surf                 surf-548dd97f9d-xr25h                                3/3     Running     274 (138m ago)   47d
+uva                  uva-6bcdbcdf46-66rmd                                 3/3     Running     42 (138m ago)    9d
+vu                   vu-74b59d8746-zhhvv                                  3/3     Running     272 (138m ago)   47d
+

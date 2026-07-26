@@ -42,3 +42,10 @@ datasets/*.csv
 notes/
 .claude/
 CLAUDE.md
+
+# IDE
+.idea/
+
+# Local go build binaries
+go/agent
+go/policy-checkpoint-gateway

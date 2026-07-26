@@ -1,0 +1,75 @@
+$ date
+Sat Jul 25 04:44:18 PM CEST 2026
+
+$ git rev-parse HEAD
+968fd33e0be5a2f9e1f0c6d4a56ab05eb1b2d6f0
+
+$ git status --short
+ M python/Makefile
+ M results/e2-policy-latency/captures.md
+?? .idea/
+?? go/agent
+?? go/cmd/Dockerfile
+?? go/policy-checkpoint-gateway
+?? results/e2-policy-latency/poll-spotcheck/20260725-164418_poll-only-deny.txt
+?? results/e2-policy-latency/watch-regime/20260725-164227_flip-to-first-deny.txt
+
+$ kubectl config current-context
+kind-kind
+
+
+=== build the gateway (-tags local) and wire up etcd + orchestrator
+
+=== seed the server agreement allowed=true via /policyEnforcer
+
+=== run the local gateway with the watch disabled (poll interval 30s)
+gateway up (poll-only):
+    1.7849906635541563e+09	[34mINFO[0m	/home/onebias/School/thesis/DYNAMOS-tobias/go/cmd/policy-checkpoint-gateway/main.go:141	Serving on 50060
+    1.7849906635639036e+09	[34mINFO[0m	/home/onebias/School/thesis/DYNAMOS-tobias/go/cmd/policy-checkpoint-gateway/watch.go:50	Agreement loaded 54d9c11105ec0d7535efe6f88afcc1bd5ec7ea185bdbfcda1a3ffa6f7df4bad0
+    1.7849906635639682e+09	[33mWARN[0m	/home/onebias/School/thesis/DYNAMOS-tobias/go/cmd/policy-checkpoint-gateway/watch.go:87	Agreement watch disabled; poll-only regime	{"pollInterval": 30}
+
+=== baseline write must ALLOW (allowed=true, agreement loaded)
+baseline: ALLOW
+
+=== flip allowed=false via /policyEnforcer; time the first enforced DENY
+t_flip=1784990664.653006785 (PUT allowed=false landed)
+t_deny=1784990694.071710993 (first write DENYd 'allowed = false' after 28 ALLOW probes)
+
+interval_ms=29418.7   poll_bound_ms=30000
+WITHIN POLL BOUND
+regime: poll-only (watch disabled); argued from the 30s bound, this single trial confirms it
+
+=== raw gateway decision records (audit leg on the local state volume)
+baseline ALLOW: {"op":"write","decision":"ALLOW","identity":{"steward":"SERVER","user":"jake.jongejans@student.uva.nl","requestType":"vflTrainModelRequest","jobId":"e2-pollcheck","localJobName":"e2-pollcheck"},"stateClass":"e2_probe","stateKey":"probe","writtenUnixSeconds":1784990664,"agreementHash":"54d9c11105ec0d7535efe6f88afcc1bd5ec7ea185bdbfcda1a3ffa6f7df4bad0","policySource":"cached","cacheAgeMs":1021}
+enforced DENY:  {"op":"write","decision":"DENY","reason":"allowed = false","identity":{"steward":"SERVER","user":"jake.jongejans@student.uva.nl","requestType":"vflTrainModelRequest","jobId":"e2-pollcheck","localJobName":"e2-pollcheck"},"stateClass":"e2_probe","stateKey":"probe","agreementHash":"1fe2344b3ac63c17fa234798a498775bf2f5fd0e90a15fa80d924a2abb7c46f9","policySource":"cached","cacheAgeMs":495}
+-- every e2_probe write decision, raw (ALLOW probes then the DENY; cacheAgeMs climbs toward the poll interval) --
+{"op":"write","decision":"ALLOW","identity":{"steward":"SERVER","user":"jake.jongejans@student.uva.nl","requestType":"vflTrainModelRequest","jobId":"e2-pollcheck","localJobName":"e2-pollcheck"},"stateClass":"e2_probe","stateKey":"probe","writtenUnixSeconds":1784990664,"agreementHash":"54d9c11105ec0d7535efe6f88afcc1bd5ec7ea185bdbfcda1a3ffa6f7df4bad0","policySource":"cached","cacheAgeMs":1021}
+{"op":"write","decision":"ALLOW","identity":{"steward":"SERVER","user":"jake.jongejans@student.uva.nl","requestType":"vflTrainModelRequest","jobId":"e2-pollcheck","localJobName":"e2-pollcheck"},"stateClass":"e2_probe","stateKey":"probe","writtenUnixSeconds":1784990664,"agreementHash":"54d9c11105ec0d7535efe6f88afcc1bd5ec7ea185bdbfcda1a3ffa6f7df4bad0","policySource":"cached","cacheAgeMs":1104}
+{"op":"write","decision":"ALLOW","identity":{"steward":"SERVER","user":"jake.jongejans@student.uva.nl","requestType":"vflTrainModelRequest","jobId":"e2-pollcheck","localJobName":"e2-pollcheck"},"stateClass":"e2_probe","stateKey":"probe","writtenUnixSeconds":1784990665,"agreementHash":"54d9c11105ec0d7535efe6f88afcc1bd5ec7ea185bdbfcda1a3ffa6f7df4bad0","policySource":"cached","cacheAgeMs":2156}
+{"op":"write","decision":"ALLOW","identity":{"steward":"SERVER","user":"jake.jongejans@student.uva.nl","requestType":"vflTrainModelRequest","jobId":"e2-pollcheck","localJobName":"e2-pollcheck"},"stateClass":"e2_probe","stateKey":"probe","writtenUnixSeconds":1784990666,"agreementHash":"54d9c11105ec0d7535efe6f88afcc1bd5ec7ea185bdbfcda1a3ffa6f7df4bad0","policySource":"cached","cacheAgeMs":3186}
+{"op":"write","decision":"ALLOW","identity":{"steward":"SERVER","user":"jake.jongejans@student.uva.nl","requestType":"vflTrainModelRequest","jobId":"e2-pollcheck","localJobName":"e2-pollcheck"},"stateClass":"e2_probe","stateKey":"probe","writtenUnixSeconds":1784990667,"agreementHash":"54d9c11105ec0d7535efe6f88afcc1bd5ec7ea185bdbfcda1a3ffa6f7df4bad0","policySource":"cached","cacheAgeMs":4216}
+{"op":"write","decision":"ALLOW","identity":{"steward":"SERVER","user":"jake.jongejans@student.uva.nl","requestType":"vflTrainModelRequest","jobId":"e2-pollcheck","localJobName":"e2-pollcheck"},"stateClass":"e2_probe","stateKey":"probe","writtenUnixSeconds":1784990668,"agreementHash":"54d9c11105ec0d7535efe6f88afcc1bd5ec7ea185bdbfcda1a3ffa6f7df4bad0","policySource":"cached","cacheAgeMs":5249}
+{"op":"write","decision":"ALLOW","identity":{"steward":"SERVER","user":"jake.jongejans@student.uva.nl","requestType":"vflTrainModelRequest","jobId":"e2-pollcheck","localJobName":"e2-pollcheck"},"stateClass":"e2_probe","stateKey":"probe","writtenUnixSeconds":1784990669,"agreementHash":"54d9c11105ec0d7535efe6f88afcc1bd5ec7ea185bdbfcda1a3ffa6f7df4bad0","policySource":"cached","cacheAgeMs":6297}
+{"op":"write","decision":"ALLOW","identity":{"steward":"SERVER","user":"jake.jongejans@student.uva.nl","requestType":"vflTrainModelRequest","jobId":"e2-pollcheck","localJobName":"e2-pollcheck"},"stateClass":"e2_probe","stateKey":"probe","writtenUnixSeconds":1784990670,"agreementHash":"54d9c11105ec0d7535efe6f88afcc1bd5ec7ea185bdbfcda1a3ffa6f7df4bad0","policySource":"cached","cacheAgeMs":7351}
+{"op":"write","decision":"ALLOW","identity":{"steward":"SERVER","user":"jake.jongejans@student.uva.nl","requestType":"vflTrainModelRequest","jobId":"e2-pollcheck","localJobName":"e2-pollcheck"},"stateClass":"e2_probe","stateKey":"probe","writtenUnixSeconds":1784990671,"agreementHash":"54d9c11105ec0d7535efe6f88afcc1bd5ec7ea185bdbfcda1a3ffa6f7df4bad0","policySource":"cached","cacheAgeMs":8407}
+{"op":"write","decision":"ALLOW","identity":{"steward":"SERVER","user":"jake.jongejans@student.uva.nl","requestType":"vflTrainModelRequest","jobId":"e2-pollcheck","localJobName":"e2-pollcheck"},"stateClass":"e2_probe","stateKey":"probe","writtenUnixSeconds":1784990673,"agreementHash":"54d9c11105ec0d7535efe6f88afcc1bd5ec7ea185bdbfcda1a3ffa6f7df4bad0","policySource":"cached","cacheAgeMs":9460}
+{"op":"write","decision":"ALLOW","identity":{"steward":"SERVER","user":"jake.jongejans@student.uva.nl","requestType":"vflTrainModelRequest","jobId":"e2-pollcheck","localJobName":"e2-pollcheck"},"stateClass":"e2_probe","stateKey":"probe","writtenUnixSeconds":1784990674,"agreementHash":"54d9c11105ec0d7535efe6f88afcc1bd5ec7ea185bdbfcda1a3ffa6f7df4bad0","policySource":"cached","cacheAgeMs":10517}
+{"op":"write","decision":"ALLOW","identity":{"steward":"SERVER","user":"jake.jongejans@student.uva.nl","requestType":"vflTrainModelRequest","jobId":"e2-pollcheck","localJobName":"e2-pollcheck"},"stateClass":"e2_probe","stateKey":"probe","writtenUnixSeconds":1784990675,"agreementHash":"54d9c11105ec0d7535efe6f88afcc1bd5ec7ea185bdbfcda1a3ffa6f7df4bad0","policySource":"cached","cacheAgeMs":11571}
+{"op":"write","decision":"ALLOW","identity":{"steward":"SERVER","user":"jake.jongejans@student.uva.nl","requestType":"vflTrainModelRequest","jobId":"e2-pollcheck","localJobName":"e2-pollcheck"},"stateClass":"e2_probe","stateKey":"probe","writtenUnixSeconds":1784990676,"agreementHash":"54d9c11105ec0d7535efe6f88afcc1bd5ec7ea185bdbfcda1a3ffa6f7df4bad0","policySource":"cached","cacheAgeMs":12622}
+{"op":"write","decision":"ALLOW","identity":{"steward":"SERVER","user":"jake.jongejans@student.uva.nl","requestType":"vflTrainModelRequest","jobId":"e2-pollcheck","localJobName":"e2-pollcheck"},"stateClass":"e2_probe","stateKey":"probe","writtenUnixSeconds":1784990677,"agreementHash":"54d9c11105ec0d7535efe6f88afcc1bd5ec7ea185bdbfcda1a3ffa6f7df4bad0","policySource":"cached","cacheAgeMs":13671}
+{"op":"write","decision":"ALLOW","identity":{"steward":"SERVER","user":"jake.jongejans@student.uva.nl","requestType":"vflTrainModelRequest","jobId":"e2-pollcheck","localJobName":"e2-pollcheck"},"stateClass":"e2_probe","stateKey":"probe","writtenUnixSeconds":1784990678,"agreementHash":"54d9c11105ec0d7535efe6f88afcc1bd5ec7ea185bdbfcda1a3ffa6f7df4bad0","policySource":"cached","cacheAgeMs":14724}
+{"op":"write","decision":"ALLOW","identity":{"steward":"SERVER","user":"jake.jongejans@student.uva.nl","requestType":"vflTrainModelRequest","jobId":"e2-pollcheck","localJobName":"e2-pollcheck"},"stateClass":"e2_probe","stateKey":"probe","writtenUnixSeconds":1784990679,"agreementHash":"54d9c11105ec0d7535efe6f88afcc1bd5ec7ea185bdbfcda1a3ffa6f7df4bad0","policySource":"cached","cacheAgeMs":15773}
+{"op":"write","decision":"ALLOW","identity":{"steward":"SERVER","user":"jake.jongejans@student.uva.nl","requestType":"vflTrainModelRequest","jobId":"e2-pollcheck","localJobName":"e2-pollcheck"},"stateClass":"e2_probe","stateKey":"probe","writtenUnixSeconds":1784990680,"agreementHash":"54d9c11105ec0d7535efe6f88afcc1bd5ec7ea185bdbfcda1a3ffa6f7df4bad0","policySource":"cached","cacheAgeMs":16832}
+{"op":"write","decision":"ALLOW","identity":{"steward":"SERVER","user":"jake.jongejans@student.uva.nl","requestType":"vflTrainModelRequest","jobId":"e2-pollcheck","localJobName":"e2-pollcheck"},"stateClass":"e2_probe","stateKey":"probe","writtenUnixSeconds":1784990681,"agreementHash":"54d9c11105ec0d7535efe6f88afcc1bd5ec7ea185bdbfcda1a3ffa6f7df4bad0","policySource":"cached","cacheAgeMs":17885}
+{"op":"write","decision":"ALLOW","identity":{"steward":"SERVER","user":"jake.jongejans@student.uva.nl","requestType":"vflTrainModelRequest","jobId":"e2-pollcheck","localJobName":"e2-pollcheck"},"stateClass":"e2_probe","stateKey":"probe","writtenUnixSeconds":1784990682,"agreementHash":"54d9c11105ec0d7535efe6f88afcc1bd5ec7ea185bdbfcda1a3ffa6f7df4bad0","policySource":"cached","cacheAgeMs":18938}
+{"op":"write","decision":"ALLOW","identity":{"steward":"SERVER","user":"jake.jongejans@student.uva.nl","requestType":"vflTrainModelRequest","jobId":"e2-pollcheck","localJobName":"e2-pollcheck"},"stateClass":"e2_probe","stateKey":"probe","writtenUnixSeconds":1784990683,"agreementHash":"54d9c11105ec0d7535efe6f88afcc1bd5ec7ea185bdbfcda1a3ffa6f7df4bad0","policySource":"cached","cacheAgeMs":19987}
+{"op":"write","decision":"ALLOW","identity":{"steward":"SERVER","user":"jake.jongejans@student.uva.nl","requestType":"vflTrainModelRequest","jobId":"e2-pollcheck","localJobName":"e2-pollcheck"},"stateClass":"e2_probe","stateKey":"probe","writtenUnixSeconds":1784990684,"agreementHash":"54d9c11105ec0d7535efe6f88afcc1bd5ec7ea185bdbfcda1a3ffa6f7df4bad0","policySource":"cached","cacheAgeMs":21039}
+{"op":"write","decision":"ALLOW","identity":{"steward":"SERVER","user":"jake.jongejans@student.uva.nl","requestType":"vflTrainModelRequest","jobId":"e2-pollcheck","localJobName":"e2-pollcheck"},"stateClass":"e2_probe","stateKey":"probe","writtenUnixSeconds":1784990685,"agreementHash":"54d9c11105ec0d7535efe6f88afcc1bd5ec7ea185bdbfcda1a3ffa6f7df4bad0","policySource":"cached","cacheAgeMs":22094}
+{"op":"write","decision":"ALLOW","identity":{"steward":"SERVER","user":"jake.jongejans@student.uva.nl","requestType":"vflTrainModelRequest","jobId":"e2-pollcheck","localJobName":"e2-pollcheck"},"stateClass":"e2_probe","stateKey":"probe","writtenUnixSeconds":1784990686,"agreementHash":"54d9c11105ec0d7535efe6f88afcc1bd5ec7ea185bdbfcda1a3ffa6f7df4bad0","policySource":"cached","cacheAgeMs":23148}
+{"op":"write","decision":"ALLOW","identity":{"steward":"SERVER","user":"jake.jongejans@student.uva.nl","requestType":"vflTrainModelRequest","jobId":"e2-pollcheck","localJobName":"e2-pollcheck"},"stateClass":"e2_probe","stateKey":"probe","writtenUnixSeconds":1784990687,"agreementHash":"54d9c11105ec0d7535efe6f88afcc1bd5ec7ea185bdbfcda1a3ffa6f7df4bad0","policySource":"cached","cacheAgeMs":24202}
+{"op":"write","decision":"ALLOW","identity":{"steward":"SERVER","user":"jake.jongejans@student.uva.nl","requestType":"vflTrainModelRequest","jobId":"e2-pollcheck","localJobName":"e2-pollcheck"},"stateClass":"e2_probe","stateKey":"probe","writtenUnixSeconds":1784990688,"agreementHash":"54d9c11105ec0d7535efe6f88afcc1bd5ec7ea185bdbfcda1a3ffa6f7df4bad0","policySource":"cached","cacheAgeMs":25260}
+{"op":"write","decision":"ALLOW","identity":{"steward":"SERVER","user":"jake.jongejans@student.uva.nl","requestType":"vflTrainModelRequest","jobId":"e2-pollcheck","localJobName":"e2-pollcheck"},"stateClass":"e2_probe","stateKey":"probe","writtenUnixSeconds":1784990689,"agreementHash":"54d9c11105ec0d7535efe6f88afcc1bd5ec7ea185bdbfcda1a3ffa6f7df4bad0","policySource":"cached","cacheAgeMs":26307}
+{"op":"write","decision":"ALLOW","identity":{"steward":"SERVER","user":"jake.jongejans@student.uva.nl","requestType":"vflTrainModelRequest","jobId":"e2-pollcheck","localJobName":"e2-pollcheck"},"stateClass":"e2_probe","stateKey":"probe","writtenUnixSeconds":1784990690,"agreementHash":"54d9c11105ec0d7535efe6f88afcc1bd5ec7ea185bdbfcda1a3ffa6f7df4bad0","policySource":"cached","cacheAgeMs":27353}
+{"op":"write","decision":"ALLOW","identity":{"steward":"SERVER","user":"jake.jongejans@student.uva.nl","requestType":"vflTrainModelRequest","jobId":"e2-pollcheck","localJobName":"e2-pollcheck"},"stateClass":"e2_probe","stateKey":"probe","writtenUnixSeconds":1784990691,"agreementHash":"54d9c11105ec0d7535efe6f88afcc1bd5ec7ea185bdbfcda1a3ffa6f7df4bad0","policySource":"cached","cacheAgeMs":28400}
+{"op":"write","decision":"ALLOW","identity":{"steward":"SERVER","user":"jake.jongejans@student.uva.nl","requestType":"vflTrainModelRequest","jobId":"e2-pollcheck","localJobName":"e2-pollcheck"},"stateClass":"e2_probe","stateKey":"probe","writtenUnixSeconds":1784990693,"agreementHash":"54d9c11105ec0d7535efe6f88afcc1bd5ec7ea185bdbfcda1a3ffa6f7df4bad0","policySource":"cached","cacheAgeMs":29449}
+{"op":"write","decision":"DENY","reason":"allowed = false","identity":{"steward":"SERVER","user":"jake.jongejans@student.uva.nl","requestType":"vflTrainModelRequest","jobId":"e2-pollcheck","localJobName":"e2-pollcheck"},"stateClass":"e2_probe","stateKey":"probe","agreementHash":"1fe2344b3ac63c17fa234798a498775bf2f5fd0e90a15fa80d924a2abb7c46f9","policySource":"cached","cacheAgeMs":495}

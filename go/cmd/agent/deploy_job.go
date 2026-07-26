@@ -298,7 +298,7 @@ func addGateway(dataStewardName, jobName string, compositionRequest *pb.Composit
 	gatewayName := "policy-checkpoint-gateway"
 	fullImage := fmt.Sprintf("%s/%s:%s", repostingName, gatewayName, getMicroserviceTag(gatewayName))
 
-	return v1.Container{
+	container := v1.Container{
 		Name:            gatewayName,
 		Image:           fullImage,
 		ImagePullPolicy: v1.PullIfNotPresent,
@@ -318,6 +318,10 @@ func addGateway(dataStewardName, jobName string, compositionRequest *pb.Composit
 			{Name: "gateway-state", MountPath: "/state"},
 		},
 	}
+	if os.Getenv("GATEWAY_PASSTHROUGH") == "true" {
+		container.Env = append(container.Env, v1.EnvVar{Name: "GATEWAY_PASSTHROUGH", Value: "true"})
+	}
+	return container
 }
 
 func getRequiredMicroservices(microserviceMetada *[]mschain.MicroserviceMetadata, request *mschain.RequestType, role string) error {

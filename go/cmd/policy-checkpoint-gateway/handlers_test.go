@@ -302,3 +302,23 @@ func TestAcquireLockConflict(t *testing.T) {
 	_, err = acquireLock(path)
 	assert.Assert(t, err != nil)
 }
+
+func TestPassthroughWriteAuditsButDoesNotPersist(t *testing.T) {
+	client, g := newTestServer(t)
+	g.passthrough = true
+
+	resp, err := client.RequestStateWrite(context.Background(), &pb.StateWriteRequest{
+		Identity: testIdentity(), StateClass: "kv", StateKey: "k1", Payload: []byte{1, 2, 3},
+	})
+	assert.NilError(t, err)
+	assert.Assert(t, resp.GetAllowed())
+
+	_, err = g.store.Read("kv", "k1")
+	assert.Assert(t, err != nil)
+
+	buf := g.store.auditW.(*bytes.Buffer)
+	g.store.auditMu.Lock()
+	out := buf.String()
+	g.store.auditMu.Unlock()
+	assert.Assert(t, strings.Contains(out, `"decision":"ALLOW"`))
+}

@@ -22,6 +22,9 @@ type gatewayServer struct {
 	store    *Store
 	identity *pb.Identity
 	policy   *policyCache
+	// passthrough skips state persistence only; decisions and the audit
+	// record still run. Off unless GATEWAY_PASSTHROUGH=true at boot.
+	passthrough bool
 	// source and regJobName back the one-time job-registration check; either
 	// being unset skips the check (local runs without etcd).
 	source      agreementSource
@@ -152,9 +155,11 @@ func (g *gatewayServer) RequestStateWrite(ctx context.Context, req *pb.StateWrit
 		return nil, status.Error(codes.Internal, "audit unavailable; failing closed")
 	}
 
-	if err := g.store.Write(req.GetStateClass(), req.GetStateKey(), req.GetPayload()); err != nil {
-		logger.Sugar().Errorw("State write failed", "err", err)
-		return nil, status.Error(codes.Internal, "state write failed")
+	if !g.passthrough {
+		if err := g.store.Write(req.GetStateClass(), req.GetStateKey(), req.GetPayload()); err != nil {
+			logger.Sugar().Errorw("State write failed", "err", err)
+			return nil, status.Error(codes.Internal, "state write failed")
+		}
 	}
 
 	return &pb.StateDecision{

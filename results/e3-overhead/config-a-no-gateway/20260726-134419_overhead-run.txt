@@ -1,0 +1,208 @@
+$ date
+Sun Jul 26 01:44:19 PM CEST 2026
+
+$ git rev-parse HEAD
+8b7f4dfb51ce8b65b08f35800719884aa2b4c1a1
+
+$ git status --short
+?? results/e3-overhead/config-a-no-gateway/20260726-134419_overhead-run.txt
+
+$ kubectl config current-context
+kind-kind
+
+
+=== reset + canonical seed, then drop requiresGateway from the chain metadata
+PREFLIGHT OK: B14, B15 applied
+[reset] deleting stale Jobs in steward namespaces
+job.batch "jake-jongejans-65c11f7eserver1" deleted
+job.batch "jake-jongejans-65c11f7eclientone1" deleted
+job.batch "jake-jongejans-65c11f7eclienttwo1" deleted
+job.batch "jake-jongejans-65c11f7eclientthree1" deleted
+[reset] clearing /agents/jobs/ etcd keys
+[reset] coordinated rollout of request path
+deployment.apps/api-gateway restarted
+deployment.apps/policy-enforcer restarted
+deployment.apps/orchestrator restarted
+deployment.apps/server restarted
+deployment.apps/clientone restarted
+deployment.apps/clienttwo restarted
+deployment.apps/clientthree restarted
+Waiting for deployment "api-gateway" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "api-gateway" rollout to finish: 1 old replicas are pending termination...
+deployment "api-gateway" successfully rolled out
+deployment "policy-enforcer" successfully rolled out
+deployment "orchestrator" successfully rolled out
+deployment "server" successfully rolled out
+deployment "clientone" successfully rolled out
+deployment "clienttwo" successfully rolled out
+deployment "clientthree" successfully rolled out
+[reset] settling 45s for AMQP topology to converge
+[reset] OK
+[seed] state_aware_server.json: OK
+[seed] state_aware_clientone.json: OK
+[seed] state_aware_clienttwo.json: OK
+[seed] state_aware_clientthree.json: OK
+[seed] verifying stateDirectives present in etcd
+[seed] server: stateDirectives in etcd
+[seed] clientone: stateDirectives in etcd
+[seed] clienttwo: stateDirectives in etcd
+[seed] clientthree: stateDirectives in etcd
+[seed] OK
+[flip] vfl-train-model-demo: requiresGateway off: {"name": "vfl-train-model-demo", "label": "computeProvider", "allowedOutputs": ["vfl-train-demo"]}
+[flip] vfl-train-demo: requiresGateway off: {"name": "vfl-train-demo", "label": "computeProvider", "allowedOutputs": []}
+
+=== trigger the chain (cycles=10) without a gateway
+trigger: {"request_id":"1ffc397d-7995-4491-8e60-5da3c36d5f52","status":"pending"}
+
+=== config evidence: no gateway container, no state volume on any steward
+[server] jake-jongejans-ac800ca5server1-rrhjb containers: anonymize-test differential-p-test vfl-train-model-demo vfl-train-demo sidecar
+[clientone] jake-jongejans-ac800ca5clientone1-gh5cv containers: anonymize-test differential-p-test vfl-train-model-demo vfl-train-demo sidecar
+[clienttwo] jake-jongejans-ac800ca5clienttwo1-bthzr containers: anonymize-test differential-p-test vfl-train-model-demo vfl-train-demo sidecar
+[clientthree] jake-jongejans-ac800ca5clientthree1-fnd7h containers: anonymize-test differential-p-test vfl-train-model-demo vfl-train-demo sidecar
+OK: all four steward pods run without gateway container or state volume
+
+=== wait for training to finish
+poll 1: pending
+poll 2: pending
+poll 3: pending
+poll 4: pending
+poll 5: pending
+poll 6: pending
+poll 7: pending
+poll 8: pending
+poll 9: pending
+poll 10: pending
+poll 11: done
+{
+    "metadata": {
+        "policy_reintroduction": -1,
+        "policy_removal": -1,
+        "total_rounds": 10,
+        "training_backtrack": 0
+    },
+    "request_id": "1ffc397d-7995-4491-8e60-5da3c36d5f52",
+    "results": [
+        {
+            "accuracy": -2.112138509750366,
+            "clients": 3,
+            "timestamp": "2026-07-26T11:46:06Z",
+            "train_round": 0
+        },
+        {
+            "accuracy": -2.1104328632354736,
+            "clients": 3,
+            "timestamp": "2026-07-26T11:46:06Z",
+            "train_round": 1
+        },
+        {
+            "accuracy": -2.100759983062744,
+            "clients": 3,
+            "timestamp": "2026-07-26T11:46:07Z",
+            "train_round": 2
+        },
+        {
+            "accuracy": -2.071930170059204,
+            "clients": 3,
+            "timestamp": "2026-07-26T11:46:08Z",
+            "train_round": 3
+        },
+        {
+            "accuracy": -2.003283977508545,
+            "clients": 3,
+            "timestamp": "2026-07-26T11:46:08Z",
+            "train_round": 4
+        },
+        {
+            "accuracy": -1.8688406944274902,
+            "clients": 3,
+            "timestamp": "2026-07-26T11:46:09Z",
+            "train_round": 5
+        },
+        {
+            "accuracy": -1.6326353549957275,
+            "clients": 3,
+            "timestamp": "2026-07-26T11:46:09Z",
+            "train_round": 6
+        },
+        {
+            "accuracy": -1.266258955001831,
+            "clients": 3,
+            "timestamp": "2026-07-26T11:46:10Z",
+            "train_round": 7
+        },
+        {
+            "accuracy": -0.75739586353302,
+            "clients": 3,
+            "timestamp": "2026-07-26T11:46:11Z",
+            "train_round": 8
+        },
+        {
+            "accuracy": -0.18921518325805664,
+            "clients": 3,
+            "timestamp": "2026-07-26T11:46:11Z",
+            "train_round": 9
+        }
+    ],
+    "status": "done"
+}
+r2 series (the payload field is named accuracy; the demo chain computes r2):
+-2.1121 -2.1104 -2.1008 -2.0719 -2.0033 -1.8688 -1.6326 -1.2663 -0.7574 -0.1892
+first r2: -2.1121  last r2: -0.1892
+
+=== microservice evidence: gateway degrade line, no checkpoint writes
+OK: server MS degraded to no-gateway mode
+    2026-07-26 11:46:03,763 - main.py - gateway_lifecycle.py:45 - WARNING - No policy gateway reachable, continuing without one: Could not connect to gateway localhost:50050 after 8 tries
+OK: absent as expected: no checkpoint write in no-gateway mode
+OK: absent as expected: no gateway connection in no-gateway mode
+
+=== per-round latency from the api-gateway round markers
+OK: cycle count in the round loop
+    2026-07-26T11:45:17.837365284Z 1.7850663178372726e+09	[34mINFO[0m	/app/cmd/api-gateway/requests.go:546	Running VFL for 10 rounds
+OK: dial-retry degrade (2026-07-26T11:46:03.763632998Z) absorbed inside round 0 (closed 2026-07-26T11:46:06.180849953Z)
+2026-07-26T11:45:17.837386457Z 1.7850663178373172e+09	[34mINFO[0m	/app/cmd/api-gateway/requests.go:548	Running VFL training round 0
+2026-07-26T11:45:17.880282670Z 1.7850663178802247e+09	[34mINFO[0m	/app/cmd/api-gateway/requests.go:693	- Sending training request
+2026-07-26T11:46:06.180849953Z 1.7850663661807268e+09	[34mINFO[0m	/app/cmd/api-gateway/requests.go:695	- Intermediate accuracy achieved: -2.112138509750366 for round 0
+2026-07-26T11:46:06.180873591Z 1.7850663661808114e+09	[34mINFO[0m	/app/cmd/api-gateway/requests.go:548	Running VFL training round 1
+2026-07-26T11:46:06.207250402Z 1.7850663662071893e+09	[34mINFO[0m	/app/cmd/api-gateway/requests.go:693	- Sending training request
+2026-07-26T11:46:06.805683896Z 1.7850663668053045e+09	[34mINFO[0m	/app/cmd/api-gateway/requests.go:695	- Intermediate accuracy achieved: -2.1104328632354736 for round 1
+2026-07-26T11:46:06.805715650Z 1.7850663668053923e+09	[34mINFO[0m	/app/cmd/api-gateway/requests.go:548	Running VFL training round 2
+2026-07-26T11:46:06.833342441Z 1.7850663668332813e+09	[34mINFO[0m	/app/cmd/api-gateway/requests.go:693	- Sending training request
+2026-07-26T11:46:07.467844386Z 1.7850663674667542e+09	[34mINFO[0m	/app/cmd/api-gateway/requests.go:695	- Intermediate accuracy achieved: -2.100759983062744 for round 2
+2026-07-26T11:46:07.467872994Z 1.7850663674672427e+09	[34mINFO[0m	/app/cmd/api-gateway/requests.go:548	Running VFL training round 3
+2026-07-26T11:46:07.492483378Z 1.7850663674924438e+09	[34mINFO[0m	/app/cmd/api-gateway/requests.go:693	- Sending training request
+2026-07-26T11:46:08.089534201Z 1.7850663680893946e+09	[34mINFO[0m	/app/cmd/api-gateway/requests.go:695	- Intermediate accuracy achieved: -2.071930170059204 for round 3
+2026-07-26T11:46:08.089563079Z 1.7850663680894604e+09	[34mINFO[0m	/app/cmd/api-gateway/requests.go:548	Running VFL training round 4
+2026-07-26T11:46:08.116317734Z 1.7850663681162558e+09	[34mINFO[0m	/app/cmd/api-gateway/requests.go:693	- Sending training request
+2026-07-26T11:46:08.724751058Z 1.7850663687241642e+09	[34mINFO[0m	/app/cmd/api-gateway/requests.go:695	- Intermediate accuracy achieved: -2.003283977508545 for round 4
+2026-07-26T11:46:08.724804162Z 1.7850663687244067e+09	[34mINFO[0m	/app/cmd/api-gateway/requests.go:548	Running VFL training round 5
+2026-07-26T11:46:08.752644221Z 1.7850663687526019e+09	[34mINFO[0m	/app/cmd/api-gateway/requests.go:693	- Sending training request
+2026-07-26T11:46:09.323625703Z 1.7850663693234735e+09	[34mINFO[0m	/app/cmd/api-gateway/requests.go:695	- Intermediate accuracy achieved: -1.8688406944274902 for round 5
+2026-07-26T11:46:09.323657480Z 1.7850663693235667e+09	[34mINFO[0m	/app/cmd/api-gateway/requests.go:548	Running VFL training round 6
+2026-07-26T11:46:09.349044562Z 1.7850663693489885e+09	[34mINFO[0m	/app/cmd/api-gateway/requests.go:693	- Sending training request
+2026-07-26T11:46:09.962580876Z 1.7850663699622264e+09	[34mINFO[0m	/app/cmd/api-gateway/requests.go:695	- Intermediate accuracy achieved: -1.6326353549957275 for round 6
+2026-07-26T11:46:09.962629621Z 1.7850663699625025e+09	[34mINFO[0m	/app/cmd/api-gateway/requests.go:548	Running VFL training round 7
+2026-07-26T11:46:09.992305832Z 1.7850663699922411e+09	[34mINFO[0m	/app/cmd/api-gateway/requests.go:693	- Sending training request
+2026-07-26T11:46:10.588689738Z 1.7850663705883427e+09	[34mINFO[0m	/app/cmd/api-gateway/requests.go:695	- Intermediate accuracy achieved: -1.266258955001831 for round 7
+2026-07-26T11:46:10.588736802Z 1.785066370588483e+09	[34mINFO[0m	/app/cmd/api-gateway/requests.go:548	Running VFL training round 8
+2026-07-26T11:46:10.618110833Z 1.7850663706180694e+09	[34mINFO[0m	/app/cmd/api-gateway/requests.go:693	- Sending training request
+2026-07-26T11:46:11.187230568Z 1.78506637118706e+09	[34mINFO[0m	/app/cmd/api-gateway/requests.go:695	- Intermediate accuracy achieved: -0.75739586353302 for round 8
+2026-07-26T11:46:11.187297928Z 1.785066371187236e+09	[34mINFO[0m	/app/cmd/api-gateway/requests.go:548	Running VFL training round 9
+2026-07-26T11:46:11.215429283Z 1.7850663712153785e+09	[34mINFO[0m	/app/cmd/api-gateway/requests.go:693	- Sending training request
+2026-07-26T11:46:11.945537006Z 1.7850663719453475e+09	[34mINFO[0m	/app/cmd/api-gateway/requests.go:695	- Intermediate accuracy achieved: -0.18921518325805664 for round 9
+
+round,start,end,duration_ms,reverify_ms,train_ms
+0,2026-07-26T11:45:17.837386+00:00,2026-07-26T11:46:06.180849+00:00,48343.5,42.9,48300.6
+1,2026-07-26T11:46:06.180873+00:00,2026-07-26T11:46:06.805683+00:00,624.8,26.4,598.4
+2,2026-07-26T11:46:06.805715+00:00,2026-07-26T11:46:07.467844+00:00,662.1,27.6,634.5
+3,2026-07-26T11:46:07.467872+00:00,2026-07-26T11:46:08.089534+00:00,621.7,24.6,597.1
+4,2026-07-26T11:46:08.089563+00:00,2026-07-26T11:46:08.724751+00:00,635.2,26.8,608.4
+5,2026-07-26T11:46:08.724804+00:00,2026-07-26T11:46:09.323625+00:00,598.8,27.8,571.0
+6,2026-07-26T11:46:09.323657+00:00,2026-07-26T11:46:09.962580+00:00,638.9,25.4,613.5
+7,2026-07-26T11:46:09.962629+00:00,2026-07-26T11:46:10.588689+00:00,626.1,29.7,596.4
+8,2026-07-26T11:46:10.588736+00:00,2026-07-26T11:46:11.187230+00:00,598.5,29.4,569.1
+9,2026-07-26T11:46:11.187297+00:00,2026-07-26T11:46:11.945537+00:00,758.2,28.1,730.1
+round0=48343.5 ms (first round, startup-inflated; kept out of steady state)
+steady state (rounds 1..9, n=9): min=598.5 ms  p50=626.1 ms  p90=758.2 ms  max=758.2 ms  mean=640.5 ms
+all rounds (n=10): min=598.5 ms  p50=635.2 ms  p90=48343.5 ms  max=48343.5 ms  mean=5410.8 ms
+run total (round 0 open to last close): 54108.2 ms
+note: the flip is ephemeral; the next reset restores requiresGateway:true

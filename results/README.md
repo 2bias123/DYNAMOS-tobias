@@ -30,7 +30,8 @@ there and sync forward, not here.
    summarized, or prettified. Derived tables and plots belong in
    `thesis/drafts/`, citing files here by path.
 2. **Append-only.** Never edit, overwrite, or delete a captured file. Failed or
-   aborted runs stay; flag them in `captures.md`.
+   aborted runs stay; flag them in `captures.md`. This holds from the moment of
+   capture, committed or not.
 3. **Every artifact gets a line in its experiment's `captures.md`:** path,
    timestamp, exact command, DYNAMOS commit, one-line description. The
    description is metadata, never a substitute for the raw file.
