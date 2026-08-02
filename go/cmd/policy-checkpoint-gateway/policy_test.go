@@ -43,6 +43,7 @@ func TestDecideWrite(t *testing.T) {
 		{"allowed cached", testAgreement(allowAll()), sourceCached, "u@x", true, ""},
 		{"allowed but stale", testAgreement(allowAll()), sourceStale, "u@x", false, "cache stale; fail closed"},
 		{"allowed but unavailable", nil, sourceUnavailable, "u@x", false, "etcd unreachable; fail closed"},
+		{"allowed but confirmed absent", nil, sourceAbsent, "u@x", false, "agreement confirmed absent; fail closed"},
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
@@ -52,6 +53,8 @@ func TestDecideWrite(t *testing.T) {
 			assert.Equal(t, d.Hash, "h1")
 			if tc.allowed {
 				assert.Equal(t, d.Retention, int64(900))
+				assert.Equal(t, d.RelationID, "GUID-test")
+				assert.Assert(t, d.Directives != nil)
 			}
 		})
 	}

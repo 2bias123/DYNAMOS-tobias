@@ -1,0 +1,26 @@
+$ date
+Sun Jul 26 02:57:24 PM CEST 2026
+
+$ git -C /home/onebias/School/thesis/DYNAMOS-tobias rev-parse HEAD
+fd2549e847e7a2efe90069545aa40a72bd8bf4bc
+
+$ docker exec kind-control-plane crictl images | grep -E 'dynamos1|tamjiyan'
+docker.io/dynamos1/agent                                 <none>               88bb1f95f07a1       29.4MB
+docker.io/dynamos1/sidecar                               <none>               66d6df92d55e8       14.1MB
+docker.io/dynamos1/anonymize-test                        latest               c049c5509c346       1.56GB
+docker.io/dynamos1/api-gateway                           main                 a820f1d258b32       31.5MB
+docker.io/dynamos1/differential-p-test                   latest               965a6b0ff715d       1.56GB
+docker.io/dynamos1/orchestrator                          main                 e03febbf40a1d       30.1MB
+docker.io/dynamos1/policy-checkpoint-gateway             latest               e7f19f8981f87       23.9MB
+docker.io/dynamos1/policy-checkpoint-gateway             main                 e7f19f8981f87       23.9MB
+docker.io/dynamos1/policy-enforcer                       main                 0a21f7ead6a80       28.7MB
+docker.io/dynamos1/sidecar                               main                 c13da052cba35       29.5MB
+docker.io/dynamos1/vfl-train-demo                        latest               a8c5166513d23       1.56GB
+docker.io/dynamos1/vfl-train-model-demo                  latest               c2bcc2cecf522       1.53GB
+docker.io/tamjiyan/anonymize-test                        latest               481446389f3c0       1.56GB
+docker.io/tamjiyan/differential-p-test                   latest               5a6809c2a6b50       1.56GB
+docker.io/tamjiyan/sidecar                               latest               689c380026d27       29.5MB
+docker.io/tamjiyan/vfl-train-demo                        latest               24418a6df0b91       1.56GB
+docker.io/dynamos1/agent                                 main                 aa45945c5c94f       67.3MB
+docker.io/tamjiyan/policy-checkpoint-gateway             latest               74646245bc22b       28.6MB
+docker.io/tamjiyan/vfl-train-model-demo                  latest               641af42473498       1.53GB

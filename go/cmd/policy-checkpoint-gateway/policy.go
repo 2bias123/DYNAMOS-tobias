@@ -16,10 +16,16 @@ import (
 type policySource string
 
 const (
-	sourceFresh       policySource = "fresh"
-	sourceCached      policySource = "cached"
-	sourceStale       policySource = "stale"
+	sourceFresh  policySource = "fresh"
+	sourceCached policySource = "cached"
+	sourceStale  policySource = "stale"
+	// sourceUnavailable: no agreement view at all — never loaded, or etcd
+	// unreachable. sourceAbsent: a fresh observation confirmed there is no
+	// usable agreement (deleted key, unparseable bytes). Both deny; the
+	// audited reasons differ so a confirmed deletion is not misrecorded as
+	// an outage.
 	sourceUnavailable policySource = "unavailable"
+	sourceAbsent      policySource = "absent"
 )
 
 // policyCache holds the last agreement observed for this steward plus its
@@ -28,6 +34,7 @@ type policyCache struct {
 	mu            sync.Mutex
 	agreement     *api.Agreement
 	hash          string
+	absent        bool
 	lastFreshRead time.Time
 	maxStaleness  time.Duration
 	now           func() time.Time
@@ -45,6 +52,7 @@ func (p *policyCache) update(a *api.Agreement, hash string) (oldHash, newHash st
 	oldHash = p.hash
 	p.agreement = a
 	p.hash = hash
+	p.absent = false
 	p.lastFreshRead = p.now()
 	return oldHash, hash
 }
@@ -58,13 +66,15 @@ func (p *policyCache) markFresh() {
 }
 
 // clear drops the cached agreement: confirmed absence fails closed
-// immediately rather than aging out. Reports whether a value was held.
+// immediately rather than aging out, and is remembered as absent (not
+// unavailable) until a later update. Reports whether a value was held.
 func (p *policyCache) clear() bool {
 	p.mu.Lock()
 	defer p.mu.Unlock()
 	had := p.agreement != nil
 	p.agreement = nil
 	p.hash = ""
+	p.absent = true
 	return had
 }
 
@@ -73,6 +83,9 @@ func (p *policyCache) snapshot() (a *api.Agreement, hash string, src policySourc
 	p.mu.Lock()
 	defer p.mu.Unlock()
 	if p.agreement == nil {
+		if p.absent {
+			return nil, "", sourceAbsent, 0
+		}
 		return nil, "", sourceUnavailable, 0
 	}
 	age := p.now().Sub(p.lastFreshRead)
@@ -94,32 +107,37 @@ func canonicalHash(a *api.Agreement) (string, error) {
 	return hex.EncodeToString(sum[:]), nil
 }
 
-// directivesFor resolves the StateDirectives governing one user+requestType.
-// A missing relation, unlisted request type, or absent directives all deny;
-// the distinct reasons keep the audit trail precise.
-func directivesFor(a *api.Agreement, user, requestType string) (*api.StateDirectives, string) {
+// directivesFor resolves the StateDirectives governing one user+requestType,
+// along with the ID of the relation consulted. A missing relation, unlisted
+// request type, or absent directives all deny; the distinct reasons keep the
+// audit trail precise.
+func directivesFor(a *api.Agreement, user, requestType string) (sd *api.StateDirectives, relationID, reason string) {
 	rel, ok := a.Relations[user]
 	if !ok {
-		return nil, "no relation for user"
+		return nil, "", "no relation for user"
 	}
 	if !slices.Contains(rel.RequestTypes, requestType) {
-		return nil, "requestType not permitted by relation"
+		return nil, rel.ID, "requestType not permitted by relation"
 	}
 	if rel.StateDirectives == nil {
-		return nil, "stateDirectives absent"
+		return nil, rel.ID, "stateDirectives absent"
 	}
-	return rel.StateDirectives, ""
+	return rel.StateDirectives, rel.ID, ""
 }
 
 // decision is the outcome of one policy evaluation, ready for audit.
+// RelationID and Directives are set once evaluation reached a relation, on
+// denials too, so the record shows the values the decision was made against.
 type decision struct {
-	Allowed   bool
-	Reason    string
-	Source    policySource
-	Hash      string
-	AgeMs     int64
-	Retention int64
-	Expired   bool
+	Allowed    bool
+	Reason     string
+	Source     policySource
+	Hash       string
+	AgeMs      int64
+	Retention  int64
+	Expired    bool
+	RelationID string
+	Directives *api.StateDirectives
 }
 
 func denySource(src policySource) (string, bool) {
@@ -128,6 +146,8 @@ func denySource(src policySource) (string, bool) {
 		return "cache stale; fail closed", true
 	case sourceUnavailable:
 		return "etcd unreachable; fail closed", true
+	case sourceAbsent:
+		return "agreement confirmed absent; fail closed", true
 	}
 	return "", false
 }
@@ -140,11 +160,13 @@ func decideWrite(a *api.Agreement, hash string, src policySource, ageMs int64, u
 		d.Reason = reason
 		return d
 	}
-	sd, reason := directivesFor(a, user, requestType)
+	sd, relID, reason := directivesFor(a, user, requestType)
+	d.RelationID = relID
 	if sd == nil {
 		d.Reason = reason
 		return d
 	}
+	d.Directives = sd
 	if !sd.Allowed {
 		d.Reason = "allowed = false"
 		return d
@@ -163,11 +185,13 @@ func decideRead(a *api.Agreement, hash string, src policySource, ageMs int64, us
 		d.Reason = reason
 		return d
 	}
-	sd, reason := directivesFor(a, user, requestType)
+	sd, relID, reason := directivesFor(a, user, requestType)
+	d.RelationID = relID
 	if sd == nil {
 		d.Reason = reason
 		return d
 	}
+	d.Directives = sd
 	if !sd.Allowed {
 		d.Reason = "allowed = false"
 		return d

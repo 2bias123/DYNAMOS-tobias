@@ -42,6 +42,7 @@ func newTestServer(t *testing.T) (pb.PolicyCheckpointGatewayClient, *gatewayServ
 		Name: "uva",
 		Relations: map[string]api.Relation{
 			"u@x": {
+				ID:              "rel-1",
 				RequestTypes:    []string{"sqlDataRequest"},
 				StateDirectives: &api.StateDirectives{Allowed: true, RetentionSeconds: 900, ResumeAllowed: true, OnRevocation: "purge"},
 			},
@@ -103,7 +104,7 @@ func TestIdentityMismatchDeniedAndAudited(t *testing.T) {
 }
 
 func TestValidateStateReadExistingAndMissing(t *testing.T) {
-	client, _ := newTestServer(t)
+	client, g := newTestServer(t)
 
 	resp, err := client.ValidateStateRead(context.Background(), &pb.StateReadRequest{
 		Identity: testIdentity(), StateClass: "kv", StateKey: "absent",
@@ -123,6 +124,14 @@ func TestValidateStateReadExistingAndMissing(t *testing.T) {
 	assert.NilError(t, err)
 	assert.Assert(t, resp.GetAllowed())
 	assert.Equal(t, string(resp.GetPayload()), "hello")
+
+	// the record is self-sufficient: relation and enforced directive values
+	buf := g.store.auditW.(*bytes.Buffer)
+	g.store.auditMu.Lock()
+	out := buf.String()
+	g.store.auditMu.Unlock()
+	assert.Assert(t, strings.Contains(out, `"relationId":"rel-1"`))
+	assert.Assert(t, strings.Contains(out, `"directives":{"allowed":true,"retentionSeconds":900,"resumeAllowed":true,"onRevocation":"purge"}`))
 }
 
 func TestReadDenialHidesFileExistence(t *testing.T) {

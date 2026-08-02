@@ -65,6 +65,22 @@ func TestWriteRefusedWhenAuditUnavailable(t *testing.T) {
 	assert.Assert(t, readErr != nil) // no unaudited file
 }
 
+func TestReadRefusedWhenAuditUnavailable(t *testing.T) {
+	client, g := newTestServer(t)
+
+	_, err := client.RequestStateWrite(context.Background(), &pb.StateWriteRequest{
+		Identity: testIdentity(), StateClass: "kv", StateKey: "k1", Payload: []byte{1},
+	})
+	assert.NilError(t, err)
+
+	assert.NilError(t, g.store.auditF.Close()) // audit leg dies
+
+	_, err = client.ValidateStateRead(context.Background(), &pb.StateReadRequest{
+		Identity: testIdentity(), StateClass: "kv", StateKey: "k1",
+	})
+	assert.Equal(t, status.Code(err), codes.Internal) // no payload without a record
+}
+
 func TestCrashBetweenAuditAndRenameLeavesLineNoFile(t *testing.T) {
 	client, g := newTestServer(t)
 

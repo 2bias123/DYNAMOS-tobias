@@ -38,17 +38,30 @@ type auditIdentity struct {
 	LocalJobName string `json:"localJobName,omitempty"`
 }
 
+// auditDirectives is the enforced StateDirectives snapshot carried by a
+// decision record, so the record stays interpretable after the agreement
+// itself is overwritten in etcd. Policy content only — never anything
+// derived from a payload.
+type auditDirectives struct {
+	Allowed          bool   `json:"allowed"`
+	RetentionSeconds int64  `json:"retentionSeconds"`
+	ResumeAllowed    bool   `json:"resumeAllowed"`
+	OnRevocation     string `json:"onRevocation"`
+}
+
 type auditRecord struct {
-	Op                 string        `json:"op"`
-	Decision           string        `json:"decision,omitempty"`
-	Reason             string        `json:"reason,omitempty"`
-	Identity           auditIdentity `json:"identity"`
-	StateClass         string        `json:"stateClass,omitempty"`
-	StateKey           string        `json:"stateKey,omitempty"`
-	WrittenUnixSeconds int64         `json:"writtenUnixSeconds,omitempty"`
-	AgreementHash      string        `json:"agreementHash,omitempty"`
-	PolicySource       string        `json:"policySource,omitempty"`
-	CacheAgeMs         *int64        `json:"cacheAgeMs,omitempty"`
+	Op                 string           `json:"op"`
+	Decision           string           `json:"decision,omitempty"`
+	Reason             string           `json:"reason,omitempty"`
+	Identity           auditIdentity    `json:"identity"`
+	StateClass         string           `json:"stateClass,omitempty"`
+	StateKey           string           `json:"stateKey,omitempty"`
+	WrittenUnixSeconds int64            `json:"writtenUnixSeconds,omitempty"`
+	AgreementHash      string           `json:"agreementHash,omitempty"`
+	PolicySource       string           `json:"policySource,omitempty"`
+	CacheAgeMs         *int64           `json:"cacheAgeMs,omitempty"`
+	RelationID         string           `json:"relationId,omitempty"`
+	Directives         *auditDirectives `json:"directives,omitempty"`
 }
 
 // nameRe constrains a state class or key to a single safe path segment: no

@@ -9,8 +9,8 @@ import (
 	"time"
 
 	"github.com/Jorrit05/DYNAMOS/pkg/api"
-	clientv3 "go.etcd.io/etcd/client/v3"
 	"go.etcd.io/etcd/api/v3/mvccpb"
+	clientv3 "go.etcd.io/etcd/client/v3"
 	"gotest.tools/assert"
 )
 
@@ -153,7 +153,26 @@ func TestSyncDeleteEventFailsClosed(t *testing.T) {
 		{Type: clientv3.EventTypeDelete},
 	}}
 
-	waitFor(t, time.Second, func() bool { _, _, s, _ := cache.snapshot(); return s == sourceUnavailable })
+	// a confirmed deletion reports absent, not unavailable
+	waitFor(t, time.Second, func() bool { _, _, s, _ := cache.snapshot(); return s == sourceAbsent })
+}
+
+func TestSyncUnparseableAgreementFailsClosed(t *testing.T) {
+	src := &mockSource{getKvs: [][]byte{agreementBytes(t, allowAll())}}
+	cache := newPolicyCache(60 * time.Second)
+	stop := make(chan struct{})
+	defer close(stop)
+
+	go syncAgreement(stop, src, agreementKey("SERVER"), cache, time.Hour)
+	waitFor(t, time.Second, func() bool { _, _, s, _ := cache.snapshot(); return s == sourceCached })
+
+	// the lineage's policy-removal path writes an empty string over the key
+	waitFor(t, time.Second, func() bool { src.mu.Lock(); defer src.mu.Unlock(); return src.watchCh != nil })
+	src.watchCh <- clientv3.WatchResponse{Events: []*clientv3.Event{
+		{Type: clientv3.EventTypePut, Kv: &mvccpb.KeyValue{Value: []byte("")}},
+	}}
+
+	waitFor(t, time.Second, func() bool { _, _, s, _ := cache.snapshot(); return s == sourceAbsent })
 }
 
 func TestSyncWatchCancelReconnects(t *testing.T) {

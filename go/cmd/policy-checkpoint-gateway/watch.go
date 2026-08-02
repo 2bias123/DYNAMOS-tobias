@@ -33,15 +33,21 @@ func agreementKey(steward string) string {
 	return agreementKeyPrefix + strings.ToLower(steward)
 }
 
+// applyAgreementBytes folds one observed agreement value into the cache.
+// Bytes that cannot be parsed or hashed clear the cache — a confirmed
+// observation that no usable agreement exists fails closed immediately
+// rather than riding the previous value toward staleness.
 func applyAgreementBytes(b []byte, cache *policyCache) {
 	var a api.Agreement
 	if err := json.Unmarshal(b, &a); err != nil {
-		logger.Sugar().Errorw("Ignoring unparseable agreement", "err", err)
+		cache.clear()
+		logger.Sugar().Errorw("Unparseable agreement, failing closed", "err", err)
 		return
 	}
 	hash, err := canonicalHash(&a)
 	if err != nil {
-		logger.Sugar().Errorw("Ignoring unhashable agreement", "err", err)
+		cache.clear()
+		logger.Sugar().Errorw("Unhashable agreement, failing closed", "err", err)
 		return
 	}
 	old, _ := cache.update(&a, hash)

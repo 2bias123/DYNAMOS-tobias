@@ -40,8 +40,6 @@ datasets/*.csv
 
 # Local-only implementation log (never staged)
 notes/
-.claude/
-CLAUDE.md
 
 # IDE
 .idea/

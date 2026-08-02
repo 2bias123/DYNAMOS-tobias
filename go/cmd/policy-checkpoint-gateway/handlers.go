@@ -110,7 +110,7 @@ func (g *gatewayServer) authorize(id *pb.Identity) error {
 
 func decisionRecord(op, verdict string, d decision, class, key string, written int64, id *pb.Identity) auditRecord {
 	age := d.AgeMs
-	return auditRecord{
+	rec := auditRecord{
 		Op:                 op,
 		Decision:           verdict,
 		Reason:             d.Reason,
@@ -121,7 +121,17 @@ func decisionRecord(op, verdict string, d decision, class, key string, written i
 		AgreementHash:      d.Hash,
 		PolicySource:       string(d.Source),
 		CacheAgeMs:         &age,
+		RelationID:         d.RelationID,
 	}
+	if d.Directives != nil {
+		rec.Directives = &auditDirectives{
+			Allowed:          d.Directives.Allowed,
+			RetentionSeconds: d.Directives.RetentionSeconds,
+			ResumeAllowed:    d.Directives.ResumeAllowed,
+			OnRevocation:     d.Directives.OnRevocation,
+		}
+	}
+	return rec
 }
 
 func (g *gatewayServer) auditDecision(op, verdict string, d decision, class, key string, written int64, id *pb.Identity) {
@@ -204,13 +214,21 @@ func (g *gatewayServer) ValidateStateRead(ctx context.Context, req *pb.StateRead
 		return &pb.StateReadResponse{Allowed: false, Reason: "not found", AgreementHash: d.Hash}, nil
 	}
 
+	// The record is appended and fsynced before the payload leaves the
+	// gateway, symmetric with the write path: every disclosure has a
+	// preceding audit line, and an unappendable audit refuses the read.
+	// DENY records above stay best-effort.
+	if err := g.store.Audit(decisionRecord("read", "ALLOW", d, req.GetStateClass(), req.GetStateKey(), writtenAt.Unix(), req.GetIdentity())); err != nil {
+		logger.Sugar().Errorw("Audit append failed, refusing read", "err", err)
+		return nil, status.Error(codes.Internal, "audit unavailable; failing closed")
+	}
+
 	payload, err := g.store.Read(req.GetStateClass(), req.GetStateKey())
 	if err != nil {
 		logger.Sugar().Errorw("State read failed", "err", err)
 		return nil, status.Error(codes.Internal, "state read failed")
 	}
 
-	g.auditDecision("read", "ALLOW", d, req.GetStateClass(), req.GetStateKey(), writtenAt.Unix(), req.GetIdentity())
 	return &pb.StateReadResponse{
 		Allowed:                   true,
 		Payload:                   payload,
