@@ -83,7 +83,7 @@ func TestSyncInitialLoadThenOutageAgesToStale(t *testing.T) {
 	stop := make(chan struct{})
 	defer close(stop)
 
-	go syncAgreement(stop, src, agreementKey("SERVER"), cache, time.Hour)
+	go syncAgreement(stop, src, agreementKey("SERVER"), cache, time.Hour, nil)
 
 	waitFor(t, time.Second, func() bool { _, _, s, _ := cache.snapshot(); return s == sourceCached })
 
@@ -103,7 +103,7 @@ func TestSyncColdStartUnavailableUntilFirstRead(t *testing.T) {
 	stop := make(chan struct{})
 	defer close(stop)
 
-	go syncAgreement(stop, src, agreementKey("SERVER"), cache, 20*time.Millisecond)
+	go syncAgreement(stop, src, agreementKey("SERVER"), cache, 20*time.Millisecond, nil)
 
 	_, _, s, _ := cache.snapshot()
 	assert.Equal(t, s, sourceUnavailable)
@@ -122,7 +122,7 @@ func TestSyncWatchEventUpdatesHash(t *testing.T) {
 	stop := make(chan struct{})
 	defer close(stop)
 
-	go syncAgreement(stop, src, agreementKey("SERVER"), cache, time.Hour)
+	go syncAgreement(stop, src, agreementKey("SERVER"), cache, time.Hour, nil)
 	waitFor(t, time.Second, func() bool { _, h, _, _ := cache.snapshot(); return h != "" })
 	_, h1, _, _ := cache.snapshot()
 
@@ -145,7 +145,7 @@ func TestSyncDeleteEventFailsClosed(t *testing.T) {
 	stop := make(chan struct{})
 	defer close(stop)
 
-	go syncAgreement(stop, src, agreementKey("SERVER"), cache, time.Hour)
+	go syncAgreement(stop, src, agreementKey("SERVER"), cache, time.Hour, nil)
 	waitFor(t, time.Second, func() bool { _, _, s, _ := cache.snapshot(); return s == sourceCached })
 
 	waitFor(t, time.Second, func() bool { src.mu.Lock(); defer src.mu.Unlock(); return src.watchCh != nil })
@@ -163,7 +163,7 @@ func TestSyncUnparseableAgreementFailsClosed(t *testing.T) {
 	stop := make(chan struct{})
 	defer close(stop)
 
-	go syncAgreement(stop, src, agreementKey("SERVER"), cache, time.Hour)
+	go syncAgreement(stop, src, agreementKey("SERVER"), cache, time.Hour, nil)
 	waitFor(t, time.Second, func() bool { _, _, s, _ := cache.snapshot(); return s == sourceCached })
 
 	// the lineage's policy-removal path writes an empty string over the key
@@ -181,7 +181,7 @@ func TestSyncWatchCancelReconnects(t *testing.T) {
 	stop := make(chan struct{})
 	defer close(stop)
 
-	go syncAgreement(stop, src, agreementKey("SERVER"), cache, time.Hour)
+	go syncAgreement(stop, src, agreementKey("SERVER"), cache, time.Hour, nil)
 	waitFor(t, time.Second, func() bool { src.mu.Lock(); defer src.mu.Unlock(); return src.watchCh != nil })
 
 	src.mu.Lock()

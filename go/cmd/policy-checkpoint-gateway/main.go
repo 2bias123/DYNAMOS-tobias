@@ -27,6 +27,7 @@ func newGatewayServer(store *Store, identity *pb.Identity) *gatewayServer {
 		identity: identity,
 		stop:     make(chan struct{}),
 		activity: make(chan struct{}, 1),
+		subs:     make(map[chan *pb.StateEvent]struct{}),
 	}
 }
 
@@ -232,7 +233,7 @@ func main() {
 
 	etcdClient := etcd.GetEtcdClient(etcdEndpoints)
 	g.source = etcdClient
-	go syncAgreement(g.stop, etcdClient, agreementKey(cfg.identity.GetSteward()), g.policy, cfg.pollInterval)
+	go syncAgreement(g.stop, etcdClient, agreementKey(cfg.identity.GetSteward()), g.policy, cfg.pollInterval, g.evaluateDisposition)
 
 	lockPath := filepath.Join(cfg.stateDir, ".lock")
 	lockFile, err := acquireLock(lockPath)

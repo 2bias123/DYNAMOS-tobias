@@ -167,6 +167,10 @@ func decideWrite(a *api.Agreement, hash string, src policySource, ageMs int64, u
 		return d
 	}
 	d.Directives = sd
+	if err := validateDirectives(sd); err != nil {
+		d.Reason = "invalid stateDirectives; fail closed"
+		return d
+	}
 	if !sd.Allowed {
 		d.Reason = "allowed = false"
 		return d
@@ -192,6 +196,10 @@ func decideRead(a *api.Agreement, hash string, src policySource, ageMs int64, us
 		return d
 	}
 	d.Directives = sd
+	if err := validateDirectives(sd); err != nil {
+		d.Reason = "invalid stateDirectives; fail closed"
+		return d
+	}
 	if !sd.Allowed {
 		d.Reason = "allowed = false"
 		return d

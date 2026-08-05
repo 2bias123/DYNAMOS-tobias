@@ -37,6 +37,41 @@ type gatewayServer struct {
 	// open SubscribeStateEvents streams; the inactivity timeout must not
 	// fire while a dependent MS still holds its event stream
 	subscribers atomic.Int64
+	// event channels of the open streams, for the advisory PURGE broadcast
+	subMu sync.Mutex
+	subs  map[chan *pb.StateEvent]struct{}
+	// sweepMu serializes disposition evaluations; lastInvalidHash dedupes
+	// the invalid_directives record per agreement version
+	sweepMu         sync.Mutex
+	lastInvalidHash string
+}
+
+func (g *gatewayServer) addSubscriber() chan *pb.StateEvent {
+	ch := make(chan *pb.StateEvent, 4)
+	g.subMu.Lock()
+	defer g.subMu.Unlock()
+	g.subs[ch] = struct{}{}
+	return ch
+}
+
+func (g *gatewayServer) removeSubscriber(ch chan *pb.StateEvent) {
+	g.subMu.Lock()
+	defer g.subMu.Unlock()
+	delete(g.subs, ch)
+}
+
+// broadcast delivers an event to every open subscribe stream. Delivery is
+// advisory: a subscriber that cannot keep up misses the event rather than
+// blocking the sweep.
+func (g *gatewayServer) broadcast(ev *pb.StateEvent) {
+	g.subMu.Lock()
+	defer g.subMu.Unlock()
+	for ch := range g.subs {
+		select {
+		case ch <- ev:
+		default:
+		}
+	}
 }
 
 func (g *gatewayServer) audit(rec auditRecord) {
@@ -250,6 +285,8 @@ func (g *gatewayServer) SubscribeStateEvents(req *pb.SubscribeRequest, stream pb
 		// restart the inactivity window from the moment the stream closes
 		g.touchActivity()
 	}()
+	events := g.addSubscriber()
+	defer g.removeSubscriber(events)
 
 	_, hash, src, _ := g.policy.snapshot()
 	if err := stream.Send(&pb.StateEvent{Kind: pb.StateEvent_AGREEMENT_CHANGED, Reason: "subscription established"}); err != nil {
@@ -257,11 +294,17 @@ func (g *gatewayServer) SubscribeStateEvents(req *pb.SubscribeRequest, stream pb
 	}
 	g.audit(auditRecord{Op: "subscribe", Reason: "subscription established", AgreementHash: hash, PolicySource: string(src), Identity: auditIdentityOf(req.GetIdentity())})
 
-	select {
-	case <-stream.Context().Done():
-		return stream.Context().Err()
-	case <-g.stop:
-		return nil
+	for {
+		select {
+		case <-stream.Context().Done():
+			return stream.Context().Err()
+		case <-g.stop:
+			return nil
+		case ev := <-events:
+			if err := stream.Send(ev); err != nil {
+				return err
+			}
+		}
 	}
 }
 

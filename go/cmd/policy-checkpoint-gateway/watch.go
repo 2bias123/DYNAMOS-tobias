@@ -59,32 +59,43 @@ func applyAgreementBytes(b []byte, cache *policyCache) {
 	}
 }
 
-// refreshAgreement does one bounded Get and folds the result into the cache.
-// A read error leaves the cache untouched (it ages toward stale); a
-// successful read of an absent key clears it (fail closed on known absence).
-func refreshAgreement(src agreementSource, key string, cache *policyCache) {
+// refreshAgreement does one bounded Get and folds the result into the cache,
+// reporting whether a fresh observation landed. A read error leaves the
+// cache untouched (it ages toward stale); a successful read of an absent key
+// clears it (fail closed on known absence).
+func refreshAgreement(src agreementSource, key string, cache *policyCache) bool {
 	ctx, cancel := context.WithTimeout(context.Background(), etcdRequestTimeout)
 	defer cancel()
 	resp, err := src.Get(ctx, key)
 	if err != nil {
 		logger.Sugar().Warnw("Agreement refresh failed", "key", key, "err", err)
-		return
+		return false
 	}
 	if len(resp.Kvs) == 0 {
 		if cache.clear() {
 			logger.Sugar().Warnf("Agreement %s no longer present, failing closed", key)
 		}
-		return
+		return true
 	}
 	applyAgreementBytes(resp.Kvs[0].Value, cache)
+	return true
 }
 
 // syncAgreement keeps the cache fresh from two directions: a periodic re-Get
 // (the liveness mechanism — a healthy watch on an unchanging key delivers
 // nothing) and a watch for low-latency change signals. Watch loss degrades to
-// poll-only until the reconnect succeeds.
-func syncAgreement(stop <-chan struct{}, src agreementSource, key string, cache *policyCache, pollInterval time.Duration) {
-	refreshAgreement(src, key, cache)
+// poll-only until the reconnect succeeds. onFresh (nil-able) runs after every
+// fresh observation folded into the cache — the level trigger for
+// disposition evaluation.
+func syncAgreement(stop <-chan struct{}, src agreementSource, key string, cache *policyCache, pollInterval time.Duration, onFresh func()) {
+	notify := func() {
+		if onFresh != nil {
+			onFresh()
+		}
+	}
+	if refreshAgreement(src, key, cache) {
+		notify()
+	}
 
 	// Poll-only mode for the degraded-regime measurement: skip the watch so the
 	// only path to a change is the periodic re-Get.
@@ -113,7 +124,9 @@ func syncAgreement(stop <-chan struct{}, src agreementSource, key string, cache 
 				wcancel()
 				return
 			case <-ticker.C:
-				refreshAgreement(src, key, cache)
+				if refreshAgreement(src, key, cache) {
+					notify()
+				}
 			case resp, ok := <-wch:
 				if !ok || resp.Canceled {
 					watching = false
@@ -122,6 +135,7 @@ func syncAgreement(stop <-chan struct{}, src agreementSource, key string, cache 
 				backoff = time.Second
 				if resp.IsProgressNotify() {
 					cache.markFresh()
+					notify()
 					continue
 				}
 				for _, ev := range resp.Events {
@@ -134,6 +148,7 @@ func syncAgreement(stop <-chan struct{}, src agreementSource, key string, cache 
 						}
 					}
 				}
+				notify()
 			}
 		}
 		wcancel()

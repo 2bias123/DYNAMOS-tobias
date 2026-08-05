@@ -8,6 +8,7 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
+	"strings"
 	"sync"
 	"time"
 )
@@ -159,6 +160,49 @@ func (s *Store) WrittenAt(class, key string) (time.Time, error) {
 		return time.Time{}, err
 	}
 	return fi.ModTime(), nil
+}
+
+type stateKey struct {
+	Class string
+	Key   string
+}
+
+// ListData returns the class/key of every state file currently on disk.
+func (s *Store) ListData() ([]stateKey, error) {
+	classes, err := os.ReadDir(s.dataDir)
+	if err != nil {
+		return nil, fmt.Errorf("read data dir: %w", err)
+	}
+	var keys []stateKey
+	for _, c := range classes {
+		if !c.IsDir() {
+			continue
+		}
+		files, err := os.ReadDir(filepath.Join(s.dataDir, c.Name()))
+		if err != nil {
+			return nil, fmt.Errorf("read class dir %s: %w", c.Name(), err)
+		}
+		for _, f := range files {
+			name, ok := strings.CutSuffix(f.Name(), ".bin")
+			if !ok {
+				continue
+			}
+			keys = append(keys, stateKey{Class: c.Name(), Key: name})
+		}
+	}
+	return keys, nil
+}
+
+// Remove deletes one state file, under the same per-key lock writes take.
+// It operates strictly under data/ and never touches the audit path.
+func (s *Store) Remove(class, key string) error {
+	if !nameRe.MatchString(class) || !nameRe.MatchString(key) {
+		return fmt.Errorf("%w: class=%q key=%q", errInvalidName, class, key)
+	}
+	mu := s.keyLock(class, key)
+	mu.Lock()
+	defer mu.Unlock()
+	return os.Remove(filepath.Join(s.dataDir, class, key+".bin"))
 }
 
 // Audit emits one NDJSON decision record: appended and fsynced to the audit

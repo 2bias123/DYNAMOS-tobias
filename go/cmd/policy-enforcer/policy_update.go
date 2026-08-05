@@ -19,6 +19,7 @@ func checkPolicyUpdate(ctx context.Context, policyUpdate *pb.PolicyUpdate) {
 			UserName: policyUpdate.User.UserName,
 		},
 		RequestApproved: false,
+		ValidArchetypes: &pb.UserArchetypes{Archetypes: make(map[string]*pb.UserAllowedArchetypes)},
 	}
 
 	getValidAgreements(policyUpdate.DataProviders, policyUpdate.User, &agreements, protoRequest)

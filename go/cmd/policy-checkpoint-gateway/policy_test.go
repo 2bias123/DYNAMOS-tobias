@@ -44,6 +44,7 @@ func TestDecideWrite(t *testing.T) {
 		{"allowed but stale", testAgreement(allowAll()), sourceStale, "u@x", false, "cache stale; fail closed"},
 		{"allowed but unavailable", nil, sourceUnavailable, "u@x", false, "etcd unreachable; fail closed"},
 		{"allowed but confirmed absent", nil, sourceAbsent, "u@x", false, "agreement confirmed absent; fail closed"},
+		{"invalid onRevocation", testAgreement(&api.StateDirectives{Allowed: true, RetentionSeconds: 900, ResumeAllowed: true, OnRevocation: "freeze"}), sourceCached, "u@x", false, "invalid stateDirectives; fail closed"},
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
