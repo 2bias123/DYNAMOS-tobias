@@ -36,5 +36,9 @@
     {
         "name": "vflTrainRequest",
         "requiredServices": ["vfl-train-demo"]
+    },
+    {
+        "name": "aggregateRequest",
+        "requiredServices": ["aggregate-demo"]
     }
 ]

@@ -218,6 +218,17 @@ func startTraining(protoRequest *pb.RequestApproval, dataRequestInterface map[st
 			}
 
 			response = sendDataToAuthProviders(dataRequestJson, msg.AuthorizedProviders, apiReqApproval.Type, msg.JobId)
+
+			// Non-VFL requests finish here; mark done and release the active job
+			// (the VFL path releases inside runVFLTraining).
+			if v, ok := trainingRequests.Load(requestID); ok {
+				reqData := v.(TrainingRequestData)
+				reqData.Status = StatusDone
+				trainingRequests.Store(requestID, reqData)
+			}
+			activeJobLock.Lock()
+			activeJobID = ""
+			activeJobLock.Unlock()
 		}
 
 		// w.WriteHeader(http.StatusOK)

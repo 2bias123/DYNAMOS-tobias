@@ -117,6 +117,13 @@
     "requiresGateway": true
   },
   {
+    "name": "aggregate-demo",
+    "label": "computeProvider",
+    "allowedOutputs": [],
+    "invalidArchetypes": [],
+    "requiresGateway": true
+  },
+  {
     "name": "anonymize-test",
     "label": "computeProvider",
     "allowedOutputs": [],

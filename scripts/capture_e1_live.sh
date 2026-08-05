@@ -10,7 +10,9 @@ set -u
 #   allow-resume    empty-PVC "not found" read, ALLOW write path, then a
 #                   second run to prove resume-allowed read
 #   resume-disabled seed resumeAllowed=false, startup read should DENY
-#   expired         seed a short retention, read should DENY "retention exceeded"
+#   expired         seed a short retention; the boot sweep destroys the aged
+#                   state under confirmed-fresh policy (op=expired DELETED),
+#                   the startup read then DENYs "not found"
 #   adversarial     long chain + grpcurl: identity mismatch PermissionDenied,
 #                   concurrent same-slot writes, a direct write the completeness
 #                   check catches, then completeness PASS on all four stewards
@@ -312,7 +314,8 @@ block_resume_disabled() {
 }
 
 # Requires prior state on the PVCs (run after allow-resume / resume-disabled):
-# an empty PVC would deny with 'not found' instead of the retention row.
+# on an empty PVC there would be nothing for the sweep to destroy and the
+# "not found" DENY would not be the retention row.
 do_expired() {
 	step "reset + seed variant retentionSeconds=${RETENTION_SHORT}"
 	reset_cluster
@@ -320,7 +323,7 @@ do_expired() {
 	verify_directive_field retentionSeconds "$RETENTION_SHORT"
 	echo "note: the previous run's checkpoints are older than ${RETENTION_SHORT}s by now (the reset alone settles 45s)"
 
-	step "run: cycles=${CYCLES_SHORT}; startup read must DENY 'retention exceeded'"
+	step "run: cycles=${CYCLES_SHORT}; boot sweep must destroy the aged state, startup read then DENYs 'not found'"
 	local id st aud ms wcount
 	id=$(trigger "$CYCLES_SHORT") || fail "trigger failed"
 	st=$(wait_done "$id" "$POLL_MAX")
@@ -328,8 +331,10 @@ do_expired() {
 
 	aud=$(audit_log server)
 	echo; echo "--- server gateway audit ---"; echo "$aud"
+	must_grep "expired state destroyed under confirmed-fresh policy" "$(echo "$aud" | grep '"op":"expired"')" -e '"decision":"DELETED"'
+	must_grep "expired record carries 'retention exceeded'" "$(echo "$aud" | grep '"op":"expired"')" -e '"reason":"retention exceeded"'
 	must_grep "startup read DENY" "$(echo "$aud" | grep '"op":"read"')" -e '"decision":"DENY"'
-	must_grep "read deny reason is 'retention exceeded'" "$(echo "$aud" | grep '"op":"read"')" -e '"reason":"retention exceeded"'
+	must_grep "read deny reason is 'not found' (the sweep already destroyed the state)" "$(echo "$aud" | grep '"op":"read"')" -e '"reason":"not found"'
 	wcount=$(echo "$aud" | grep '"op":"write"' | grep -c '"decision":"ALLOW"')
 	[ "$wcount" -ge "$CYCLES_SHORT" ] || fail "expected >=${CYCLES_SHORT} ALLOW writes, got $wcount"
 	echo "OK: $wcount ALLOW write audit lines (a fresh write restarts the retention clock)"
@@ -341,7 +346,7 @@ do_expired() {
 
 block_expired() {
 	capture live-chain retention-expired-deny expired do_expired \
-		"E1 live row: retention exceeded -> read DENY, no resume; decision-only (no deletion, per v10 scope)"
+		"E1 live row: retention exceeded -> boot sweep destroys under confirmed-fresh policy (op=expired DELETED), read DENY not-found, writes still ALLOW"
 }
 
 gw_rpc() { # $1 = identity json, $2 = state_key; writes payload AQID to class "adversarial"

@@ -4,9 +4,12 @@ set -u
 # Runs the E1 unit tests (the bufconn half of E1) and saves the raw go test
 # output under results/e1-decision-correctness/bufconn/, adding a line to that
 # experiment's captures.md. Covers the write/read decision tables, identity
-# checks (mismatch + registration latch), the write-refused-when-audit-
-# unavailable row, the audit-before-rename invariant, and the lock-conflict
-# row. -count=1 forces a fresh run so the capture can't be a cached result.
+# checks (mismatch + registration latch), the write- and read-refused-when-
+# audit-unavailable rows, the audit-before-rename invariant, the lock-conflict
+# row, and the destroy rows (revocation purge, deferral, regrant-cancel,
+# retain, invalid directives, boot rescan, purge event, retention-expiry
+# delete/retain). -count=1 forces a fresh run so the capture can't be a
+# cached result.
 #
 # Usage: capture_e1_bufconn.sh
 
@@ -15,7 +18,7 @@ out_dir="$root/results/e1-decision-correctness/bufconn"
 ts="$(date +%Y%m%d-%H%M%S)"
 out="$out_dir/${ts}_go-test-bufconn-oracle.txt"
 
-tests='^(TestDecideWrite|TestDecideRead|TestRequestStateWriteAllowsAndPersists|TestValidateStateReadExistingAndMissing|TestReadDenialHidesFileExistence|TestWriteDeniedWhenCacheStale|TestWriteDeniedAfterPolicyFlip|TestIdentityMismatchDeniedAndAudited|TestUnregisteredIdentityDenied|TestAcquireLockConflict|TestWriteProducesLineBeforeFileInvariantHolds|TestWriteRefusedWhenAuditUnavailable|TestCrashBetweenAuditAndRenameLeavesLineNoFile)$'
+tests='^(TestDecideWrite|TestDecideRead|TestRequestStateWriteAllowsAndPersists|TestValidateStateReadExistingAndMissing|TestReadDenialHidesFileExistence|TestWriteDeniedWhenCacheStale|TestWriteDeniedAfterPolicyFlip|TestIdentityMismatchDeniedAndAudited|TestUnregisteredIdentityDenied|TestAcquireLockConflict|TestWriteProducesLineBeforeFileInvariantHolds|TestWriteRefusedWhenAuditUnavailable|TestCrashBetweenAuditAndRenameLeavesLineNoFile|TestReadRefusedWhenAuditUnavailable|TestSweepPurgesRevokedStateAfterConfirm|TestSweepDefersWhenConfirmFails|TestSweepCancelsOnRegrant|TestSweepRetainsWithoutPurgeDirective|TestSweepInvalidDirectivesAuditedNoPurge|TestBootIntoRevokedPurgesAtStartup|TestPurgeEventReachesSubscriber|TestSweepDeletesExpiredAfterConfirm|TestSweepRetainsExpiredWhenConfirmFails)$'
 cmd="go test -v -count=1 -run '$tests' ./cmd/policy-checkpoint-gateway/"
 
 run() {

@@ -19,6 +19,24 @@
                 "resumeAllowed": true,
                 "onRevocation": "purge"
             }
+        },
+        "jorrit.stutterheim@cloudnation.nl": {
+            "ID": "GUID-state-aware-aggregate",
+            "requestTypes": [
+                "aggregateRequest"
+            ],
+            "allowedArchetypes": [
+                "computeToData"
+            ],
+            "allowedComputeProviders": [
+                "clientone"
+            ],
+            "stateDirectives": {
+                "allowed": true,
+                "retentionSeconds": 120,
+                "resumeAllowed": true,
+                "onRevocation": "purge"
+            }
         }
     },
     "computeProviders": [

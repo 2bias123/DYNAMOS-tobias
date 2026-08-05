@@ -1,6 +1,6 @@
 SHELL := /usr/bin/env bash
 # took out to test: sql-query ml-differential-privacy ml-model-training ml-merge-datasets ml-anonymize-dataset ml-synthetic-dataset-generation
-targets := test-microservice vfl-train-model vfl-train vfl-train-demo vfl-train-model-demo anonymize-test differential-p-test
+targets := test-microservice vfl-train-model vfl-train vfl-train-demo vfl-train-model-demo anonymize-test differential-p-test aggregate-demo
 datasets := "../configuration/datasets/"
 branch_name := $(shell git rev-parse --abbrev-ref HEAD)
 dockerhub_account := dynamos1
@@ -33,6 +33,15 @@ $(targets):
 		mkdir -p ./$@/data; \
 		cp ./datasets/yearly_weather.csv ./$@/data/; \
 		cp ./datasets/yearly_building.csv ./$@/data/; \
+	fi
+
+	# Only for aggregate-demo, copy the client datasets to ./data
+	# (from vfl-train-demo/data, the tracked copies; ./datasets is gitignored)
+	if [ "$@" = "aggregate-demo" ]; then \
+		mkdir -p ./$@/data; \
+		cp ./vfl-train-demo/data/clientoneData.csv ./$@/data/; \
+		cp ./vfl-train-demo/data/clienttwoData.csv ./$@/data/; \
+		cp ./vfl-train-demo/data/clientthreeData.csv ./$@/data/; \
 	fi
 
 	@trap 'rm -f ./$@/Dockerfile; rm -rf ./$@/*.whl; rm -rf ./$@/datasets; rm -rf ./$@/protofiles' EXIT;  \

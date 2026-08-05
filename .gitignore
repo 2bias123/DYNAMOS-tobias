@@ -34,6 +34,8 @@ __debug_bin
 node_modules
 .env.local
 datasets/*.csv
+# Build-time copies from vfl-train-demo/data (see python/Makefile)
+python/aggregate-demo/data/
 
 *.drawio.bkp
 *.drawio.dtmp
