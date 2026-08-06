@@ -1,0 +1,104 @@
+$ date
+Wed Aug  5 03:46:35 PM CEST 2026
+
+$ git rev-parse HEAD
+36004ea2f948879cd49234a500bbf0a055b74ab3
+
+$ git status --short
+ M results/e5-genericity/captures.md
+?? results/e5-genericity/scenes/
+
+$ kubectl config current-context
+kind-kind
+
+
+=== reset + seed variant allowed=false, onRevocation='purge', retention=3600
+PREFLIGHT OK: B14, B15 applied
+[reset] deleting stale Jobs in steward namespaces
+No resources found
+job.batch "jorrit-stutterheim-eed531a7clientone1" deleted
+No resources found
+No resources found
+[reset] clearing /agents/jobs/ etcd keys
+[reset] coordinated rollout of request path
+deployment.apps/api-gateway restarted
+deployment.apps/policy-enforcer restarted
+deployment.apps/orchestrator restarted
+deployment.apps/server restarted
+deployment.apps/clientone restarted
+deployment.apps/clienttwo restarted
+deployment.apps/clientthree restarted
+Waiting for deployment "api-gateway" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "api-gateway" rollout to finish: 1 old replicas are pending termination...
+deployment "api-gateway" successfully rolled out
+deployment "policy-enforcer" successfully rolled out
+deployment "orchestrator" successfully rolled out
+deployment "server" successfully rolled out
+Waiting for deployment "clientone" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "clientone" rollout to finish: 1 old replicas are pending termination...
+deployment "clientone" successfully rolled out
+deployment "clienttwo" successfully rolled out
+deployment "clientthree" successfully rolled out
+[reset] settling 45s for AMQP topology to converge
+[reset] OK
+[seed] aggregateRequest config seeded (variant: sd['allowed'] = False; sd['onRevocation'] = 'purge'; sd['retentionSeconds'] = 3600)
+[seed] verified in etcd: onRevocation=purge
+
+=== run: the boot sweep must destroy the retained blob under the confirmed-fresh gate
+trigger: {"request_id":"898c1c12-22f8-4ff4-8887-94f036a98ece","status":"pending"}
+job pod: jorrit-stutterheim-25748ce8clientone1-5gfc9
+
+--- gateway audit ---
+1.7859376591220753e+09	[34mINFO[0m	/app/cmd/policy-checkpoint-gateway/main.go:142	Serving on 50050
+1.7859376591272976e+09	[34mINFO[0m	/app/cmd/policy-checkpoint-gateway/watch.go:56	Agreement loaded ab85cb6689230b0f659faef4feaab740a6fb32adab76604dd46688841c3e626d
+{"op":"purge","decision":"PURGED","reason":"revoked; onRevocation=purge","identity":{"steward":"CLIENTONE","user":"jorrit.stutterheim@cloudnation.nl","requestType":"aggregateRequest","jobId":"jorrit-stutterheim-25748ce8clientone1","localJobName":"jorrit-stutterheim-25748ce8clientone1"},"stateClass":"aggregate_result","stateKey":"latest","agreementHash":"ab85cb6689230b0f659faef4feaab740a6fb32adab76604dd46688841c3e626d","policySource":"fresh","cacheAgeMs":0,"relationId":"GUID-state-aware-aggregate","directives":{"allowed":false,"retentionSeconds":3600,"resumeAllowed":true,"onRevocation":"purge"}}
+1.7859376591297226e+09	[33mWARN[0m	/app/cmd/policy-checkpoint-gateway/purge.go:238	Purged 1 state files under revoked agreement ab85cb6689230b0f659faef4feaab740a6fb32adab76604dd46688841c3e626d
+{"op":"subscribe","reason":"subscription established","identity":{"steward":"CLIENTONE","user":"jorrit.stutterheim@cloudnation.nl","requestType":"aggregateRequest","jobId":"jorrit-stutterheim-25748ce8clientone1","localJobName":"jorrit-stutterheim-25748ce8clientone1"},"agreementHash":"ab85cb6689230b0f659faef4feaab740a6fb32adab76604dd46688841c3e626d","policySource":"cached"}
+{"op":"read","decision":"DENY","reason":"allowed = false","identity":{"steward":"CLIENTONE","user":"jorrit.stutterheim@cloudnation.nl","requestType":"aggregateRequest","jobId":"jorrit-stutterheim-25748ce8clientone1","localJobName":"jorrit-stutterheim-25748ce8clientone1"},"stateClass":"aggregate_result","stateKey":"latest","agreementHash":"ab85cb6689230b0f659faef4feaab740a6fb32adab76604dd46688841c3e626d","policySource":"cached","cacheAgeMs":445,"relationId":"GUID-state-aware-aggregate","directives":{"allowed":false,"retentionSeconds":3600,"resumeAllowed":true,"onRevocation":"purge"}}
+{"op":"write","decision":"DENY","reason":"allowed = false","identity":{"steward":"CLIENTONE","user":"jorrit.stutterheim@cloudnation.nl","requestType":"aggregateRequest","jobId":"jorrit-stutterheim-25748ce8clientone1","localJobName":"jorrit-stutterheim-25748ce8clientone1"},"stateClass":"aggregate_result","stateKey":"latest","agreementHash":"ab85cb6689230b0f659faef4feaab740a6fb32adab76604dd46688841c3e626d","policySource":"cached","cacheAgeMs":567,"relationId":"GUID-state-aware-aggregate","directives":{"allowed":false,"retentionSeconds":3600,"resumeAllowed":true,"onRevocation":"purge"}}
+{"op":"shutdown","reason":"ms_exit","identity":{"steward":"CLIENTONE","user":"jorrit.stutterheim@cloudnation.nl","requestType":"aggregateRequest","jobId":"jorrit-stutterheim-25748ce8clientone1","localJobName":"jorrit-stutterheim-25748ce8clientone1"}}
+1.7859376597074194e+09	[34mINFO[0m	/app/cmd/policy-checkpoint-gateway/main.go:210	Stopping gateway, draining briefly before stop
+1.785937661708349e+09	[34mINFO[0m	/app/cmd/policy-checkpoint-gateway/main.go:258	Exiting gateway server
+
+--- MS log ---
+2026-08-05 13:47:39,527 - main.py - main.py:153 - INFO - Waiting for sidecar gRPC on localhost:50051 ...
+2026-08-05 13:47:39,529 - main.py - ms_init.py:183 - DEBUG - NewConfiguration aggregate-demo, 
+job_name: jorrit-stutterheim-25748ce8clientone1 
+port: 50053,  
+first_service: 1,  
+last_service: 1
+2026-08-05 13:47:39,539 - main.py - grpc_client.py:72 - DEBUG - Try connecting to: localhost:50051
+2026-08-05 13:47:39,540 - main.py - grpc_server.py:162 - INFO - gRPC server started on localhost:50053
+2026-08-05 13:47:39,544 - main.py - grpc_client.py:78 - INFO - Successfully connected to gRPC server at localhost:50051
+2026-08-05 13:47:39,556 - main.py - gateway_client.py:95 - DEBUG - Try connecting to gateway at: localhost:50050
+2026-08-05 13:47:39,558 - main.py - gateway_client.py:99 - INFO - Successfully connected to gateway at localhost:50050
+2026-08-05 13:47:39,558 - main.py - gateway_lifecycle.py:67 - INFO - Gateway connected, state-event listener started (aggregate-demo)
+2026-08-05 13:47:39,562 - main.py - grpc_server.py:56 - INFO - Received health check request
+2026-08-05 13:47:39,565 - main.py - grpc_server.py:97 - DEBUG - Starting MicroserviceServicer grpc_server.py/SendData: jorrit-stutterheim-25748ce8clientone1
+2026-08-05 13:47:39,570 - main.py - grpc_server.py:109 - DEBUG - msComm type: <class 'microserviceCommunication_pb2.MicroserviceCommunication'>
+2026-08-05 13:47:39,570 - main.py - ms_init.py:108 - DEBUG - 1. scMap: {'SpanID': 'f0d553c9b7aa1067', 'TraceID': 'e5e6b2eb00aeea1c3fbd73b9d7d1d7eb'}
+2026-08-05 13:47:39,570 - main.py - ms_init.py:109 - DEBUG - 1. state: ['{key=sampled, value=1}']
+2026-08-05 13:47:39,570 - main.py - ms_init.py:120 - DEBUG - 2
+2026-08-05 13:47:39,570 - main.py - main.py:105 - INFO - Received original request type: aggregateRequest
+2026-08-05 13:47:39,574 - main.py - gateway_lifecycle.py:60 - INFO - Gateway state event: AGREEMENT_CHANGED reason=subscription established
+2026-08-05 13:47:39,575 - main.py - main.py:81 - INFO - Result read denied (allowed = false); recomputing
+2026-08-05 13:47:39,704 - main.py - main.py:97 - WARNING - Result write denied (allowed = false); continuing without persistence
+2026-08-05 13:47:39,704 - main.py - grpc_client.py:139 - DEBUG - Sending message to <microserviceCommunication_pb2_grpc.MicroserviceStub object at 0x7f6621c1f140>
+2026-08-05 13:47:39,708 - main.py - gateway_client.py:170 - INFO - Requested gateway shutdown: ms_exit
+2026-08-05 13:47:39,708 - main.py - grpc_server.py:181 - INFO - Stopping gRPC server...
+2026-08-05 13:47:39,709 - main.py - grpc_server.py:167 - INFO - Server stopped
+2026-08-05 13:47:39,709 - main.py - grpc_server.py:186 - INFO - gRPC server stopped
+2026-08-05 13:47:39,709 - main.py - grpc_client.py:52 - DEBUG - Closed gRPC channel
+2026-08-05 13:47:41,709 - main.py - main.py:171 - DEBUG - Exiting aggregate-demo
+OK: purge record per removal, confirmed fresh
+    {"op":"purge","decision":"PURGED","reason":"revoked; onRevocation=purge","identity":{"steward":"CLIENTONE","user":"jorrit.stutterheim@cloudnation.nl","requestType":"aggregateRequest","jobId":"jorrit-stutterheim-25748ce8clientone1","localJobName":"jorrit-stutterheim-25748ce8clientone1"},"stateClass":"aggregate_result","stateKey":"latest","agreementHash":"ab85cb6689230b0f659faef4feaab740a6fb32adab76604dd46688841c3e626d","policySource":"fresh","cacheAgeMs":0,"relationId":"GUID-state-aware-aggregate","directives":{"allowed":false,"retentionSeconds":3600,"resumeAllowed":true,"onRevocation":"purge"}}
+OK: purge reason names the revocation
+    {"op":"purge","decision":"PURGED","reason":"revoked; onRevocation=purge","identity":{"steward":"CLIENTONE","user":"jorrit.stutterheim@cloudnation.nl","requestType":"aggregateRequest","jobId":"jorrit-stutterheim-25748ce8clientone1","localJobName":"jorrit-stutterheim-25748ce8clientone1"},"stateClass":"aggregate_result","stateKey":"latest","agreementHash":"ab85cb6689230b0f659faef4feaab740a6fb32adab76604dd46688841c3e626d","policySource":"fresh","cacheAgeMs":0,"relationId":"GUID-state-aware-aggregate","directives":{"allowed":false,"retentionSeconds":3600,"resumeAllowed":true,"onRevocation":"purge"}}
+OK: purge record names the blob
+    {"op":"purge","decision":"PURGED","reason":"revoked; onRevocation=purge","identity":{"steward":"CLIENTONE","user":"jorrit.stutterheim@cloudnation.nl","requestType":"aggregateRequest","jobId":"jorrit-stutterheim-25748ce8clientone1","localJobName":"jorrit-stutterheim-25748ce8clientone1"},"stateClass":"aggregate_result","stateKey":"latest","agreementHash":"ab85cb6689230b0f659faef4feaab740a6fb32adab76604dd46688841c3e626d","policySource":"fresh","cacheAgeMs":0,"relationId":"GUID-state-aware-aggregate","directives":{"allowed":false,"retentionSeconds":3600,"resumeAllowed":true,"onRevocation":"purge"}}
+OK: gateway counted the removal
+    1.7859376591297226e+09	[33mWARN[0m	/app/cmd/policy-checkpoint-gateway/purge.go:238	Purged 1 state files under revoked agreement ab85cb6689230b0f659faef4feaab740a6fb32adab76604dd46688841c3e626d
+OK: read after the purge still DENYs on policy
+    {"op":"read","decision":"DENY","reason":"allowed = false","identity":{"steward":"CLIENTONE","user":"jorrit.stutterheim@cloudnation.nl","requestType":"aggregateRequest","jobId":"jorrit-stutterheim-25748ce8clientone1","localJobName":"jorrit-stutterheim-25748ce8clientone1"},"stateClass":"aggregate_result","stateKey":"latest","agreementHash":"ab85cb6689230b0f659faef4feaab740a6fb32adab76604dd46688841c3e626d","policySource":"cached","cacheAgeMs":445,"relationId":"GUID-state-aware-aggregate","directives":{"allowed":false,"retentionSeconds":3600,"resumeAllowed":true,"onRevocation":"purge"}}
+OK: MS answered without persistence
+    2026-08-05 13:47:39,704 - main.py - main.py:97 - WARNING - Result write denied (allowed = false); continuing without persistence

@@ -1,0 +1,42 @@
+$ date
+Wed Aug  5 03:20:58 PM CEST 2026
+
+$ git rev-parse HEAD
+94d58b9ca2c2eabf9cb25bbaf764492fe8d95dd8
+
+$ git status --short
+ M results/e1-decision-correctness/captures.md
+?? results/e1-decision-correctness/adversarial/20260805-151701_adversarial-battery.txt
+?? results/e1-decision-correctness/audit-completeness/20260805-152058_completeness-invariant.txt
+?? results/e1-decision-correctness/bufconn/20260805-151150_go-test-bufconn-oracle.txt
+?? results/e1-decision-correctness/live-chain/20260805-151205_allow-write-and-resume.txt
+?? results/e1-decision-correctness/live-chain/20260805-151439_resume-disabled-deny.txt
+?? results/e1-decision-correctness/live-chain/20260805-151553_retention-expired-deny.txt
+?? results/env/20260805-151144_env-snapshot.txt
+?? results/env/20260805-151144_images.txt
+
+$ kubectl config current-context
+kind-kind
+
+
+=== steward server
+[server] state PVC: state-server-ad751c18-vfltrainmodelrequest
+state files: 2  audit lines: 342  allow-writes: 2
+COMPLETENESS PASS: every state file has an ALLOW audit line
+
+=== steward clientone
+[clientone] state PVC: state-clientone-ad751c18-vfltrainmodelrequest
+state files: 1  audit lines: 338  allow-writes: 1
+COMPLETENESS PASS: every state file has an ALLOW audit line
+
+=== steward clienttwo
+[clienttwo] state PVC: state-clienttwo-ad751c18-vfltrainmodelrequest
+state files: 1  audit lines: 338  allow-writes: 1
+COMPLETENESS PASS: every state file has an ALLOW audit line
+
+=== steward clientthree
+[clientthree] state PVC: state-clientthree-ad751c18-vfltrainmodelrequest
+state files: 1  audit lines: 338  allow-writes: 1
+COMPLETENESS PASS: every state file has an ALLOW audit line
+
+OK: completeness PASS on all 4 steward PVCs

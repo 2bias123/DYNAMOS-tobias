@@ -1,0 +1,118 @@
+$ date
+Wed Aug  5 03:15:53 PM CEST 2026
+
+$ git rev-parse HEAD
+94d58b9ca2c2eabf9cb25bbaf764492fe8d95dd8
+
+$ git status --short
+ M results/e1-decision-correctness/captures.md
+?? results/e1-decision-correctness/bufconn/20260805-151150_go-test-bufconn-oracle.txt
+?? results/e1-decision-correctness/live-chain/20260805-151205_allow-write-and-resume.txt
+?? results/e1-decision-correctness/live-chain/20260805-151439_resume-disabled-deny.txt
+?? results/e1-decision-correctness/live-chain/20260805-151553_retention-expired-deny.txt
+?? results/env/20260805-151144_env-snapshot.txt
+?? results/env/20260805-151144_images.txt
+
+$ kubectl config current-context
+kind-kind
+
+
+=== reset + seed variant retentionSeconds=30
+PREFLIGHT OK: B14, B15 applied
+[reset] deleting stale Jobs in steward namespaces
+job.batch "jake-jongejans-dc9487e6server1" deleted
+job.batch "jake-jongejans-dc9487e6clientone1" deleted
+job.batch "jake-jongejans-dc9487e6clienttwo1" deleted
+job.batch "jake-jongejans-dc9487e6clientthree1" deleted
+[reset] clearing /agents/jobs/ etcd keys
+[reset] coordinated rollout of request path
+deployment.apps/api-gateway restarted
+deployment.apps/policy-enforcer restarted
+deployment.apps/orchestrator restarted
+deployment.apps/server restarted
+deployment.apps/clientone restarted
+deployment.apps/clienttwo restarted
+deployment.apps/clientthree restarted
+Waiting for deployment "api-gateway" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "api-gateway" rollout to finish: 1 old replicas are pending termination...
+deployment "api-gateway" successfully rolled out
+deployment "policy-enforcer" successfully rolled out
+deployment "orchestrator" successfully rolled out
+Waiting for deployment "server" rollout to finish: 1 old replicas are pending termination...
+deployment "server" successfully rolled out
+deployment "clientone" successfully rolled out
+deployment "clienttwo" successfully rolled out
+deployment "clientthree" successfully rolled out
+[reset] settling 45s for AMQP topology to converge
+[reset] OK
+[seed] server: OK (variant: sd['retentionSeconds'] = 30)
+[seed] clientone: OK (variant: sd['retentionSeconds'] = 30)
+[seed] clienttwo: OK (variant: sd['retentionSeconds'] = 30)
+[seed] clientthree: OK (variant: sd['retentionSeconds'] = 30)
+[seed] verified in etcd for all stewards: retentionSeconds=30
+note: the previous run's checkpoints are older than 30s by now (the reset alone settles 45s)
+
+=== run: cycles=3; boot sweep must destroy the aged state, startup read then DENYs 'not found'
+trigger: {"request_id":"605c9eae-b25a-44c7-9f12-7da5e078aa4e","status":"pending"}
+poll 1: pending
+poll 2: done
+{
+    "metadata": {
+        "policy_reintroduction": -1,
+        "policy_removal": -1,
+        "total_rounds": 3,
+        "training_backtrack": 0
+    },
+    "request_id": "605c9eae-b25a-44c7-9f12-7da5e078aa4e",
+    "results": [
+        {
+            "accuracy": -2.1118228435516357,
+            "clients": 3,
+            "timestamp": "2026-08-05T13:16:58Z",
+            "train_round": 0
+        },
+        {
+            "accuracy": -2.10983943939209,
+            "clients": 3,
+            "timestamp": "2026-08-05T13:16:59Z",
+            "train_round": 1
+        },
+        {
+            "accuracy": -2.099306344985962,
+            "clients": 3,
+            "timestamp": "2026-08-05T13:17:00Z",
+            "train_round": 2
+        }
+    ],
+    "status": "done"
+}
+
+--- server gateway audit ---
+1.785935812938136e+09	[34mINFO[0m	/app/cmd/policy-checkpoint-gateway/main.go:142	Serving on 50050
+1.7859358129429064e+09	[34mINFO[0m	/app/cmd/policy-checkpoint-gateway/watch.go:56	Agreement loaded 8c638343afc70e1aa692b55fd654f24b03df91cb321d3de1be32142f4d08b0f4
+{"op":"expired","decision":"DELETED","reason":"retention exceeded","identity":{"steward":"SERVER","user":"jake.jongejans@student.uva.nl","requestType":"vflTrainModelRequest","jobId":"jake-jongejans-ecf9b8e4server1","localJobName":"jake-jongejans-ecf9b8e4server1"},"stateClass":"vfl_server_model","stateKey":"latest","agreementHash":"8c638343afc70e1aa692b55fd654f24b03df91cb321d3de1be32142f4d08b0f4","policySource":"fresh","cacheAgeMs":0,"relationId":"GUID-state-aware","directives":{"allowed":true,"retentionSeconds":30,"resumeAllowed":true,"onRevocation":"purge"}}
+1.7859358129464512e+09	[33mWARN[0m	/app/cmd/policy-checkpoint-gateway/purge.go:131	Deleted 1 expired state files (retention 30s)
+{"op":"subscribe","reason":"subscription established","identity":{"steward":"SERVER","user":"jake.jongejans@student.uva.nl","requestType":"vflTrainModelRequest","jobId":"jake-jongejans-ecf9b8e4server1","localJobName":"jake-jongejans-ecf9b8e4server1"},"agreementHash":"8c638343afc70e1aa692b55fd654f24b03df91cb321d3de1be32142f4d08b0f4","policySource":"cached"}
+{"op":"subscribe","reason":"subscription established","identity":{"steward":"SERVER","user":"jake.jongejans@student.uva.nl","requestType":"vflTrainModelRequest","jobId":"jake-jongejans-ecf9b8e4server1","localJobName":"jake-jongejans-ecf9b8e4server1"},"agreementHash":"8c638343afc70e1aa692b55fd654f24b03df91cb321d3de1be32142f4d08b0f4","policySource":"cached"}
+{"op":"read","decision":"DENY","reason":"not found","identity":{"steward":"SERVER","user":"jake.jongejans@student.uva.nl","requestType":"vflTrainModelRequest","jobId":"jake-jongejans-ecf9b8e4server1","localJobName":"jake-jongejans-ecf9b8e4server1"},"stateClass":"vfl_server_model","stateKey":"latest","agreementHash":"8c638343afc70e1aa692b55fd654f24b03df91cb321d3de1be32142f4d08b0f4","policySource":"cached","cacheAgeMs":2202,"relationId":"GUID-state-aware","directives":{"allowed":true,"retentionSeconds":30,"resumeAllowed":true,"onRevocation":"purge"}}
+{"op":"write","decision":"ALLOW","identity":{"steward":"SERVER","user":"jake.jongejans@student.uva.nl","requestType":"vflTrainModelRequest","jobId":"jake-jongejans-ecf9b8e4server1","localJobName":"jake-jongejans-ecf9b8e4server1"},"stateClass":"vfl_server_model","stateKey":"latest","writtenUnixSeconds":1785935817,"agreementHash":"8c638343afc70e1aa692b55fd654f24b03df91cb321d3de1be32142f4d08b0f4","policySource":"cached","cacheAgeMs":4528,"relationId":"GUID-state-aware","directives":{"allowed":true,"retentionSeconds":30,"resumeAllowed":true,"onRevocation":"purge"}}
+{"op":"write","decision":"ALLOW","identity":{"steward":"SERVER","user":"jake.jongejans@student.uva.nl","requestType":"vflTrainModelRequest","jobId":"jake-jongejans-ecf9b8e4server1","localJobName":"jake-jongejans-ecf9b8e4server1"},"stateClass":"vfl_server_model","stateKey":"latest","writtenUnixSeconds":1785935819,"agreementHash":"8c638343afc70e1aa692b55fd654f24b03df91cb321d3de1be32142f4d08b0f4","policySource":"cached","cacheAgeMs":6263,"relationId":"GUID-state-aware","directives":{"allowed":true,"retentionSeconds":30,"resumeAllowed":true,"onRevocation":"purge"}}
+{"op":"write","decision":"ALLOW","identity":{"steward":"SERVER","user":"jake.jongejans@student.uva.nl","requestType":"vflTrainModelRequest","jobId":"jake-jongejans-ecf9b8e4server1","localJobName":"jake-jongejans-ecf9b8e4server1"},"stateClass":"vfl_server_model","stateKey":"latest","writtenUnixSeconds":1785935819,"agreementHash":"8c638343afc70e1aa692b55fd654f24b03df91cb321d3de1be32142f4d08b0f4","policySource":"cached","cacheAgeMs":6931,"relationId":"GUID-state-aware","directives":{"allowed":true,"retentionSeconds":30,"resumeAllowed":true,"onRevocation":"purge"}}
+{"op":"shutdown","reason":"ms_exit","identity":{"steward":"SERVER","user":"jake.jongejans@student.uva.nl","requestType":"vflTrainModelRequest","jobId":"jake-jongejans-ecf9b8e4server1","localJobName":"jake-jongejans-ecf9b8e4server1"}}
+1.78593582008701e+09	[34mINFO[0m	/app/cmd/policy-checkpoint-gateway/main.go:210	Stopping gateway, draining briefly before stop
+OK: expired state destroyed under confirmed-fresh policy
+    {"op":"expired","decision":"DELETED","reason":"retention exceeded","identity":{"steward":"SERVER","user":"jake.jongejans@student.uva.nl","requestType":"vflTrainModelRequest","jobId":"jake-jongejans-ecf9b8e4server1","localJobName":"jake-jongejans-ecf9b8e4server1"},"stateClass":"vfl_server_model","stateKey":"latest","agreementHash":"8c638343afc70e1aa692b55fd654f24b03df91cb321d3de1be32142f4d08b0f4","policySource":"fresh","cacheAgeMs":0,"relationId":"GUID-state-aware","directives":{"allowed":true,"retentionSeconds":30,"resumeAllowed":true,"onRevocation":"purge"}}
+OK: expired record carries 'retention exceeded'
+    {"op":"expired","decision":"DELETED","reason":"retention exceeded","identity":{"steward":"SERVER","user":"jake.jongejans@student.uva.nl","requestType":"vflTrainModelRequest","jobId":"jake-jongejans-ecf9b8e4server1","localJobName":"jake-jongejans-ecf9b8e4server1"},"stateClass":"vfl_server_model","stateKey":"latest","agreementHash":"8c638343afc70e1aa692b55fd654f24b03df91cb321d3de1be32142f4d08b0f4","policySource":"fresh","cacheAgeMs":0,"relationId":"GUID-state-aware","directives":{"allowed":true,"retentionSeconds":30,"resumeAllowed":true,"onRevocation":"purge"}}
+OK: startup read DENY
+    {"op":"read","decision":"DENY","reason":"not found","identity":{"steward":"SERVER","user":"jake.jongejans@student.uva.nl","requestType":"vflTrainModelRequest","jobId":"jake-jongejans-ecf9b8e4server1","localJobName":"jake-jongejans-ecf9b8e4server1"},"stateClass":"vfl_server_model","stateKey":"latest","agreementHash":"8c638343afc70e1aa692b55fd654f24b03df91cb321d3de1be32142f4d08b0f4","policySource":"cached","cacheAgeMs":2202,"relationId":"GUID-state-aware","directives":{"allowed":true,"retentionSeconds":30,"resumeAllowed":true,"onRevocation":"purge"}}
+OK: read deny reason is 'not found' (the sweep already destroyed the state)
+    {"op":"read","decision":"DENY","reason":"not found","identity":{"steward":"SERVER","user":"jake.jongejans@student.uva.nl","requestType":"vflTrainModelRequest","jobId":"jake-jongejans-ecf9b8e4server1","localJobName":"jake-jongejans-ecf9b8e4server1"},"stateClass":"vfl_server_model","stateKey":"latest","agreementHash":"8c638343afc70e1aa692b55fd654f24b03df91cb321d3de1be32142f4d08b0f4","policySource":"cached","cacheAgeMs":2202,"relationId":"GUID-state-aware","directives":{"allowed":true,"retentionSeconds":30,"resumeAllowed":true,"onRevocation":"purge"}}
+OK: 3 ALLOW write audit lines (a fresh write restarts the retention clock)
+
+--- server MS lines ---
+2026-08-05 13:16:55,157 - main.py - main.py:364 - INFO - Resume read denied (not found); starting fresh
+2026-08-05 13:16:57,476 - main.py - main.py:344 - INFO - Checkpoint write allowed: round_index=1
+2026-08-05 13:16:59,210 - main.py - main.py:344 - INFO - Checkpoint write allowed: round_index=2
+2026-08-05 13:16:59,880 - main.py - main.py:344 - INFO - Checkpoint write allowed: round_index=3
+OK: absent as expected: no resume from expired state
