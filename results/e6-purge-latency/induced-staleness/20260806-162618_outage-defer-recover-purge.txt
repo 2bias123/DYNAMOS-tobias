@@ -1,0 +1,42 @@
+$ date
+Thu Aug  6 04:26:18 PM CEST 2026
+
+$ git rev-parse HEAD
+f50c272bf1d62a498535f6b2fbf139fbb0a89a3a
+
+$ git status --short
+ M results/e6-purge-latency/captures.md
+?? results/e6-purge-latency/induced-staleness/
+?? results/e6-purge-latency/watch-regime/
+
+$ kubectl config current-context
+kind-kind
+
+
+=== build the gateway (-tags local); etcd through a killable port-forward
+
+=== seed the server agreement allowed=true (canonical carries onRevocation=purge)
+
+=== run the local gateway: poll-only every 5s, staleness bound 20s
+
+=== baseline: ALLOW write puts the blob on the state dir
+baseline: ALLOW, blob present
+
+=== outage: kill the etcd forward; the cache must age to stale and writes must fail closed
+stale DENY after 20.0s of outage (bound 20s + last-poll age)
+last stale record: {"op":"write","decision":"DENY","reason":"cache stale; fail closed","identity":{"steward":"SERVER","user":"jake.jongejans@student.uva.nl","requestType":"vflTrainModelRequest","jobId":"e6-staleness","localJobName":"e6-staleness"},"stateClass":"e6_probe","stateKey":"probe","agreementHash":"54d9c11105ec0d7535efe6f88afcc1bd5ec7ea185bdbfcda1a3ffa6f7df4bad0","policySource":"stale","cacheAgeMs":21046}
+
+=== flip allowed=false during the outage; the gateway cannot observe it
+t_flip=1786026406.352941820 (revocation pending in etcd, unobserved by the gateway)
+
+=== hold through the outage: nothing may be destroyed on a non-fresh view
+OK: blob intact through the outage; no purge records; writes failing closed stale
+cache_age_ms rising: 21046
+
+=== recovery: restore the etcd forward; the deferred purge must complete fresh within one poll bound
+recovery -> purge-complete: 10824.0 ms (bound: 5s poll + confirming Get)
+purge record: {"op":"purge","decision":"PURGED","reason":"revoked; onRevocation=purge","identity":{"steward":"SERVER","user":"jake.jongejans@student.uva.nl","requestType":"vflTrainModelRequest","jobId":"e6-staleness","localJobName":"e6-staleness"},"stateClass":"e6_probe","stateKey":"probe","agreementHash":"1fe2344b3ac63c17fa234798a498775bf2f5fd0e90a15fa80d924a2abb7c46f9","policySource":"fresh","cacheAgeMs":0,"relationId":"GUID-state-aware","directives":{"allowed":false,"retentionSeconds":900,"resumeAllowed":true,"onRevocation":"purge"}}
+
+cache_age_ms trajectory: rose through the outage (stale DENY records), closed to a confirmed-fresh purge
+note: the per-reconsideration DEFERRED line needs a confirm failure milliseconds after a
+successful observation; not stageable externally — unit-proven (TestSweepDefersWhenConfirmFails).

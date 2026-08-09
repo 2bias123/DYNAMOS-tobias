@@ -19,7 +19,7 @@ set -u
 #              complete and upper-bounds the etcd-commit -> purge gap. The
 #              PUT round-trip time is reported per trial so the bound's slack
 #              is visible. t_purge is the gateway's own sweep-completion log
-#              line (zap epoch, host clock — kind shares it).
+#              line (zap epoch, host clock; kind shares it).
 #              The flip -> first-DENY side is E2's capture; cited, not
 #              re-measured here.
 #   staleness  the induced-staleness arm on a locally built gateway whose
@@ -38,7 +38,7 @@ set -u
 # What the staleness arm does NOT show, stated here so the capture is not
 # over-read: the per-reconsideration DEFERRED audit line requires the
 # confirming Get to fail milliseconds after a successful observation of the
-# revoked view — that interleaving is not stageable from outside the process
+# revoked view. That interleaving is not stageable from outside the process
 # and is covered by the unit oracle (TestSweepDefersWhenConfirmFails in the
 # counted E1 bufconn capture). The live claims here are: nothing is destroyed
 # while the view is non-fresh, staleness is visible and fail-closed, and the
@@ -352,7 +352,7 @@ do_staleness() {
 
 	step "hold through the outage: nothing may be destroyed on a non-fresh view"
 	sleep $((POLL_INTERVAL * 2))
-	[ -f "$blob" ] || fail "blob destroyed during the outage — non-fresh destruction is a safety violation"
+	[ -f "$blob" ] || fail "blob destroyed during the outage: non-fresh destruction is a safety violation"
 	grep -q '"decision":"PURGED"' "$audit" && fail "purge record during the outage"
 	grep -q "Purged" "$gw_log" && fail "purge sweep ran during the outage"
 	echo "OK: blob intact through the outage; no purge records; writes failing closed stale"
@@ -384,7 +384,7 @@ do_staleness() {
 	echo
 	echo "cache_age_ms trajectory: rose through the outage (stale DENY records), closed to a confirmed-fresh purge"
 	echo "note: the per-reconsideration DEFERRED line needs a confirm failure milliseconds after a"
-	echo "successful observation; not stageable externally — unit-proven (TestSweepDefersWhenConfirmFails)."
+	echo "successful observation; not stageable externally, unit-proven (TestSweepDefersWhenConfirmFails)."
 
 	flip_server true >/dev/null
 	kill "$GWPID" 2>/dev/null; GWPID=""

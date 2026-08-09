@@ -1,0 +1,73 @@
+$ date
+Sat Aug  8 09:08:59 PM CEST 2026
+
+$ git -C /home/onebias/School/thesis/DYNAMOS-tobias rev-parse --abbrev-ref HEAD
+main
+
+$ git -C /home/onebias/School/thesis/DYNAMOS-tobias rev-parse HEAD
+b3f6ad2133a969cfbfbff4865d4b4cf119944a72
+
+$ git -C /home/onebias/School/thesis/DYNAMOS-tobias status --short
+?? results/env/20260808-210859_env-snapshot.txt
+
+$ go version
+go version go1.23.8 linux/amd64
+
+$ kind version
+kind v0.24.0 go1.23.8 linux/amd64
+
+$ kubectl version --client
+Client Version: v1.31.2
+Kustomize Version: v5.4.2
+
+$ kubectl get nodes -o wide
+NAME                 STATUS   ROLES           AGE   VERSION   INTERNAL-IP   EXTERNAL-IP   OS-IMAGE                         KERNEL-VERSION   CONTAINER-RUNTIME
+kind-control-plane   Ready    control-plane   74d   v1.31.0   172.18.0.2    <none>        Debian GNU/Linux 12 (bookworm)   6.6.94           containerd://1.7.18
+
+$ kubectl get pods -A
+NAMESPACE            NAME                                                 READY   STATUS             RESTARTS        AGE
+api-gateway          api-gateway-797986c8cd-wgq4z                         3/3     Running            0               5m30s
+clientone            clientone-7d589f6957-rgzg7                           3/3     Running            0               5m29s
+clientone            jake-jongejans-5c9d0897clientone1-hszjr              1/6     NotReady           0               3m29s
+clientthree          clientthree-684764499c-7wlwp                         3/3     Running            0               5m28s
+clientthree          jake-jongejans-5c9d0897clientthree1-bsz6k            1/6     NotReady           0               3m29s
+clienttwo            clienttwo-56c6df45cf-2gxd7                           3/3     Running            0               5m29s
+clienttwo            jake-jongejans-5c9d0897clienttwo1-6qpb9              1/6     NotReady           0               3m29s
+core                 debug                                                1/2     ImagePullBackOff   446 (28m ago)   61d
+core                 etcd-0                                               2/2     Running            104 (9h ago)    54d
+core                 etcd-1                                               2/2     Running            104 (9h ago)    54d
+core                 etcd-2                                               2/2     Running            104 (9h ago)    54d
+core                 grafana-664bc9d4f7-sxc9d                             2/2     Running            126 (9h ago)    61d
+core                 loki-85444789f-f28qv                                 2/2     Running            126 (9h ago)    61d
+core                 promtail-8kxmg                                       2/2     Running            126 (9h ago)    61d
+core                 rabbitmq-7ff55c6b4b-v2nfl                            2/2     Running            104 (9h ago)    54d
+default              prometheus-alertmanager-0                            1/1     Running            63 (9h ago)     61d
+default              prometheus-kube-state-metrics-6b6b5f8c5c-gkvcc       1/1     Running            103 (9h ago)    61d
+default              prometheus-prometheus-node-exporter-5mw8v            1/1     Running            63 (9h ago)     61d
+default              prometheus-prometheus-pushgateway-79764966fb-q2clb   1/1     Running            63 (9h ago)     61d
+default              prometheus-server-659f5f956b-m6m8w                   2/2     Running            126 (9h ago)    61d
+ingress              nginx-nginx-ingress-controller-58bc7cddcc-5t5ph      1/1     Running            110 (9h ago)    61d
+kube-system          coredns-6f6b679f8f-dr2lp                             1/1     Running            84 (9h ago)     74d
+kube-system          coredns-6f6b679f8f-jbnwf                             1/1     Running            84 (9h ago)     74d
+kube-system          etcd-kind-control-plane                              1/1     Running            84 (9h ago)     74d
+kube-system          kindnet-m9vxf                                        1/1     Running            84 (9h ago)     74d
+kube-system          kube-apiserver-kind-control-plane                    1/1     Running            84 (9h ago)     74d
+kube-system          kube-controller-manager-kind-control-plane           1/1     Running            84 (9h ago)     74d
+kube-system          kube-proxy-2nfth                                     1/1     Running            84 (9h ago)     74d
+kube-system          kube-scheduler-kind-control-plane                    1/1     Running            84 (9h ago)     74d
+linkerd-jaeger       collector-8459487b75-zrpvc                           2/2     Running            167 (9h ago)    74d
+linkerd-jaeger       jaeger-77d4954795-52cw4                              2/2     Running            167 (9h ago)    74d
+linkerd-jaeger       jaeger-injector-7cb554bc64-s7tdr                     2/2     Running            168 (9h ago)    74d
+linkerd              linkerd-destination-74bbdc7579-lptd7                 4/4     Running            208 (9h ago)    54d
+linkerd              linkerd-identity-67c984c94c-6cqwr                    2/2     Running            109 (9h ago)    54d
+linkerd              linkerd-proxy-injector-5d6d4bc85-fljbd               2/2     Running            104 (9h ago)    54d
+local-path-storage   local-path-provisioner-57c5987fd4-psc95              1/1     Running            148 (9h ago)    74d
+orchestrator         init-etcd-pvc-hs7cf                                  0/1     Completed          0               61d
+orchestrator         orchestrator-6f54585956-nmnqc                        3/3     Running            0               5m29s
+orchestrator         policy-enforcer-844c86c468-z8vhh                     3/3     Running            0               5m29s
+server               jake-jongejans-5c9d0897server1-fgjrz                 2/6     NotReady           0               3m29s
+server               server-967c88859-vmdbq                               3/3     Running            0               5m29s
+surf                 surf-564854569d-qlq9p                                3/3     Running            12 (9h ago)     3d8h
+uva                  uva-5cd4c9b5b6-jh9m7                                 3/3     Running            14 (9h ago)     3d8h
+vu                   vu-697bbdd66b-dkgnp                                  3/3     Running            14 (9h ago)     3d8h
+
