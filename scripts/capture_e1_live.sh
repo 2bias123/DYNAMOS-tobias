@@ -25,190 +25,43 @@ set -u
 # them. allow-resume DELETES the four state PVCs to start clean; expired needs
 # state left on the PVCs by an earlier block.
 
+EXP=E1
 root="$(cd "$(dirname "$0")/.." && pwd)"
 # Override for shakedown runs that must not land in the evidence tree.
 results_dir="${E1_RESULTS_DIR:-$root/results/e1-decision-correctness}"
+. "$root/scripts/capture_lib.sh"
 
 STEWARD_NS=(server clientone clienttwo clientthree)
 USER_NAME="jake.jongejans@student.uva.nl"
 APIPORT="${APIPORT:-8080}"
 ORCHPORT="${ORCHPORT:-8082}"
 GWPORT="${GWPORT:-50050}"
-CYCLES_SHORT="${CYCLES_SHORT:-3}"
+CYCLES_SHORT="${CYCLES_SHORT:-$CAMPAIGN_N}"
 CYCLES_LONG="${CYCLES_LONG:-300}"
 RETENTION_SHORT="${RETENTION_SHORT:-30}"
 CONCURRENT_N="${CONCURRENT_N:-8}"
-POLL_MAX="${POLL_MAX:-36}"        # x5s = 3 min, short-chain runs
+POLL_MAX="${POLL_MAX:-$(poll_max_for_cycles "$CYCLES_SHORT")}"  # x5s, short-chain runs
 POLL_MAX_LONG="${POLL_MAX_LONG:-120}"  # x5s = 10 min, the cycles=300 run
 
 PIDS=()
 cleanup() { for p in "${PIDS[@]}"; do kill "$p" 2>/dev/null; done; }
 trap cleanup EXIT
 
-step() { echo; echo "=== $*"; }
-fail() { echo "E1 FAIL: $*" >&2; exit 1; }
-
 # --- shared helpers -------------------------------------------------------
 
-provenance() {
-	echo "\$ date"
-	date
-	echo
-	echo "\$ git rev-parse HEAD"
-	git -C "$root" rev-parse HEAD
-	echo
-	echo "\$ git status --short"
-	git -C "$root" status --short
-	echo
-	echo "\$ kubectl config current-context"
-	kubectl config current-context
-	echo
-}
-
-reset_cluster() {
-	"$root/reset.sh" || fail "reset.sh failed"
-}
-
-# Seed the four state-aware agreements via the orchestrator /policyEnforcer
-# operator path. $1 is an optional python statement applied to each relation's
-# stateDirectives dict (variable `sd`) before the PUT; empty seeds canonical.
-seed_agreements() {
-	local transform="${1:-}"
-	pkill -f "port-forward.*${ORCHPORT}:8080" 2>/dev/null
-	kubectl port-forward -n orchestrator svc/orchestrator "${ORCHPORT}:8080" >/dev/null 2>&1 &
-	PIDS+=($!)
-	sleep 3
-	local s f code tmp
-	for s in "${STEWARD_NS[@]}"; do
-		f="$root/configuration/etcd_launch_files/state_aware_${s}.json"
-		tmp=$(mktemp)
-		python3 -c "
-import json
-a = json.load(open('$f'))
-for rel in a['relations'].values():
-    sd = rel.get('stateDirectives')
-    if sd is None:
-        continue
-    ${transform:-pass}
-print(json.dumps(a))" > "$tmp" || fail "variant transform failed for $s"
-		code=$(curl -s -o /dev/null -w '%{http_code}' -X PUT "http://localhost:${ORCHPORT}/api/v1/policyEnforcer" \
-			-H 'Content-Type: application/json' --data-binary @"$tmp")
-		rm -f "$tmp"
-		[ "$code" = "200" ] || fail "seed PUT for $s returned http $code"
-		echo "[seed] $s: OK${transform:+ (variant: $transform)}"
-	done
-}
-
-# Assert a stateDirectives field landed in etcd for every steward.
-verify_directive_field() { # $1 field, $2 expected python repr (True/False/30)
-	local s got
-	for s in "${STEWARD_NS[@]}"; do
-		got=$(kubectl exec -n core etcd-0 -c etcd -- sh -c \
-			"ETCDCTL_API=3 /usr/local/bin/etcdctl --endpoints=localhost:2379 get /policyEnforcer/agreements/${s} --print-value-only" \
-			| python3 -c "
-import sys, json
-a = json.load(sys.stdin)
-print(a['relations']['${USER_NAME}']['stateDirectives']['$1'])")
-		[ "$got" = "$2" ] || fail "etcd agreement for $s: $1=$got, expected $2"
-	done
-	echo "[seed] verified in etcd for all stewards: $1=$2"
-}
-
-trigger() { # $1 = cycles; echoes request_id (logs go to stderr)
-	pkill -f "port-forward.*${APIPORT}:8080" 2>/dev/null
-	kubectl port-forward -n api-gateway svc/api-gateway "${APIPORT}:8080" >/dev/null 2>&1 &
-	PIDS+=($!)
-	sleep 3
-	local resp
-	resp=$(curl -s -X POST "http://localhost:${APIPORT}/api/v1/requestApproval" \
-		-H 'Content-Type: application/json' -d '{
-  "type": "vflTrainModelRequest",
-  "user": { "id": "1234", "userName": "'"${USER_NAME}"'" },
-  "dataProviders": ["server", "clientone", "clienttwo", "clientthree"],
-  "data_request": { "type": "vflTrainModelRequest",
-    "data": { "learning_rate": 0.1, "cycles": '"$1"',
-      "policy_removal": -1, "policy_reintroduction": -1, "training_backtrack": 0 },
-    "requestMetadata": {} } }')
-	echo "trigger: $resp" >&2
-	echo "$resp" | python3 -c "import sys, json; print(json.load(sys.stdin)['request_id'])" \
-		|| fail "trigger not accepted: $resp"
-}
-
-wait_done() { # $1 = request_id, $2 = max polls (5s each); prints final status JSON
-	local i out st
-	for i in $(seq 1 "$2"); do
-		sleep 5
-		out=$(curl -s "http://localhost:${APIPORT}/api/v1/getTrainingStatus?id=$1")
-		st=$(echo "$out" | python3 -c "import sys, json; print(json.load(sys.stdin).get('status', ''))" 2>/dev/null)
-		echo "poll $i: ${st:-no-response}" >&2
-		if [ "$st" = "done" ]; then
-			echo "$out"
-			return 0
-		fi
-		[ "$st" = "failed" ] && fail "training status=failed: $out"
-	done
-	fail "training not done after $2 polls"
-}
-
 steward_job() { kubectl get jobs -n "$1" -o jsonpath='{.items[0].metadata.name}'; }
-
-steward_pod() { kubectl get pods -n "$1" -o name 2>/dev/null | grep jake | head -1 | cut -d/ -f2; }
 
 audit_log() { kubectl logs -n "$1" "job/$(steward_job "$1")" -c policy-checkpoint-gateway 2>/dev/null; }
 
 ms_log() { kubectl logs -n "$1" "job/$(steward_job "$1")" -c "$2" 2>/dev/null; }
-
-# Assert helper: $1 = description, $2 = text, remaining args = grep args that
-# must all match. Prints the matching line(s) into the artifact.
-must_grep() {
-	local desc="$1" text="$2"
-	shift 2
-	local hit
-	hit=$(echo "$text" | grep "$@")
-	[ -n "$hit" ] || fail "expected: $desc"
-	echo "OK: $desc"
-	echo "$hit" | head -5 | sed 's/^/    /'
-}
-
-must_not_grep() {
-	local desc="$1" text="$2"
-	shift 2
-	if echo "$text" | grep -q "$@"; then
-		fail "unexpected: $desc"
-	fi
-	echo "OK: absent as expected: $desc"
-}
-
-# Run a block function, tee its output to a timestamped artifact, append the
-# generated captures.md line. Aborts the script if the block failed.
-capture() { # $1 = subdir, $2 = slug, $3 = block arg for the captures line, $4 = fn, $5 = note
-	local subdir="$1" slug="$2" blockarg="$3" fn="$4" note="$5"
-	local ts out rc commit
-	ts="$(date +%Y%m%d-%H%M%S)"
-	out="$results_dir/${subdir}/${ts}_${slug}.txt"
-	mkdir -p "$(dirname "$out")"
-	{ provenance; "$fn"; } 2>&1 | tee "$out"
-	rc=${PIPESTATUS[0]}
-	commit="$(git -C "$root" rev-parse --short HEAD)"
-	[ "$rc" -ne 0 ] && note="$note; FAILED (exit=$rc)"
-	echo "\`e1-decision-correctness/${subdir}/${ts}_${slug}.txt | $ts | scripts/capture_e1_live.sh ${blockarg} | $commit | $note\`" \
-		>> "$results_dir/captures.md"
-	echo
-	echo "captured: $out (exit=$rc)"
-	[ "$rc" -ne 0 ] && exit "$rc"
-	return 0
-}
 
 # --- blocks ---------------------------------------------------------------
 
 do_allow_resume() {
 	step "clean slate: reset, then delete the four state PVCs"
 	reset_cluster
+	delete_state_pvcs
 	local ns
-	for ns in "${STEWARD_NS[@]}"; do
-		kubectl get pvc -n "$ns" -o name 2>/dev/null | grep 'persistentvolumeclaim/state-' \
-			| xargs -r kubectl delete -n "$ns" --wait=true
-	done
 
 	step "seed canonical state-aware agreements"
 	seed_agreements ""
@@ -278,7 +131,7 @@ do_allow_resume() {
 }
 
 block_allow_resume() {
-	capture live-chain allow-write-and-resume allow-resume do_allow_resume \
+	run_capture live-chain allow-write-and-resume "scripts/capture_e1_live.sh allow-resume" do_allow_resume \
 		"E1 live rows: empty-PVC read DENY not-found, ALLOW write path, resume-allowed read (writtenAt matches across remount)"
 }
 
@@ -309,7 +162,7 @@ do_resume_disabled() {
 }
 
 block_resume_disabled() {
-	capture live-chain resume-disabled-deny resume-disabled do_resume_disabled \
+	run_capture live-chain resume-disabled-deny "scripts/capture_e1_live.sh resume-disabled" do_resume_disabled \
 		"E1 live row: resumeAllowed=false -> startup read DENY 'resume disabled'; writes still ALLOW"
 }
 
@@ -345,7 +198,7 @@ do_expired() {
 }
 
 block_expired() {
-	capture live-chain retention-expired-deny expired do_expired \
+	run_capture live-chain retention-expired-deny "scripts/capture_e1_live.sh expired" do_expired \
 		"E1 live row: retention exceeded -> boot sweep destroys under confirmed-fresh policy (op=expired DELETED), read DENY not-found, writes still ALLOW"
 }
 
@@ -462,7 +315,7 @@ if rs:
 }
 
 block_adversarial() {
-	capture adversarial adversarial-battery adversarial do_adversarial \
+	run_capture adversarial adversarial-battery "scripts/capture_e1_live.sh adversarial" do_adversarial \
 		"E1 adversarial rows: identity mismatch PermissionDenied, ${CONCURRENT_N:-8} concurrent same-slot writes, bypass write flagged then removed, completeness PASS x4"
 }
 

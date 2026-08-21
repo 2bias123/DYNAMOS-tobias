@@ -45,9 +45,11 @@ set -u
 # tamjiyan/aggregate-demo. The orchestrator re-applies the PVC launch files
 # on every boot, so each block re-seeds after its reset.
 
+EXP=E5
 root="$(cd "$(dirname "$0")/.." && pwd)"
 # Override for shakedown runs that must not land in the evidence tree.
 results_dir="${E5_RESULTS_DIR:-$root/results/e5-genericity}"
+. "$root/scripts/capture_lib.sh"
 
 NS=clientone
 USER_NAME="jorrit.stutterheim@cloudnation.nl"
@@ -60,28 +62,6 @@ POD_POLL_MAX="${POD_POLL_MAX:-60}"   # x2s: job pod appear/complete
 PIDS=()
 cleanup() { for p in "${PIDS[@]}"; do kill "$p" 2>/dev/null; done; }
 trap cleanup EXIT
-
-step() { echo; echo "=== $*"; }
-fail() { echo "E5 FAIL: $*" >&2; exit 1; }
-
-provenance() {
-	echo "\$ date"
-	date
-	echo
-	echo "\$ git rev-parse HEAD"
-	git -C "$root" rev-parse HEAD
-	echo
-	echo "\$ git status --short"
-	git -C "$root" status --short
-	echo
-	echo "\$ kubectl config current-context"
-	kubectl config current-context
-	echo
-}
-
-reset_cluster() {
-	"$root/reset.sh" || fail "reset.sh failed"
-}
 
 # Seed the aggregateRequest chain config: request type and chain metadata via
 # their canonical keys, then the clientone agreement through the operator
@@ -198,43 +178,6 @@ wait_new_pod_done() { # $1 = pod name that must NOT match; prints the new pod na
 gw_log() { kubectl logs -n "$NS" "$1" -c policy-checkpoint-gateway 2>/dev/null; }
 ms_log() { kubectl logs -n "$NS" "$1" -c aggregate-demo 2>/dev/null; }
 
-must_grep() {
-	local desc="$1" text="$2"
-	shift 2
-	local hit
-	hit=$(echo "$text" | grep "$@")
-	[ -n "$hit" ] || fail "expected: $desc"
-	echo "OK: $desc"
-	echo "$hit" | head -5 | sed 's/^/    /'
-}
-
-must_not_grep() {
-	local desc="$1" text="$2"
-	shift 2
-	if echo "$text" | grep -q "$@"; then
-		fail "unexpected: $desc"
-	fi
-	echo "OK: absent as expected: $desc"
-}
-
-capture() { # $1 = slug, $2 = block arg, $3 = fn, $4 = note
-	local slug="$1" blockarg="$2" fn="$3" note="$4"
-	local ts out rc commit
-	ts="$(date +%Y%m%d-%H%M%S)"
-	out="$results_dir/scenes/${ts}_${slug}.txt"
-	mkdir -p "$(dirname "$out")"
-	{ provenance; "$fn"; } 2>&1 | tee "$out"
-	rc=${PIPESTATUS[0]}
-	commit="$(git -C "$root" rev-parse --short HEAD)"
-	[ "$rc" -ne 0 ] && note="$note; FAILED (exit=$rc)"
-	echo "\`e5-genericity/scenes/${ts}_${slug}.txt | $ts | scripts/capture_e5_genericity.sh ${blockarg} | $commit | $note\`" \
-		>> "$results_dir/captures.md"
-	echo
-	echo "captured: $out (exit=$rc)"
-	[ "$rc" -ne 0 ] && exit "$rc"
-	return 0
-}
-
 # --- blocks ---------------------------------------------------------------
 
 do_miss_hit() {
@@ -291,7 +234,7 @@ do_miss_hit() {
 }
 
 block_miss_hit() {
-	capture miss-then-hit miss-hit do_miss_hit \
+	run_capture scenes miss-then-hit "scripts/capture_e5_genericity.sh miss-hit" do_miss_hit \
 		"E5 scenes 1+2: clean-slate miss -> governed write, then a new pod reuses via gateway read (writtenUnixSeconds matches), no recompute; records carry aggregate_result"
 }
 
@@ -322,7 +265,7 @@ do_denial() {
 }
 
 block_denial() {
-	capture denial-after-flip denial do_denial \
+	run_capture scenes denial-after-flip "scripts/capture_e5_genericity.sh denial" do_denial \
 		"E5 scene 3: allowed=false (onRevocation retain) -> read+write DENY 'allowed = false', unpersisted answer, no destruction records"
 }
 
@@ -353,7 +296,7 @@ do_revocation_purge() {
 }
 
 block_revocation_purge() {
-	capture revocation-purge revocation-purge do_revocation_purge \
+	run_capture scenes revocation-purge "scripts/capture_e5_genericity.sh revocation-purge" do_revocation_purge \
 		"E5 scene 4: onRevocation=purge -> blob destroyed at the boot sweep under the confirmed-fresh gate (op=purge PURGED, policySource fresh), record per removal"
 }
 
@@ -404,7 +347,7 @@ do_retention() {
 }
 
 block_retention() {
-	capture retention-expiry retention do_retention \
+	run_capture scenes retention-expiry "scripts/capture_e5_genericity.sh retention" do_retention \
 		"E5 scene 5: the agreement's own 120s bound -> op=expired DELETED at the boot sweep (confirmed fresh), read DENY not-found, recompute"
 }
 

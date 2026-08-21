@@ -25,13 +25,15 @@ set -u
 # canonical microservices config on every boot, so any reset restores
 # requiresGateway:true).
 #
-# Usage: capture_e3_overhead.sh <a|b|c> [cycles]   (cycles default 10)
+# Usage: capture_e3_overhead.sh <a|b|c> [cycles]   (cycles default CAMPAIGN_N)
 
+EXP=E3
 root="$(cd "$(dirname "$0")/.." && pwd)"
 results_dir="${E3_RESULTS_DIR:-$root/results/e3-overhead}"
+. "$root/scripts/capture_lib.sh"
 
 CONFIG="${1:-}"
-CYCLES="${2:-10}"
+CYCLES="${2:-$CAMPAIGN_N}"
 case "$CONFIG" in
 	a) subdir="config-a-no-gateway" ;;
 	b) subdir="config-b-passthrough" ;;
@@ -43,7 +45,7 @@ USER_NAME="jake.jongejans@student.uva.nl"
 STEWARD_NS=(server clientone clienttwo clientthree)
 APIPORT="${APIPORT:-8080}"
 ORCHPORT="${ORCHPORT:-8082}"
-POLL_MAX="${POLL_MAX:-36}"   # x5s
+POLL_MAX="${POLL_MAX:-$(poll_max_for_cycles "$CYCLES")}"   # x5s
 GATEWAY_MS=(vfl-train-model-demo vfl-train-demo)
 INSPECTOR_IMAGE="${INSPECTOR_IMAGE:-tamjiyan/vfl-train-demo:latest}"
 INSPECTOR=e3-inspector
@@ -56,9 +58,7 @@ cleanup() {
 }
 trap cleanup EXIT
 
-step() { echo; echo "=== $*"; }
-fail() { echo "E3 FAIL: $*" >&2; exit 1; }
-
+# Timing runs also record load context on top of the shared provenance.
 provenance() {
 	echo "\$ date"; date; echo
 	echo "\$ git rev-parse HEAD"; git -C "$root" rev-parse HEAD; echo
@@ -69,29 +69,6 @@ provenance() {
 }
 
 # --- shared helpers -------------------------------------------------------
-
-reset_and_seed() {
-	"$root/reset.sh" || fail "reset.sh failed"
-	pkill -f "port-forward.*${ORCHPORT}:8080" 2>/dev/null
-	kubectl -n orchestrator rollout status deploy/orchestrator --timeout=90s >/dev/null 2>&1
-	local i
-	for i in 1 2 3 4; do
-		"$root/scripts/seed_state_aware.sh" && return 0
-		echo "[e3] seed attempt $i failed; retrying in 5s"
-		sleep 5
-	done
-	fail "seed failed after 4 attempts"
-}
-
-# Delete the four state PVCs so a run starts stateless (they are recreated at
-# job deploy). Same clean-slate step the E1 allow-resume block uses.
-delete_state_pvcs() {
-	local ns
-	for ns in "${STEWARD_NS[@]}"; do
-		kubectl get pvc -n "$ns" -o name 2>/dev/null | grep 'persistentvolumeclaim/state-' \
-			| xargs -r kubectl delete -n "$ns" --wait=true
-	done
-}
 
 # Pass-through is armed by an env var on the steward agent deployments, which
 # the agent propagates into every gateway container it deploys. kubectl set
@@ -141,63 +118,6 @@ print(json.dumps(m))" | etcdctl_pod -i "put $key \"\$(cat)\"" >/dev/null \
 	done
 }
 
-trigger() { # $1 = cycles; echoes request_id (logs go to stderr)
-	pkill -f "port-forward.*${APIPORT}:8080" 2>/dev/null
-	kubectl port-forward -n api-gateway svc/api-gateway "${APIPORT}:8080" >/dev/null 2>&1 &
-	PIDS+=($!)
-	sleep 3
-	local resp
-	resp=$(curl -s -X POST "http://localhost:${APIPORT}/api/v1/requestApproval" \
-		-H 'Content-Type: application/json' -d '{
-  "type": "vflTrainModelRequest",
-  "user": { "id": "1234", "userName": "'"${USER_NAME}"'" },
-  "dataProviders": ["server", "clientone", "clienttwo", "clientthree"],
-  "data_request": { "type": "vflTrainModelRequest",
-    "data": { "learning_rate": 0.1, "cycles": '"$1"',
-      "policy_removal": -1, "policy_reintroduction": -1, "training_backtrack": 0 },
-    "requestMetadata": {} } }')
-	echo "trigger: $resp" >&2
-	echo "$resp" | python3 -c "import sys, json; print(json.load(sys.stdin)['request_id'])" \
-		|| fail "trigger not accepted: $resp"
-}
-
-wait_done() { # $1 = request_id; prints final status JSON
-	local i out st
-	for i in $(seq 1 "$POLL_MAX"); do
-		sleep 5
-		out=$(curl -s "http://localhost:${APIPORT}/api/v1/getTrainingStatus?id=$1")
-		st=$(echo "$out" | python3 -c "import sys, json; print(json.load(sys.stdin).get('status', ''))" 2>/dev/null)
-		echo "poll $i: ${st:-no-response}" >&2
-		if [ "$st" = "done" ]; then
-			echo "$out"
-			return 0
-		fi
-		[ "$st" = "failed" ] && fail "training status=failed: $out"
-	done
-	fail "training not done after $POLL_MAX polls"
-}
-
-steward_pod() { kubectl get pods -n "$1" -o name 2>/dev/null | grep jake | head -1 | cut -d/ -f2; }
-
-must_grep() { # $1 = description, $2 = text, remaining = grep args
-	local desc="$1" text="$2"
-	shift 2
-	local hit
-	hit=$(echo "$text" | grep "$@")
-	[ -n "$hit" ] || fail "expected: $desc"
-	echo "OK: $desc"
-	echo "$hit" | head -5 | sed 's/^/    /'
-}
-
-must_not_grep() {
-	local desc="$1" text="$2"
-	shift 2
-	if echo "$text" | grep -q "$@"; then
-		fail "unexpected: $desc"
-	fi
-	echo "OK: absent as expected: $desc"
-}
-
 # --- shared recording core (identical across configs) ---------------------
 
 # Assert the chain pods carry (or do not carry) the gateway container and
@@ -225,16 +145,6 @@ config_evidence() {
 		fi
 	done
 	echo "OK: all four steward pods match the $mode config"
-}
-
-r2_series() { # $1 = status JSON
-	echo "$1" | python3 -m json.tool
-	echo "$1" | python3 -c "
-import sys, json
-rs = [r['accuracy'] for r in json.load(sys.stdin)['results']]
-print('r2 series (the payload field is named accuracy; the demo chain computes r2):')
-print(' '.join('%.4f' % v for v in rs))
-print('first r2: %.4f  last r2: %.4f' % (rs[0], rs[-1]))"
 }
 
 # Dump the full logs into the artifact: the api-gateway container, both VFL
@@ -353,34 +263,14 @@ measure_rounds() {
 # dump, which still needs those pods.
 payload_sizes_server() {
 	step "payload size: persisted checkpoints on the server state PVC"
-	local ns=server pvc i
-	pvc=$(kubectl get pvc -n "$ns" -o name 2>/dev/null | grep 'persistentvolumeclaim/state-' | head -1 | cut -d/ -f2)
-	[ -n "$pvc" ] || fail "no server state PVC found"
-	echo "[server] state PVC: $pvc"
+	local ns=server i
 	kubectl -n "$ns" delete jobs --all --ignore-not-found=true --wait=true >/dev/null 2>&1
 	kubectl -n "$ns" delete pod "$INSPECTOR" --ignore-not-found=true --wait=true >/dev/null 2>&1
 	for i in $(seq 1 30); do
 		kubectl get pods -n "$ns" -o name 2>/dev/null | grep -q jake || break
 		sleep 2
 	done
-	kubectl apply -f - >/dev/null <<-YAML
-	apiVersion: v1
-	kind: Pod
-	metadata: { name: $INSPECTOR, namespace: $ns }
-	spec:
-	  restartPolicy: Never
-	  containers:
-	  - name: inspector
-	    image: $INSPECTOR_IMAGE
-	    imagePullPolicy: IfNotPresent
-	    command: ["python3", "-c", "import time; time.sleep(3600)"]
-	    volumeMounts:
-	    - { name: state, mountPath: /state, readOnly: true }
-	  volumes:
-	  - name: state
-	    persistentVolumeClaim: { claimName: $pvc }
-	YAML
-	kubectl -n "$ns" wait --for=condition=Ready "pod/$INSPECTOR" --timeout=120s >/dev/null 2>&1 \
+	start_state_inspector "$ns" "$INSPECTOR" "$INSPECTOR_IMAGE" \
 		|| fail "payload inspector pod did not become ready"
 	PAYLOAD_LISTING=$(kubectl exec -n "$ns" "$INSPECTOR" -c inspector -- sh -c \
 		'ls -lR /state; du -sb /state/data /state/audit; echo "state files: $(find /state/data -type f | wc -l)"') \
@@ -520,23 +410,5 @@ do_config_c() {
 	must_grep "persisted state files on the PVC" "$PAYLOAD_LISTING" -E "state files: [1-9]"
 }
 
-# --- capture plumbing -----------------------------------------------------
-
-capture() {
-	local ts out rc commit note
-	ts="$(date +%Y%m%d-%H%M%S)"
-	out="$results_dir/${subdir}/${ts}_overhead-run.txt"
-	mkdir -p "$(dirname "$out")"
-	{ provenance; "do_config_${CONFIG}"; } 2>&1 | tee "$out"
-	rc=${PIPESTATUS[0]}
-	commit="$(git -C "$root" rev-parse --short HEAD)"
-	note="E3 config ${CONFIG} (${subdir#config-?-}): per-round latency + r2 + full logs, cycles=${CYCLES}"
-	[ "$rc" -ne 0 ] && note="$note; FAILED (exit=$rc)"
-	echo "\`e3-overhead/${subdir}/${ts}_overhead-run.txt | $ts | scripts/capture_e3_overhead.sh ${CONFIG} ${CYCLES} | $commit | $note\`" \
-		>> "$results_dir/captures.md"
-	echo
-	echo "captured: $out (exit=$rc)"
-	exit "$rc"
-}
-
-capture
+run_capture "$subdir" overhead-run "scripts/capture_e3_overhead.sh ${CONFIG} ${CYCLES}" "do_config_${CONFIG}" \
+	"E3 config ${CONFIG} (${subdir#config-?-}): per-round latency + r2 + full logs, cycles=${CYCLES}"

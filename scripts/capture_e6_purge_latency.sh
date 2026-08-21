@@ -45,7 +45,7 @@ set -u
 # deferred purge completes fresh on recovery.
 #
 # Usage: capture_e6_purge_latency.sh [latency [trials]|staleness|all]
-# Default is all (latency 10 trials, then staleness).
+# Default is all (latency CAMPAIGN_N trials, then staleness).
 #
 # E6 measures latency: run it on a QUIET machine (no builds, no heavy loads),
 # like E2/E3 and unlike the correctness experiments.
@@ -54,13 +54,15 @@ set -u
 # Neither arm needs reset.sh or a running chain; both leave the server
 # agreement seeded canonical (allowed=true).
 
+EXP=E6
 root="$(cd "$(dirname "$0")/.." && pwd)"
 results_dir="${E6_RESULTS_DIR:-$root/results/e6-purge-latency}"
+. "$root/scripts/capture_lib.sh"
 
 USER_NAME="jake.jongejans@student.uva.nl"
 NS=server
 ORCHPORT="${ORCHPORT:-8082}"
-TRIALS=10
+TRIALS=$CAMPAIGN_N
 PURGE_TIMEOUT="${PURGE_TIMEOUT:-35}"   # watch is sub-second; 30s poll is the fallback bound
 ALLOW_TIMEOUT="${ALLOW_TIMEOUT:-35}"
 cfg_server="$root/configuration/etcd_launch_files/state_aware_server.json"
@@ -92,16 +94,6 @@ cleanup() {
 	[ -n "$scratch" ] && rm -rf "$scratch"
 }
 trap cleanup EXIT
-
-step() { echo; echo "=== $*"; }
-fail() { echo "E6 FAIL: $*" >&2; exit 1; }
-
-provenance() {
-	echo "\$ date"; date; echo
-	echo "\$ git rev-parse HEAD"; git -C "$root" rev-parse HEAD; echo
-	echo "\$ git status --short"; git -C "$root" status --short; echo
-	echo "\$ kubectl config current-context"; kubectl config current-context; echo
-}
 
 start_orch_forward() {
 	pkill -f "port-forward.*${ORCHPORT}:8080" 2>/dev/null
@@ -243,11 +235,7 @@ do_latency() {
 
 	echo
 	echo "flip -> purge-complete (from PUT initiation; includes the PUT round trip shown per trial):"
-	printf '%s\n' "${purge_ms[@]}" | python3 -c "
-import sys, statistics
-xs = sorted(float(x) for x in sys.stdin if x.strip())
-print('  trials=%d  min=%.1f ms  median=%.1f ms  max=%.1f ms  mean=%.1f ms' % (
-    len(xs), xs[0], statistics.median(xs), xs[-1], statistics.mean(xs)))"
+	printf '%s\n' "${purge_ms[@]}" | summarize_series ms
 	echo "regime: watch-delivered; the flip -> first-DENY side is E2's capture (watch-regime, 10 trials)"
 	echo "note: t_purge is the gateway's own sweep-completion log timestamp; the state dir is pod-local"
 	echo "note: purge-record count covers the probe blob (and nothing else in this pod)"
@@ -256,21 +244,8 @@ print('  trials=%d  min=%.1f ms  median=%.1f ms  max=%.1f ms  mean=%.1f ms' % (
 }
 
 block_latency() {
-	local ts out rc commit note
-	ts="$(date +%Y%m%d-%H%M%S)"
-	out="$results_dir/watch-regime/${ts}_flip-to-purge-complete.txt"
-	mkdir -p "$(dirname "$out")"
-	{ provenance; do_latency; } 2>&1 | tee "$out"
-	rc=${PIPESTATUS[0]}
-	commit="$(git -C "$root" rev-parse --short HEAD)"
-	note="E6 watch-regime: flip via /policyEnforcer PUT (stamped at initiation) to purge-complete on a standalone gateway pod, ${TRIALS} trials"
-	[ "$rc" -ne 0 ] && note="$note; FAILED (exit=$rc)"
-	echo "\`e6-purge-latency/watch-regime/${ts}_flip-to-purge-complete.txt | $ts | scripts/capture_e6_purge_latency.sh latency ${TRIALS} | $commit | $note\`" \
-		>> "$results_dir/captures.md"
-	echo
-	echo "captured: $out (exit=$rc)"
-	[ "$rc" -ne 0 ] && exit "$rc"
-	return 0
+	run_capture watch-regime flip-to-purge-complete "scripts/capture_e6_purge_latency.sh latency ${TRIALS}" do_latency \
+		"E6 watch-regime: flip via /policyEnforcer PUT (stamped at initiation) to purge-complete on a standalone gateway pod, ${TRIALS} trials"
 }
 
 # ---- staleness arm: local gateway, killable etcd forward -----------------
@@ -391,21 +366,8 @@ do_staleness() {
 }
 
 block_staleness() {
-	local ts out rc commit note
-	ts="$(date +%Y%m%d-%H%M%S)"
-	out="$results_dir/induced-staleness/${ts}_outage-defer-recover-purge.txt"
-	mkdir -p "$(dirname "$out")"
-	{ provenance; do_staleness; } 2>&1 | tee "$out"
-	rc=${PIPESTATUS[0]}
-	commit="$(git -C "$root" rev-parse --short HEAD)"
-	note="E6 induced staleness: outage -> stale fail-closed writes, no destruction on non-fresh, flip unobserved; recovery -> confirmed-fresh purge within one poll bound"
-	[ "$rc" -ne 0 ] && note="$note; FAILED (exit=$rc)"
-	echo "\`e6-purge-latency/induced-staleness/${ts}_outage-defer-recover-purge.txt | $ts | scripts/capture_e6_purge_latency.sh staleness | $commit | $note\`" \
-		>> "$results_dir/captures.md"
-	echo
-	echo "captured: $out (exit=$rc)"
-	[ "$rc" -ne 0 ] && exit "$rc"
-	return 0
+	run_capture induced-staleness outage-defer-recover-purge "scripts/capture_e6_purge_latency.sh staleness" do_staleness \
+		"E6 induced staleness: outage -> stale fail-closed writes, no destruction on non-fresh, flip unobserved; recovery -> confirmed-fresh purge within one poll bound"
 }
 
 # --- main -----------------------------------------------------------------
@@ -413,7 +375,7 @@ block_staleness() {
 which="${1:-all}"
 case "$which" in
 latency)
-	TRIALS="${2:-10}"
+	TRIALS="${2:-$CAMPAIGN_N}"
 	block_latency
 	;;
 staleness) block_staleness ;;

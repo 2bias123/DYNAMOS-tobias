@@ -42,20 +42,22 @@ set -u
 #
 # Needs the fork images loaded in kind (dev-loop.md imageID check).
 
+EXP=E4
 root="$(cd "$(dirname "$0")/.." && pwd)"
 # Override for shakedown runs that must not land in the evidence tree.
 results_dir="${E4_RESULTS_DIR:-$root/results/e4-storage-growth}"
+. "$root/scripts/capture_lib.sh"
 
 STEWARD_NS=(server clientone clienttwo clientthree)
 USER_NAME="jake.jongejans@student.uva.nl"
 APIPORT="${APIPORT:-8080}"
 ORCHPORT="${ORCHPORT:-8082}"
-GROWTH_CYCLES="${GROWTH_CYCLES:-20}"
-FLIP_CYCLES="${FLIP_CYCLES:-24}"
-FLIP_AFTER="${FLIP_AFTER:-8}"        # completed rounds before the flip lands
+GROWTH_CYCLES="${GROWTH_CYCLES:-$CAMPAIGN_N}"
+FLIP_CYCLES="${FLIP_CYCLES:-$CAMPAIGN_N}"
+FLIP_AFTER="${FLIP_AFTER:-10}"       # completed rounds before the flip lands
 CYCLES_RESUME="${CYCLES_RESUME:-3}"
 RETENTION_SHORT="${RETENTION_SHORT:-120}"
-POLL_MAX="${POLL_MAX:-60}"           # x5s
+POLL_MAX="${POLL_MAX:-$(poll_max_for_cycles "$CAMPAIGN_N")}"  # x5s
 INSPECTOR_IMAGE="${INSPECTOR_IMAGE:-tamjiyan/vfl-train-demo:latest}"
 SAMPLER=e4-sampler
 INSPECTOR=e4-inspector
@@ -70,74 +72,7 @@ cleanup() {
 }
 trap cleanup EXIT
 
-step() { echo; echo "=== $*"; }
-fail() { echo "E4 FAIL: $*" >&2; exit 1; }
-
-provenance() {
-	echo "\$ date"; date; echo
-	echo "\$ git rev-parse HEAD"; git -C "$root" rev-parse HEAD; echo
-	echo "\$ git status --short"; git -C "$root" status --short; echo
-	echo "\$ kubectl config current-context"; kubectl config current-context; echo
-}
-
 # --- shared helpers -------------------------------------------------------
-
-reset_cluster() {
-	"$root/reset.sh" || fail "reset.sh failed"
-}
-
-delete_state_pvcs() {
-	local ns
-	for ns in "${STEWARD_NS[@]}"; do
-		kubectl get pvc -n "$ns" -o name 2>/dev/null | grep 'persistentvolumeclaim/state-' \
-			| xargs -r kubectl delete -n "$ns" --wait=true
-	done
-}
-
-# Seed the four state-aware agreements via the orchestrator /policyEnforcer
-# operator path. $1 is an optional python statement applied to each relation's
-# stateDirectives dict (variable `sd`) before the PUT; empty seeds canonical.
-seed_agreements() {
-	local transform="${1:-}"
-	pkill -f "port-forward.*${ORCHPORT}:8080" 2>/dev/null
-	kubectl port-forward -n orchestrator svc/orchestrator "${ORCHPORT}:8080" >/dev/null 2>&1 &
-	PIDS+=($!)
-	sleep 3
-	local s f code tmp
-	for s in "${STEWARD_NS[@]}"; do
-		f="$root/configuration/etcd_launch_files/state_aware_${s}.json"
-		tmp=$(mktemp)
-		python3 -c "
-import json
-a = json.load(open('$f'))
-for rel in a['relations'].values():
-    sd = rel.get('stateDirectives')
-    if sd is None:
-        continue
-    ${transform:-pass}
-print(json.dumps(a))" > "$tmp" || fail "variant transform failed for $s"
-		code=$(curl -s -o /dev/null -w '%{http_code}' -X PUT "http://localhost:${ORCHPORT}/api/v1/policyEnforcer" \
-			-H 'Content-Type: application/json' --data-binary @"$tmp")
-		rm -f "$tmp"
-		[ "$code" = "200" ] || fail "seed PUT for $s returned http $code"
-		echo "[seed] $s: OK${transform:+ (variant: $transform)}"
-	done
-}
-
-# Assert a stateDirectives field landed in etcd for every steward.
-verify_directive_field() { # $1 field, $2 expected python repr
-	local s got
-	for s in "${STEWARD_NS[@]}"; do
-		got=$(kubectl exec -n core etcd-0 -c etcd -- sh -c \
-			"ETCDCTL_API=3 /usr/local/bin/etcdctl --endpoints=localhost:2379 get /policyEnforcer/agreements/${s} --print-value-only" \
-			| python3 -c "
-import sys, json
-a = json.load(sys.stdin)
-print(a['relations']['${USER_NAME}']['stateDirectives']['$1'])")
-		[ "$got" = "$2" ] || fail "etcd agreement for $s: $1=$got, expected $2"
-	done
-	echo "[seed] verified in etcd for all stewards: $1=$2"
-}
 
 # PUT the server agreement with allowed=$1 (true|false), keeping the
 # deny-but-retain variant (onRevocation="") the flip arm seeds with, so the
@@ -158,78 +93,11 @@ print(json.dumps(a))" > "$tmp" || { rm -f "$tmp"; fail "flip json build failed";
 	echo "$code"
 }
 
-trigger() { # $1 = cycles; echoes request_id (logs go to stderr)
-	pkill -f "port-forward.*${APIPORT}:8080" 2>/dev/null
-	kubectl port-forward -n api-gateway svc/api-gateway "${APIPORT}:8080" >/dev/null 2>&1 &
-	PIDS+=($!)
-	sleep 3
-	local resp
-	resp=$(curl -s -X POST "http://localhost:${APIPORT}/api/v1/requestApproval" \
-		-H 'Content-Type: application/json' -d '{
-  "type": "vflTrainModelRequest",
-  "user": { "id": "1234", "userName": "'"${USER_NAME}"'" },
-  "dataProviders": ["server", "clientone", "clienttwo", "clientthree"],
-  "data_request": { "type": "vflTrainModelRequest",
-    "data": { "learning_rate": 0.1, "cycles": '"$1"',
-      "policy_removal": -1, "policy_reintroduction": -1, "training_backtrack": 0 },
-    "requestMetadata": {} } }')
-	echo "trigger: $resp" >&2
-	echo "$resp" | python3 -c "import sys, json; print(json.load(sys.stdin)['request_id'])" \
-		|| fail "trigger not accepted: $resp"
-}
-
-wait_done() { # $1 = request_id; prints final status JSON
-	local i out st
-	for i in $(seq 1 "$POLL_MAX"); do
-		sleep 5
-		out=$(curl -s "http://localhost:${APIPORT}/api/v1/getTrainingStatus?id=$1")
-		st=$(echo "$out" | python3 -c "import sys, json; print(json.load(sys.stdin).get('status', ''))" 2>/dev/null)
-		echo "poll $i: ${st:-no-response}" >&2
-		if [ "$st" = "done" ]; then
-			echo "$out"
-			return 0
-		fi
-		[ "$st" = "failed" ] && fail "training status=failed: $out"
-	done
-	fail "training not done after $POLL_MAX polls"
-}
-
-steward_pod() { kubectl get pods -n "$1" -o name 2>/dev/null | grep jake | head -1 | cut -d/ -f2; }
-
 api_gw_log() { kubectl logs -n api-gateway deploy/api-gateway -c api-gateway --timestamps 2>/dev/null; }
 
 gw_log() { kubectl logs -n "$1" "$(steward_pod "$1")" -c policy-checkpoint-gateway --timestamps 2>/dev/null; }
 
 ms_log() { kubectl logs -n "$1" "$(steward_pod "$1")" -c "$2" --timestamps 2>/dev/null; }
-
-must_grep() {
-	local desc="$1" text="$2"
-	shift 2
-	local hit
-	hit=$(echo "$text" | grep "$@")
-	[ -n "$hit" ] || fail "expected: $desc"
-	echo "OK: $desc"
-	echo "$hit" | head -5 | sed 's/^/    /'
-}
-
-must_not_grep() {
-	local desc="$1" text="$2"
-	shift 2
-	if echo "$text" | grep -q "$@"; then
-		fail "unexpected: $desc"
-	fi
-	echo "OK: absent as expected: $desc"
-}
-
-r2_series() { # $1 = status JSON
-	echo "$1" | python3 -m json.tool
-	echo "$1" | python3 -c "
-import sys, json
-rs = [r['accuracy'] for r in json.load(sys.stdin)['results']]
-print('r2 series (the payload field is named accuracy; the demo chain computes r2):')
-print(' '.join('%.4f' % v for v in rs))
-print('first r2: %.4f  last r2: %.4f' % (rs[0], rs[-1]))"
-}
 
 # Wait until the api-gateway has closed round $1 (its accuracy marker is the
 # round's end), so a following flip lands after that round completed.
@@ -288,30 +156,10 @@ start_sampler() {
 # pod. Drops this user's finished Jobs first so the pod name space is clean;
 # state survives. Sets PVC_LISTING.
 pvc_listing() { # $1 = ns
-	local ns="$1" pvc i
-	pvc=$(kubectl get pvc -n "$ns" -o name 2>/dev/null | grep 'persistentvolumeclaim/state-' | head -1 | cut -d/ -f2)
-	[ -n "$pvc" ] || fail "no state PVC found in $ns"
-	echo "[$ns] state PVC: $pvc"
+	local ns="$1"
 	kubectl -n "$ns" get jobs -o name 2>/dev/null | grep jake | xargs -r kubectl -n "$ns" delete --wait=true >/dev/null 2>&1
 	kubectl -n "$ns" delete pod "$INSPECTOR" --ignore-not-found=true --wait=true >/dev/null 2>&1
-	kubectl apply -f - >/dev/null <<-YAML
-	apiVersion: v1
-	kind: Pod
-	metadata: { name: $INSPECTOR, namespace: $ns }
-	spec:
-	  restartPolicy: Never
-	  containers:
-	  - name: inspector
-	    image: $INSPECTOR_IMAGE
-	    imagePullPolicy: IfNotPresent
-	    command: ["python3", "-c", "import time; time.sleep(3600)"]
-	    volumeMounts:
-	    - { name: state, mountPath: /state, readOnly: true }
-	  volumes:
-	  - name: state
-	    persistentVolumeClaim: { claimName: $pvc }
-	YAML
-	kubectl -n "$ns" wait --for=condition=Ready "pod/$INSPECTOR" --timeout=120s >/dev/null 2>&1 \
+	start_state_inspector "$ns" "$INSPECTOR" "$INSPECTOR_IMAGE" \
 		|| fail "inspector pod in $ns did not become ready"
 	PVC_LISTING=$(kubectl exec -n "$ns" "$INSPECTOR" -c inspector -- sh -c \
 		'ls -lR /state; du -sb /state/data /state/audit; echo "state files: $(find /state/data -type f | wc -l)"') \
@@ -645,39 +493,13 @@ for line in sys.stdin:
 }
 
 block_growth() {
-	local ts out rc commit note
-	ts="$(date +%Y%m%d-%H%M%S)"
-	out="$results_dir/growth/${ts}_growth-per-round.txt"
-	mkdir -p "$(dirname "$out")"
-	{ provenance; do_growth; } 2>&1 | tee "$out"
-	rc=${PIPESTATUS[0]}
-	commit="$(git -C "$root" rev-parse --short HEAD)"
-	note="E4 growth: per-round audit and PVC bytes over ${GROWTH_CYCLES} enforced rounds (sampler + audit-record bytes), final listings on all four steward PVCs"
-	[ "$rc" -ne 0 ] && note="$note; FAILED (exit=$rc)"
-	echo "\`e4-storage-growth/growth/${ts}_growth-per-round.txt | $ts | scripts/capture_e4_storage_growth.sh growth ${GROWTH_CYCLES} | $commit | $note\`" \
-		>> "$results_dir/captures.md"
-	echo
-	echo "captured: $out (exit=$rc)"
-	[ "$rc" -ne 0 ] && exit "$rc"
-	return 0
+	run_capture growth growth-per-round "scripts/capture_e4_storage_growth.sh growth ${GROWTH_CYCLES}" do_growth \
+		"E4 growth: per-round audit and PVC bytes over ${GROWTH_CYCLES} enforced rounds (sampler + audit-record bytes), final listings on all four steward PVCs"
 }
 
 block_flip() {
-	local ts out rc commit note
-	ts="$(date +%Y%m%d-%H%M%S)"
-	out="$results_dir/flip-curve/${ts}_allow-flip-deny-curve.txt"
-	mkdir -p "$(dirname "$out")"
-	{ provenance; do_flip; } 2>&1 | tee "$out"
-	rc=${PIPESTATUS[0]}
-	commit="$(git -C "$root" rev-parse --short HEAD)"
-	note="E4 flip curve: allowed=false after ${FLIP_AFTER} of ${FLIP_CYCLES} rounds (onRevocation retain) -> training continues, persistence stops; aged checkpoint expires, no resume"
-	[ "$rc" -ne 0 ] && note="$note; FAILED (exit=$rc)"
-	echo "\`e4-storage-growth/flip-curve/${ts}_allow-flip-deny-curve.txt | $ts | scripts/capture_e4_storage_growth.sh flip ${FLIP_CYCLES} ${FLIP_AFTER} | $commit | $note\`" \
-		>> "$results_dir/captures.md"
-	echo
-	echo "captured: $out (exit=$rc)"
-	[ "$rc" -ne 0 ] && exit "$rc"
-	return 0
+	run_capture flip-curve allow-flip-deny-curve "scripts/capture_e4_storage_growth.sh flip ${FLIP_CYCLES} ${FLIP_AFTER}" do_flip \
+		"E4 flip curve: allowed=false after ${FLIP_AFTER} of ${FLIP_CYCLES} rounds (onRevocation retain) -> training continues, persistence stops; aged checkpoint expires, no resume"
 }
 
 # --- main -----------------------------------------------------------------

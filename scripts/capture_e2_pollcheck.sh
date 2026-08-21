@@ -20,8 +20,10 @@ set -u
 #
 # Usage: capture_e2_pollcheck.sh
 
+EXP=E2
 root="$(cd "$(dirname "$0")/.." && pwd)"
 results_dir="${E2_RESULTS_DIR:-$root/results/e2-policy-latency}"
+. "$root/scripts/capture_lib.sh"
 
 USER_NAME="jake.jongejans@student.uva.nl"
 GWPORT=50060
@@ -43,16 +45,6 @@ cleanup() {
 	[ -n "$scratch" ] && rm -rf "$scratch"
 }
 trap cleanup EXIT
-
-step() { echo; echo "=== $*"; }
-fail() { echo "E2 FAIL: $*" >&2; exit 1; }
-
-provenance() {
-	echo "\$ date"; date; echo
-	echo "\$ git rev-parse HEAD"; git -C "$root" rev-parse HEAD; echo
-	echo "\$ git status --short"; git -C "$root" status --short; echo
-	echo "\$ kubectl config current-context"; kubectl config current-context; echo
-}
 
 gw_write() {
 	grpcurl -plaintext -import-path "$root/proto-files" -proto policyCheckpointGateway.proto \
@@ -155,21 +147,5 @@ import sys; sys.exit(0 if iv <= bound else 1)" || fail "DENY exceeded the poll b
 	flip_server true >/dev/null
 }
 
-capture() {
-	local ts out rc commit note
-	ts="$(date +%Y%m%d-%H%M%S)"
-	out="$results_dir/poll-spotcheck/${ts}_poll-only-deny.txt"
-	mkdir -p "$(dirname "$out")"
-	{ provenance; do_pollcheck; } 2>&1 | tee "$out"
-	rc=${PIPESTATUS[0]}
-	commit="$(git -C "$root" rev-parse --short HEAD)"
-	note="E2 poll-only spot-check (watch disabled): flip to first enforced DENY within the ${POLL_INTERVAL}s poll bound, one confirming trial"
-	[ "$rc" -ne 0 ] && note="$note; FAILED (exit=$rc)"
-	echo "\`e2-policy-latency/poll-spotcheck/${ts}_poll-only-deny.txt | $ts | scripts/capture_e2_pollcheck.sh | $commit | $note\`" \
-		>> "$results_dir/captures.md"
-	echo
-	echo "captured: $out (exit=$rc)"
-	exit "$rc"
-}
-
-capture
+run_capture poll-spotcheck poll-only-deny "scripts/capture_e2_pollcheck.sh" do_pollcheck \
+	"E2 poll-only spot-check (watch disabled): flip to first enforced DENY within the ${POLL_INTERVAL}s poll bound, one confirming trial"

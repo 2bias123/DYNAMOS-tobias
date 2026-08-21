@@ -23,18 +23,20 @@ set -u
 # watch to redeliver ALLOW, then flips to allowed=false and times the first
 # DENY. cycles is high enough that the gateway outlives all trials.
 #
-# Usage: capture_e2_latency.sh [trials]   (default 10)
+# Usage: capture_e2_latency.sh [trials]   (default CAMPAIGN_N)
 
+EXP=E2
 root="$(cd "$(dirname "$0")/.." && pwd)"
 results_dir="${E2_RESULTS_DIR:-$root/results/e2-policy-latency}"
+. "$root/scripts/capture_lib.sh"
 
 USER_NAME="jake.jongejans@student.uva.nl"
 NS=server
 MS_CONTAINER=vfl-train-model-demo
 APIPORT="${APIPORT:-8080}"
 ORCHPORT="${ORCHPORT:-8082}"
-CYCLES="${CYCLES:-600}"
-TRIALS="${1:-10}"
+TRIALS="${1:-$CAMPAIGN_N}"
+CYCLES="${CYCLES:-$(( TRIALS * 24 > 600 ? TRIALS * 24 : 600 ))}"  # chain lifetime: outlives all trials
 DENY_TIMEOUT="${DENY_TIMEOUT:-35}"   # seconds to wait for the DENY (watch is sub-second; poll bound is 30s)
 ALLOW_TIMEOUT="${ALLOW_TIMEOUT:-35}"
 cfg_server="$root/configuration/etcd_launch_files/state_aware_server.json"
@@ -51,54 +53,9 @@ cleanup() {
 }
 trap cleanup EXIT
 
-step() { echo; echo "=== $*"; }
-fail() { echo "E2 FAIL: $*" >&2; exit 1; }
-
-provenance() {
-	echo "\$ date"; date; echo
-	echo "\$ git rev-parse HEAD"; git -C "$root" rev-parse HEAD; echo
-	echo "\$ git status --short"; git -C "$root" status --short; echo
-	echo "\$ kubectl config current-context"; kubectl config current-context; echo
-}
-
 server_pod() { kubectl get pods -n "$NS" -o name 2>/dev/null | grep jake | head -1 | cut -d/ -f2; }
 
 # ---- boot + flip helpers -------------------------------------------------
-
-reset_and_seed() {
-	"$root/reset.sh" || fail "reset.sh failed"
-	# The orchestrator's HTTP endpoint can lag its readiness by a few seconds
-	# after a reset, so seed_state_aware.sh's one-shot port-forward sometimes
-	# gets http 000. Wait for the rollout, clear any stale forward, then retry.
-	pkill -f "port-forward.*${ORCHPORT}:8080" 2>/dev/null
-	kubectl -n orchestrator rollout status deploy/orchestrator --timeout=90s >/dev/null 2>&1
-	local i
-	for i in 1 2 3 4; do
-		"$root/scripts/seed_state_aware.sh" && return 0
-		echo "[e2] seed attempt $i failed; retrying in 5s"
-		sleep 5
-	done
-	fail "seed failed after 4 attempts"
-}
-
-trigger_chain() {
-	pkill -f "port-forward.*${APIPORT}:8080" 2>/dev/null
-	kubectl port-forward -n api-gateway svc/api-gateway "${APIPORT}:8080" >/dev/null 2>&1 &
-	PIDS+=($!)
-	sleep 3
-	local resp
-	resp=$(curl -s -X POST "http://localhost:${APIPORT}/api/v1/requestApproval" \
-		-H 'Content-Type: application/json' -d '{
-  "type": "vflTrainModelRequest",
-  "user": { "id": "1234", "userName": "'"${USER_NAME}"'" },
-  "dataProviders": ["server", "clientone", "clienttwo", "clientthree"],
-  "data_request": { "type": "vflTrainModelRequest",
-    "data": { "learning_rate": 0.1, "cycles": '"${CYCLES}"',
-      "policy_removal": -1, "policy_reintroduction": -1, "training_backtrack": 0 },
-    "requestMetadata": {} } }')
-	echo "trigger: $resp" >&2
-	echo "$resp" | grep -q request_id || fail "trigger not accepted"
-}
 
 wait_gateway_up() {
 	local pod="" i
@@ -211,7 +168,7 @@ wait_for() { # $1 decision, $2 tmin, $3 timeout -> echoes epoch or fails
 do_e2() {
 	step "boot a governed chain (cycles=${CYCLES}) with allowed=true"
 	reset_and_seed
-	trigger_chain
+	trigger "$CYCLES" >/dev/null
 	wait_gateway_up
 	start_orch_forward
 
@@ -263,31 +220,10 @@ do_e2() {
 	flip_server true >/dev/null
 
 	echo
-	printf '%s\n' "${intervals[@]}" | python3 -c "
-import sys, statistics
-xs = [float(x) for x in sys.stdin if x.strip()]
-xs.sort()
-print('trials=%d  min=%.1f ms  median=%.1f ms  max=%.1f ms  mean=%.1f ms' % (
-    len(xs), xs[0], statistics.median(xs), xs[-1], statistics.mean(xs)))"
+	printf '%s\n' "${intervals[@]}" | summarize_series ms
 	echo "regime: watch-delivered (gateway watch on /policyEnforcer/agreements/server active)"
 	echo "note: writer cadence 10ms bounds the resolution; state_class=e2_probe does not touch vfl_server_model"
 }
 
-capture() {
-	local ts out rc commit note
-	ts="$(date +%Y%m%d-%H%M%S)"
-	out="$results_dir/watch-regime/${ts}_flip-to-first-deny.txt"
-	mkdir -p "$(dirname "$out")"
-	{ provenance; do_e2; } 2>&1 | tee "$out"
-	rc=${PIPESTATUS[0]}
-	commit="$(git -C "$root" rev-parse --short HEAD)"
-	note="E2 watch-regime: flip via /policyEnforcer PUT to first enforced DENY on the aggregator's next write, ${TRIALS} trials"
-	[ "$rc" -ne 0 ] && note="$note; FAILED (exit=$rc)"
-	echo "\`e2-policy-latency/watch-regime/${ts}_flip-to-first-deny.txt | $ts | scripts/capture_e2_latency.sh ${TRIALS} | $commit | $note\`" \
-		>> "$results_dir/captures.md"
-	echo
-	echo "captured: $out (exit=$rc)"
-	exit "$rc"
-}
-
-capture
+run_capture watch-regime flip-to-first-deny "scripts/capture_e2_latency.sh ${TRIALS}" do_e2 \
+	"E2 watch-regime: flip via /policyEnforcer PUT to first enforced DENY on the aggregator's next write, ${TRIALS} trials"
