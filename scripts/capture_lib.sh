@@ -219,11 +219,12 @@ start_state_inspector() { # $1 ns, $2 pod name, $3 image
 r2_series() { # $1 = status JSON
 	echo "$1" | python3 -m json.tool
 	echo "$1" | python3 -c "
-import sys, json
+import sys, json, statistics
 rs = [r['accuracy'] for r in json.load(sys.stdin)['results']]
 print('r2 series (the payload field is named accuracy; the demo chain computes r2):')
 print(' '.join('%.4f' % v for v in rs))
-print('first r2: %.4f  last r2: %.4f' % (rs[0], rs[-1]))"
+print('first r2: %.4f  last r2: %.4f  mean r2: %.4f  median r2: %.4f  (n=%d)' % (
+    rs[0], rs[-1], statistics.mean(rs), statistics.median(rs), len(rs)))"
 }
 
 # Run a block function, tee provenance + its output into a timestamped

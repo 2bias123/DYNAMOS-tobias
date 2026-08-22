@@ -175,6 +175,7 @@ func (g *gatewayServer) auditDecision(op, verdict string, d decision, class, key
 
 func (g *gatewayServer) RequestStateWrite(ctx context.Context, req *pb.StateWriteRequest) (*pb.StateDecision, error) {
 	g.touchActivity()
+	start := time.Now()
 	if err := g.authorize(req.GetIdentity()); err != nil {
 		return nil, err
 	}
@@ -183,8 +184,10 @@ func (g *gatewayServer) RequestStateWrite(ctx context.Context, req *pb.StateWrit
 		return nil, status.Error(codes.InvalidArgument, err.Error())
 	}
 
+	tDecide := time.Now()
 	a, hash, src, ageMs := g.policy.snapshot()
 	d := decideWrite(a, hash, src, ageMs, g.identity.GetUser(), g.identity.GetRequestType())
+	decideUs := time.Since(tDecide).Microseconds()
 	if !d.Allowed {
 		g.auditDecision("write", "DENY", d, req.GetStateClass(), req.GetStateKey(), 0, req.GetIdentity())
 		return &pb.StateDecision{Allowed: false, Reason: d.Reason, AgreementHash: d.Hash}, nil
@@ -195,17 +198,26 @@ func (g *gatewayServer) RequestStateWrite(ctx context.Context, req *pb.StateWrit
 	// between leaves a recorded intent, never an unrecorded file; an
 	// unappendable audit refuses the write outright.
 	written := time.Now().Unix()
+	tAudit := time.Now()
 	if err := g.store.Audit(decisionRecord("write", "ALLOW", d, req.GetStateClass(), req.GetStateKey(), written, req.GetIdentity())); err != nil {
 		logger.Sugar().Errorw("Audit append failed, refusing write", "err", err)
 		return nil, status.Error(codes.Internal, "audit unavailable; failing closed")
 	}
+	auditUs := time.Since(tAudit).Microseconds()
 
+	var persistUs int64
 	if !g.passthrough {
+		tPersist := time.Now()
 		if err := g.store.Write(req.GetStateClass(), req.GetStateKey(), req.GetPayload()); err != nil {
 			logger.Sugar().Errorw("State write failed", "err", err)
 			return nil, status.Error(codes.Internal, "state write failed")
 		}
+		persistUs = time.Since(tPersist).Microseconds()
 	}
+
+	logger.Sugar().Infow("Write timing",
+		"decideMicros", decideUs, "auditMicros", auditUs,
+		"persistMicros", persistUs, "totalMicros", time.Since(start).Microseconds())
 
 	return &pb.StateDecision{
 		Allowed:                   true,
@@ -217,6 +229,7 @@ func (g *gatewayServer) RequestStateWrite(ctx context.Context, req *pb.StateWrit
 
 func (g *gatewayServer) ValidateStateRead(ctx context.Context, req *pb.StateReadRequest) (*pb.StateReadResponse, error) {
 	g.touchActivity()
+	start := time.Now()
 	if err := g.authorize(req.GetIdentity()); err != nil {
 		return nil, err
 	}
@@ -237,8 +250,10 @@ func (g *gatewayServer) ValidateStateRead(ctx context.Context, req *pb.StateRead
 
 	// Policy is evaluated before existence so a denial never reveals
 	// whether state is present.
+	tDecide := time.Now()
 	a, hash, src, ageMs := g.policy.snapshot()
 	d := decideRead(a, hash, src, ageMs, g.identity.GetUser(), g.identity.GetRequestType(), fileAge)
+	decideUs := time.Since(tDecide).Microseconds()
 	if !d.Allowed {
 		g.auditDecision("read", "DENY", d, req.GetStateClass(), req.GetStateKey(), 0, req.GetIdentity())
 		return &pb.StateReadResponse{Allowed: false, Reason: d.Reason, AgreementHash: d.Hash}, nil
@@ -253,16 +268,23 @@ func (g *gatewayServer) ValidateStateRead(ctx context.Context, req *pb.StateRead
 	// gateway, symmetric with the write path: every disclosure has a
 	// preceding audit line, and an unappendable audit refuses the read.
 	// DENY records above stay best-effort.
+	tAudit := time.Now()
 	if err := g.store.Audit(decisionRecord("read", "ALLOW", d, req.GetStateClass(), req.GetStateKey(), writtenAt.Unix(), req.GetIdentity())); err != nil {
 		logger.Sugar().Errorw("Audit append failed, refusing read", "err", err)
 		return nil, status.Error(codes.Internal, "audit unavailable; failing closed")
 	}
+	auditUs := time.Since(tAudit).Microseconds()
 
+	tRead := time.Now()
 	payload, err := g.store.Read(req.GetStateClass(), req.GetStateKey())
 	if err != nil {
 		logger.Sugar().Errorw("State read failed", "err", err)
 		return nil, status.Error(codes.Internal, "state read failed")
 	}
+
+	logger.Sugar().Infow("Read timing",
+		"decideMicros", decideUs, "auditMicros", auditUs,
+		"readMicros", time.Since(tRead).Microseconds(), "totalMicros", time.Since(start).Microseconds())
 
 	return &pb.StateReadResponse{
 		Allowed:                   true,

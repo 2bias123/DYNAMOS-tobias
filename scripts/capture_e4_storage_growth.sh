@@ -2,7 +2,7 @@
 set -u
 
 # E4 storage growth + governed training curve, saving raw output under
-# results/e4-storage-growth/ and appending to that experiment's captures.md.
+# results/campaign-n50/e4-storage-growth/ and appending to that experiment's captures.md.
 #
 #   growth   audit-log and PVC growth per round on a full-enforcement run.
 #            A sampler pod co-mounts the server state PVC read-only and
@@ -45,7 +45,7 @@ set -u
 EXP=E4
 root="$(cd "$(dirname "$0")/.." && pwd)"
 # Override for shakedown runs that must not land in the evidence tree.
-results_dir="${E4_RESULTS_DIR:-$root/results/e4-storage-growth}"
+results_dir="${E4_RESULTS_DIR:-$root/results/campaign-n50/e4-storage-growth}"
 . "$root/scripts/capture_lib.sh"
 
 STEWARD_NS=(server clientone clienttwo clientthree)

@@ -2,7 +2,7 @@
 set -u
 
 # E6 revocation-to-purge latency, both arms, saving raw output under
-# results/e6-purge-latency/ and appending to that experiment's captures.md.
+# results/campaign-n50/e6-purge-latency/ and appending to that experiment's captures.md.
 #
 #   latency    flip -> purge-complete against a standalone long-lived gateway
 #              pod (the frozen chain-gateway image, in-cluster etcd path,
@@ -21,7 +21,14 @@ set -u
 #              is visible. t_purge is the gateway's own sweep-completion log
 #              line (zap epoch, host clock; kind shares it).
 #              The flip -> first-DENY side is E2's capture; cited, not
-#              re-measured here.
+#              re-measured here. Each trial also splits the interval at the
+#              gateway's Agreement-changed line (delivery vs sweep) and
+#              prints the Purge-sweep-timing spans (confirm vs unlink).
+#   poll-control  the same trials with the watch disabled at a short poll
+#              interval (CONTROL_POLL_INTERVAL, default 5s): the
+#              interval-tracking control for the latency-clustering
+#              question — if clustering follows the update interval, it
+#              must show here as spread over the tick phase.
 #   staleness  the induced-staleness arm on a locally built gateway whose
 #              etcd connection runs through a killable port-forward, so the
 #              outage touches nothing else. Poll-only regime for determinism.
@@ -44,8 +51,9 @@ set -u
 # while the view is non-fresh, staleness is visible and fail-closed, and the
 # deferred purge completes fresh on recovery.
 #
-# Usage: capture_e6_purge_latency.sh [latency [trials]|staleness|all]
-# Default is all (latency CAMPAIGN_N trials, then staleness).
+# Usage: capture_e6_purge_latency.sh [latency [trials]|poll-control [trials]|staleness|all]
+# Default is all (latency, then poll-control, CAMPAIGN_N trials each, then
+# staleness).
 #
 # E6 measures latency: run it on a QUIET machine (no builds, no heavy loads),
 # like E2/E3 and unlike the correctness experiments.
@@ -56,7 +64,7 @@ set -u
 
 EXP=E6
 root="$(cd "$(dirname "$0")/.." && pwd)"
-results_dir="${E6_RESULTS_DIR:-$root/results/e6-purge-latency}"
+results_dir="${E6_RESULTS_DIR:-$root/results/campaign-n50/e6-purge-latency}"
 . "$root/scripts/capture_lib.sh"
 
 USER_NAME="jake.jongejans@student.uva.nl"
@@ -71,6 +79,7 @@ cfg_server="$root/configuration/etcd_launch_files/state_aware_server.json"
 GW_POD=e6-gateway
 GW_IMAGE="docker.io/tamjiyan/policy-checkpoint-gateway:latest"
 GWPORT_POD=50062
+CONTROL_POLL_INTERVAL="${CONTROL_POLL_INTERVAL:-5}"
 
 # staleness-arm knobs (local gateway)
 GWPORT_LOCAL=50061
@@ -162,12 +171,17 @@ wait_probe_allow() {
 	return 1
 }
 
-do_latency() {
+do_latency() { # $1 = watch | poll
+	local regime="${1:-watch}"
 	step "standalone gateway pod: the frozen image, in-cluster etcd path, no chain to disturb"
 	kubectl delete pod "$GW_POD" -n "$NS" --ignore-not-found=true --wait=true
 	start_orch_forward
 	[ "$(flip_server true)" = 200 ] || fail "seed PUT failed"
 
+	local extra_env=()
+	if [ "$regime" = poll ]; then
+		extra_env+=(--env=AGREEMENT_WATCH_DISABLED=true --env=AGREEMENT_POLL_INTERVAL_SECONDS="$CONTROL_POLL_INTERVAL")
+	fi
 	# IfNotPresent: kubectl run defaults :latest to Always, which would pull
 	# from the registry instead of using the kind-loaded image.
 	kubectl run "$GW_POD" -n "$NS" --image="$GW_IMAGE" --restart=Never \
@@ -175,7 +189,7 @@ do_latency() {
 		--env=DATA_STEWARD_NAME=SERVER --env=REQUEST_USER="$USER_NAME" \
 		--env=REQUEST_TYPE=vflTrainModelRequest --env=JOB_NAME=e6-latency \
 		--env=LOCAL_JOB_NAME=e6-latency --env=GATEWAY_PORT=50050 \
-		--env=STATE_DIR=/tmp/state || fail "gateway pod create failed"
+		--env=STATE_DIR=/tmp/state "${extra_env[@]}" || fail "gateway pod create failed"
 	local i
 	for i in $(seq 1 60); do
 		kubectl get pod "$GW_POD" -n "$NS" -o jsonpath='{.status.phase}' 2>/dev/null | grep -q Running && break
@@ -188,6 +202,10 @@ do_latency() {
 	gw_pod_log | grep -q "Serving on 50050" || { gw_pod_log | tail -5; fail "gateway pod did not start serving"; }
 	echo "gateway pod up:"
 	gw_pod_log | grep -E "Serving on|Agreement loaded" | sed 's/^/    /'
+	if [ "$regime" = poll ]; then
+		gw_pod_log | grep -q "Agreement watch disabled" || fail "gateway did not report the poll-only regime"
+		echo "regime: poll-only, interval ${CONTROL_POLL_INTERVAL}s"
+	fi
 
 	pkill -f "port-forward.*${GWPORT_POD}:50050" 2>/dev/null
 	kubectl port-forward -n "$NS" "pod/$GW_POD" "${GWPORT_POD}:50050" >/dev/null 2>&1 &
@@ -199,9 +217,9 @@ do_latency() {
 	echo "baseline: ALLOW, blob present"
 
 	echo
-	echo "trial,t_put_start,t_put_returned,t_purge,flip_to_purge_ms,put_rtt_ms,purge_records"
-	local k code tstart tret tpurge p_ms rtt_ms gwmark nrec out
-	local purge_ms=()
+	echo "trial,t_put_start,t_put_returned,t_purge,flip_to_purge_ms,put_rtt_ms,observe_ms,sweep_ms,purge_records"
+	local k code tstart tret tpurge p_ms rtt_ms gwmark nrec out tobs obs_ms sweep_ms
+	local purge_ms=() observes=()
 	for k in $(seq 1 "$TRIALS"); do
 		# Independence: re-enable and confirm via an ALLOWed probe write, which
 		# also recreates the blob this trial's flip will destroy.
@@ -220,11 +238,21 @@ do_latency() {
 		tpurge=$(wait_for_purge "$gwmark" "$PURGE_TIMEOUT") || fail "no purge completion within ${PURGE_TIMEOUT}s (trial $k)"
 		p_ms=$(python3 -c "print('%.1f' % (($tpurge - $tstart) * 1000))")
 		rtt_ms=$(python3 -c "print('%.1f' % (($tret - $tstart) * 1000))")
+		# Split the interval at the gateway's own observation of the flip.
+		tobs=$(gw_pod_log | tail -n +$((gwmark + 1)) | grep "Agreement changed" \
+			| awk -v t="$tstart" '$1 >= t {print $1; exit}')
+		obs_ms=""; sweep_ms=""
+		if [ -n "$tobs" ]; then
+			obs_ms=$(python3 -c "print('%.1f' % (($tobs - $tstart) * 1000))")
+			sweep_ms=$(python3 -c "print('%.1f' % (($tpurge - $tobs) * 1000))")
+			observes+=("$obs_ms")
+		fi
 		nrec=$(gw_pod_log | tail -n +$((gwmark + 1)) | grep -c '"op":"purge".*"decision":"PURGED"')
-		echo "$k,$tstart,$tret,$tpurge,$p_ms,$rtt_ms,$nrec"
+		echo "$k,$tstart,$tret,$tpurge,$p_ms,$rtt_ms,$obs_ms,$sweep_ms,$nrec"
 		purge_ms+=("$p_ms")
 		echo "  purge records this trial:"
 		gw_pod_log | tail -n +$((gwmark + 1)) | grep '"op":"purge"' | head -3 | sed 's/^/    /'
+		gw_pod_log | tail -n +$((gwmark + 1)) | grep "Purge sweep timing" | head -1 | sed 's/^/    /'
 		# Post-purge sanity, not a latency claim: the next write must DENY.
 		out=$(gw_probe_write)
 		echo "$out" | grep -q 'allowed = false' || { echo "$out"; fail "post-purge write did not DENY (trial $k)"; }
@@ -236,16 +264,33 @@ do_latency() {
 	echo
 	echo "flip -> purge-complete (from PUT initiation; includes the PUT round trip shown per trial):"
 	printf '%s\n' "${purge_ms[@]}" | summarize_series ms
-	echo "regime: watch-delivered; the flip -> first-DENY side is E2's capture (watch-regime, 10 trials)"
+	if [ "${#observes[@]}" -gt 0 ]; then
+		echo "flip -> observed (Agreement changed line), ${#observes[@]}/${TRIALS} trials:"
+		printf '%s\n' "${observes[@]}" | summarize_series ms
+	fi
+	if [ "$regime" = poll ]; then
+		echo "regime: poll-only (watch disabled, interval ${CONTROL_POLL_INTERVAL}s); observe_ms is the tick phase — the interval-tracking control for the clustering question"
+	else
+		echo "regime: watch-delivered; the flip -> first-DENY side is E2's capture"
+	fi
 	echo "note: t_purge is the gateway's own sweep-completion log timestamp; the state dir is pod-local"
 	echo "note: purge-record count covers the probe blob (and nothing else in this pod)"
+	echo "note: observe_ms/sweep_ms split delivery from sweep; the Purge-sweep-timing line splits confirm from unlink"
 
 	kubectl delete pod "$GW_POD" -n "$NS" --ignore-not-found=true --wait=false
 }
 
+do_latency_watch() { do_latency watch; }
+do_latency_poll() { do_latency poll; }
+
 block_latency() {
-	run_capture watch-regime flip-to-purge-complete "scripts/capture_e6_purge_latency.sh latency ${TRIALS}" do_latency \
+	run_capture watch-regime flip-to-purge-complete "scripts/capture_e6_purge_latency.sh latency ${TRIALS}" do_latency_watch \
 		"E6 watch-regime: flip via /policyEnforcer PUT (stamped at initiation) to purge-complete on a standalone gateway pod, ${TRIALS} trials"
+}
+
+block_poll_control() {
+	run_capture poll-control flip-to-purge-complete-poll "scripts/capture_e6_purge_latency.sh poll-control ${TRIALS}" do_latency_poll \
+		"E6 poll-only control: watch disabled at a ${CONTROL_POLL_INTERVAL}s interval, flip to purge-complete, ${TRIALS} trials; interval-tracking control for the latency clustering"
 }
 
 # ---- staleness arm: local gateway, killable etcd forward -----------------
@@ -378,10 +423,15 @@ latency)
 	TRIALS="${2:-$CAMPAIGN_N}"
 	block_latency
 	;;
+poll-control)
+	TRIALS="${2:-$CAMPAIGN_N}"
+	block_poll_control
+	;;
 staleness) block_staleness ;;
 all)
 	block_latency
+	block_poll_control
 	block_staleness
 	;;
-*) echo "usage: $0 [latency [trials]|staleness|all]" >&2; exit 2 ;;
+*) echo "usage: $0 [latency [trials]|poll-control [trials]|staleness|all]" >&2; exit 2 ;;
 esac

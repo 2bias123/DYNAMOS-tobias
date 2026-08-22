@@ -27,7 +27,7 @@ set -u
 
 EXP=E2
 root="$(cd "$(dirname "$0")/.." && pwd)"
-results_dir="${E2_RESULTS_DIR:-$root/results/e2-policy-latency}"
+results_dir="${E2_RESULTS_DIR:-$root/results/campaign-n50/e2-policy-latency}"
 . "$root/scripts/capture_lib.sh"
 
 USER_NAME="jake.jongejans@student.uva.nl"
@@ -183,9 +183,9 @@ do_e2() {
 	echo "writer steady: ALLOW flowing"
 
 	echo
-	echo "trial,t_reenable,t_allow_confirmed,t_flip,t_deny,interval_ms"
-	local k code tflip ttrue tallow tdeny ms gwmark denyline
-	local intervals=()
+	echo "trial,t_reenable,t_allow_confirmed,t_flip,t_deny,interval_ms,observe_ms,enforce_ms"
+	local k code tput tflip ttrue tallow tdeny ms gwmark denyline tobs obs_ms enf_ms
+	local intervals=() observes=()
 	for k in $(seq 1 "$TRIALS"); do
 		# Independence: re-enable (PUT allowed=true) and wait for a confirmed ALLOW
 		# from the writer before this trial's flip. Trial 1 is already at true.
@@ -198,14 +198,29 @@ do_e2() {
 		# Mark the gateway audit stream so we can pull this trial's DENY record.
 		gwmark=$(kubectl logs -n "$NS" "$pod" -c policy-checkpoint-gateway 2>/dev/null | wc -l)
 
-		# Flip to allowed=false; t_flip is the moment the PUT lands.
+		# Flip to allowed=false; t_flip is the moment the PUT lands. The watch
+		# can deliver before the PUT returns, so the observation lookup below
+		# thresholds at PUT initiation instead of t_flip.
+		tput=$(date +%s.%N)
 		code=$(flip_server false)
 		tflip=$(date +%s.%N)
 		[ "$code" = 200 ] || fail "flip PUT returned $code (trial $k)"
 
 		tdeny=$(wait_for DENY "$tflip" "$DENY_TIMEOUT") || fail "no enforced DENY within ${DENY_TIMEOUT}s (trial $k)"
 		ms=$(python3 -c "print('%.1f' % (($tdeny - $tflip) * 1000))")
-		echo "$k,$ttrue,$tallow,$tflip,$tdeny,$ms"
+
+		# Split the interval at the gateway's own observation of the flip (the
+		# zap "Agreement changed" line, epoch-stamped on the shared host clock).
+		tobs=$(kubectl logs -n "$NS" "$pod" -c policy-checkpoint-gateway 2>/dev/null \
+			| tail -n +$((gwmark + 1)) | grep "Agreement changed" \
+			| awk -v t="$tput" '$1 >= t {print $1; exit}')
+		obs_ms=""; enf_ms=""
+		if [ -n "$tobs" ]; then
+			obs_ms=$(python3 -c "print('%.1f' % (($tobs - $tflip) * 1000))")
+			enf_ms=$(python3 -c "print('%.1f' % (($tdeny - $tobs) * 1000))")
+			observes+=("$obs_ms")
+		fi
+		echo "$k,$ttrue,$tallow,$tflip,$tdeny,$ms,$obs_ms,$enf_ms"
 		intervals+=("$ms")
 
 		# Raw gateway decision record for this trial's first probe DENY: the audit
@@ -220,9 +235,16 @@ do_e2() {
 	flip_server true >/dev/null
 
 	echo
+	echo "flip -> first enforced DENY:"
 	printf '%s\n' "${intervals[@]}" | summarize_series ms
+	if [ "${#observes[@]}" -gt 0 ]; then
+		echo "flip -> watch-observed (Agreement changed line), ${#observes[@]}/${TRIALS} trials:"
+		printf '%s\n' "${observes[@]}" | summarize_series ms
+	fi
 	echo "regime: watch-delivered (gateway watch on /policyEnforcer/agreements/server active)"
 	echo "note: writer cadence 10ms bounds the resolution; state_class=e2_probe does not touch vfl_server_model"
+	echo "note: observe_ms is flip to the gateway's Agreement-changed log line; enforce_ms is that line to the first DENY"
+	echo "note: observe_ms can be negative: t_flip is stamped after the PUT returns, and the watch can deliver inside the PUT round trip"
 }
 
 run_capture watch-regime flip-to-first-deny "scripts/capture_e2_latency.sh ${TRIALS}" do_e2 \

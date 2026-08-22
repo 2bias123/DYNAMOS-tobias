@@ -18,7 +18,7 @@ set -u
 # Dropping the lingering Jobs is the same thing reset.sh does; the state PVCs
 # survive it.
 #
-# Output goes to results/e1-decision-correctness/audit-completeness/ with a
+# Output goes to results/campaign-n50/e1-decision-correctness/audit-completeness/ with a
 # captures.md line. Exits non-zero if any steward fails.
 #
 # Usage: capture_e1_completeness.sh
@@ -26,7 +26,7 @@ set -u
 EXP=E1
 root="$(cd "$(dirname "$0")/.." && pwd)"
 # Override for shakedown runs that must not land in the evidence tree.
-results_dir="${E1_RESULTS_DIR:-$root/results/e1-decision-correctness}"
+results_dir="${E1_RESULTS_DIR:-$root/results/campaign-n50/e1-decision-correctness}"
 . "$root/scripts/capture_lib.sh"
 
 STEWARD_NS=(server clientone clienttwo clientthree)

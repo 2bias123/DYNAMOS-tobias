@@ -1,10 +1,13 @@
 #!/usr/bin/env bash
 set -u
 
-# E2 degraded poll-only regime: ONE confirming trial with the gateway's watch
-# disabled, showing the enforced DENY arrives within the 30s poll bound. This
-# regime is argued from the bound (ticker interval + Get timeout); the single
-# trial is confirmation, not a dataset.
+# E2 degraded poll-only regime: N trials with the gateway's watch disabled,
+# timing each agreement flip to the first enforced DENY. The regime is argued
+# from the bound (ticker interval + Get timeout); the trials show how the
+# interval distributes over the tick phase. The probe writer runs at 1s
+# cadence, so each interval carries up to ~1s of probe lag on top of the
+# phase; the gateway's own observation of the flip (its Agreement-changed
+# line) is the pure bound check.
 #
 # The watch is disabled by AGREEMENT_WATCH_DISABLED=true, so the only path from
 # an agreement flip to enforcement is the gateway's periodic re-Get. To set that
@@ -18,11 +21,11 @@ set -u
 # etcd and the orchestrator, runs the gateway, drives the trial, and tears
 # everything down. Assumes the kind cluster and orchestrator are up.
 #
-# Usage: capture_e2_pollcheck.sh
+# Usage: capture_e2_pollcheck.sh [trials]   (default CAMPAIGN_N)
 
 EXP=E2
 root="$(cd "$(dirname "$0")/.." && pwd)"
-results_dir="${E2_RESULTS_DIR:-$root/results/e2-policy-latency}"
+results_dir="${E2_RESULTS_DIR:-$root/results/campaign-n50/e2-policy-latency}"
 . "$root/scripts/capture_lib.sh"
 
 USER_NAME="jake.jongejans@student.uva.nl"
@@ -31,6 +34,7 @@ ETCD_LOCAL_PORT=30005          # fixed: config_local.go points the gateway at lo
 ORCHPORT="${ORCHPORT:-8082}"
 POLL_INTERVAL="${POLL_INTERVAL:-30}"
 DENY_TIMEOUT="${DENY_TIMEOUT:-45}"   # a bit over the poll bound so a late tick is still caught
+TRIALS="${1:-$CAMPAIGN_N}"
 cfg_server="$root/configuration/etcd_launch_files/state_aware_server.json"
 
 IDENTITY='{"steward":"SERVER","user":"'"$USER_NAME"'","request_type":"vflTrainModelRequest","job_id":"e2-pollcheck","local_job_name":"e2-pollcheck"}'
@@ -103,49 +107,75 @@ do_pollcheck() {
 	echo "$base" | grep -q '"allowed": true' || { echo "$base"; fail "baseline write did not ALLOW"; }
 	echo "baseline: ALLOW"
 
-	step "flip allowed=false via /policyEnforcer; time the first enforced DENY"
-	local code tflip tdeny attempt out ms
-	code=$(flip_server false)
-	tflip=$(date +%s.%N)
-	[ "$code" = 200 ] || fail "flip PUT returned $code"
-	echo "t_flip=$tflip (PUT allowed=false landed)"
+	step "${TRIALS} trials: flip allowed=false, time the first enforced DENY under the ${POLL_INTERVAL}s poll bound"
+	echo "trial,t_reenable,t_allow,t_flip,t_deny,interval_ms,observe_ms"
+	local k code ttrue tallow tput tflip tdeny out ms gwmark tobs obs_ms
+	local intervals=() observes=()
+	for k in $(seq 1 "$TRIALS"); do
+		# Independence: re-enable and wait for a poll tick to redeliver ALLOW.
+		ttrue=$(date +%s.%N)
+		[ "$(flip_server true)" = 200 ] || fail "re-enable PUT failed (trial $k)"
+		while :; do
+			out=$(gw_write)
+			echo "$out" | grep -q '"allowed": true' && break
+			python3 -c "import sys; sys.exit(0 if ($(date +%s.%N) - $ttrue) > $DENY_TIMEOUT else 1)" \
+				&& fail "no ALLOW after re-enable within ${DENY_TIMEOUT}s (trial $k)"
+			sleep 1
+		done
+		tallow=$(date +%s.%N)
 
-	tdeny=""
-	attempt=0
-	while :; do
-		out=$(gw_write)
-		if echo "$out" | grep -q 'allowed = false'; then
-			tdeny=$(date +%s.%N)
-			break
+		gwmark=$(wc -l < "$gw_log")
+		tput=$(date +%s.%N)
+		code=$(flip_server false)
+		tflip=$(date +%s.%N)
+		[ "$code" = 200 ] || fail "flip PUT returned $code (trial $k)"
+		tdeny=""
+		while :; do
+			out=$(gw_write)
+			if echo "$out" | grep -q 'allowed = false'; then
+				tdeny=$(date +%s.%N)
+				break
+			fi
+			python3 -c "import sys; sys.exit(0 if ($(date +%s.%N) - $tflip) > $DENY_TIMEOUT else 1)" \
+				&& fail "no enforced DENY within ${DENY_TIMEOUT}s (trial $k: the poll did not pick up the flip)"
+			sleep 1
+		done
+		ms=$(python3 -c "print('%.1f' % (($tdeny - $tflip) * 1000))")
+		# The writer's probe cadence rides on top of the tick phase, so the
+		# interval check carries probe slack; the gateway-side observation
+		# below is the strict bound.
+		python3 -c "import sys; sys.exit(0 if $ms <= $POLL_INTERVAL * 1000 + 2000 else 1)" \
+			|| fail "DENY outside the poll bound plus probe slack (trial $k: ${ms} ms)"
+		tobs=$(tail -n +$((gwmark + 1)) "$gw_log" | grep "Agreement changed" \
+			| awk -v t="$tput" '$1 >= t {print $1; exit}')
+		obs_ms=""
+		if [ -n "$tobs" ]; then
+			obs_ms=$(python3 -c "print('%.1f' % (($tobs - $tflip) * 1000))")
+			python3 -c "import sys; sys.exit(0 if $obs_ms <= $POLL_INTERVAL * 1000 + 2500 else 1)" \
+				|| fail "gateway observed the flip outside the poll bound (trial $k: ${obs_ms} ms)"
+			observes+=("$obs_ms")
 		fi
-		attempt=$((attempt + 1))
-		# stop well after the poll bound so a miss is a real failure, not a short wait
-		if python3 -c "import sys; sys.exit(0 if ($(date +%s.%N) - $tflip) > $DENY_TIMEOUT else 1)"; then
-			fail "no enforced DENY within ${DENY_TIMEOUT}s (watch-disabled poll did not pick up the flip)"
-		fi
-		sleep 1
+		echo "$k,$ttrue,$tallow,$tflip,$tdeny,$ms,$obs_ms"
+		intervals+=("$ms")
 	done
-	echo "t_deny=$tdeny (first write DENYd 'allowed = false' after $attempt ALLOW probes)"
 
-	ms=$(python3 -c "print('%.1f' % (($tdeny - $tflip) * 1000))")
 	echo
-	echo "interval_ms=$ms   poll_bound_ms=$((POLL_INTERVAL * 1000))"
-	python3 -c "
-iv = $ms; bound = $POLL_INTERVAL * 1000
-print('WITHIN POLL BOUND' if iv <= bound else 'EXCEEDED POLL BOUND')
-import sys; sys.exit(0 if iv <= bound else 1)" || fail "DENY exceeded the poll bound"
-	echo "regime: poll-only (watch disabled); argued from the ${POLL_INTERVAL}s bound, this single trial confirms it"
+	echo "flip -> first enforced DENY (bound ${POLL_INTERVAL}s + 1s probe cadence):"
+	printf '%s\n' "${intervals[@]}" | summarize_series ms
+	if [ "${#observes[@]}" -gt 0 ]; then
+		echo "flip -> poll-observed (Agreement changed line, strict bound), ${#observes[@]}/${TRIALS} trials:"
+		printf '%s\n' "${observes[@]}" | summarize_series ms
+	fi
+	echo "regime: poll-only (watch disabled); the interval is the phase of the ${POLL_INTERVAL}s tick plus probe lag"
 
 	step "raw gateway decision records (audit leg on the local state volume)"
 	local audit="$state_dir/audit/audit.log"
-	echo "baseline ALLOW: $(grep '"decision":"ALLOW"' "$audit" 2>/dev/null | grep '"stateClass":"e2_probe"' | head -1)"
-	echo "enforced DENY:  $(grep '"decision":"DENY"' "$audit" 2>/dev/null | grep '"stateClass":"e2_probe"' | head -1)"
-	echo "-- every e2_probe write decision, raw (ALLOW probes then the DENY; cacheAgeMs climbs toward the poll interval) --"
+	echo "-- every e2_probe write decision, raw (per-trial ALLOW probes then the DENY; cacheAgeMs climbs toward the poll interval) --"
 	grep '"op":"write"' "$audit" 2>/dev/null | grep '"stateClass":"e2_probe"'
 
 	# Leave the agreement enabled.
 	flip_server true >/dev/null
 }
 
-run_capture poll-spotcheck poll-only-deny "scripts/capture_e2_pollcheck.sh" do_pollcheck \
-	"E2 poll-only spot-check (watch disabled): flip to first enforced DENY within the ${POLL_INTERVAL}s poll bound, one confirming trial"
+run_capture poll-regime poll-only-deny "scripts/capture_e2_pollcheck.sh ${TRIALS}" do_pollcheck \
+	"E2 poll-only regime (watch disabled): flip to first enforced DENY, ${TRIALS} trials under the ${POLL_INTERVAL}s poll bound"

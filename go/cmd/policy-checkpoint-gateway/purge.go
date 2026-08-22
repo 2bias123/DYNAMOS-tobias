@@ -178,7 +178,9 @@ func (g *gatewayServer) confirmFresh() (*api.Agreement, string, error) {
 // reconsiders on the next fresh observation, and every reconsideration that
 // still cannot confirm appends its own DEFERRED line.
 func (g *gatewayServer) confirmAndPurge(observed decision) {
+	start := time.Now()
 	a, hash, err := g.confirmFresh()
+	confirmUs := time.Since(start).Microseconds()
 	if err != nil {
 		g.auditPurgeDeferred(observed, err.Error())
 		return
@@ -191,6 +193,7 @@ func (g *gatewayServer) confirmAndPurge(observed decision) {
 		return // current policy no longer prescribes purge: cancelled
 	}
 
+	tSweep := time.Now()
 	g.purgeAll(decision{
 		Source:     sourceFresh,
 		Hash:       hash,
@@ -198,6 +201,9 @@ func (g *gatewayServer) confirmAndPurge(observed decision) {
 		Directives: sd,
 		Reason:     "revoked; onRevocation=purge",
 	})
+	logger.Sugar().Infow("Purge sweep timing",
+		"confirmMicros", confirmUs, "sweepMicros", time.Since(tSweep).Microseconds(),
+		"totalMicros", time.Since(start).Microseconds())
 }
 
 func (g *gatewayServer) auditPurgeDeferred(observed decision, why string) {

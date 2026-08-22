@@ -339,6 +339,7 @@ def write_server_checkpoint():
             "round_index": vfl_server.round_index,
             "nof_clients": vfl_server.nof_clients,
         }, buffer)
+        logger.info(f"Checkpoint write requested: round_index={vfl_server.round_index}")
         decision = gateway.request_state_write("vfl_server_model", "latest", buffer.getvalue())
         if decision.allowed:
             logger.info(f"Checkpoint write allowed: round_index={vfl_server.round_index}")

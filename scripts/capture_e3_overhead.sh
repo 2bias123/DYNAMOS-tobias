@@ -29,7 +29,7 @@ set -u
 
 EXP=E3
 root="$(cd "$(dirname "$0")/.." && pwd)"
-results_dir="${E3_RESULTS_DIR:-$root/results/e3-overhead}"
+results_dir="${E3_RESULTS_DIR:-$root/results/campaign-n50/e3-overhead}"
 . "$root/scripts/capture_lib.sh"
 
 CONFIG="${1:-}"
@@ -180,13 +180,17 @@ full_logs() {
 
 # Per-round latency from the api-gateway round markers, paired by round
 # number, plus a summary line. Fails if any of the $1 expected rounds is
-# missing a marker.
-round_latency_table() { # $1 = cycles, $2 = api-gateway log (--timestamps)
-	local lines_tmp
-	lines_tmp=$(mktemp)
+# missing a marker. The checkpoint and span columns come from the server MS
+# and gateway logs and stay blank where the config has no gateway; MS
+# round_index=k closes chain round k-1.
+round_latency_table() { # $1 = cycles, $2 = api-gateway round lines, $3 = server MS checkpoint lines, $4 = server gateway Write-timing lines
+	local lines_tmp ckpt_tmp span_tmp
+	lines_tmp=$(mktemp); ckpt_tmp=$(mktemp); span_tmp=$(mktemp)
 	echo "$2" > "$lines_tmp"
-	python3 - "$1" "$lines_tmp" <<'PY'
-import re, sys
+	echo "$3" > "$ckpt_tmp"
+	echo "$4" > "$span_tmp"
+	python3 - "$1" "$lines_tmp" "$ckpt_tmp" "$span_tmp" <<'PY'
+import json, re, sys
 from datetime import datetime
 
 cycles = int(sys.argv[1])
@@ -213,10 +217,28 @@ for line in open(sys.argv[2]):
     if m:
         ends[int(m.group(1))] = ts(line)
 
+req, alw = {}, {}
+for line in open(sys.argv[3]):
+    m = re.search(r'Checkpoint write (requested|allowed): round_index=(\d+)', line)
+    if m:
+        d = req if m.group(1) == 'requested' else alw
+        d.setdefault(int(m.group(2)) - 1, ts(line))
+
+spans = []
+for line in open(sys.argv[4]):
+    i = line.find('{')
+    if i >= 0:
+        try:
+            spans.append(json.loads(line[i:]))
+        except ValueError:
+            pass
+
 # duration = open marker to accuracy line; reverify = open marker to the
 # training dispatch (the baseline's own per-round policy re-verification sits
-# in this segment, in every config); train = dispatch to accuracy.
-print("round,start,end,duration_ms,reverify_ms,train_ms")
+# in this segment, in every config); train = dispatch to accuracy;
+# ckpt_wait = the MS's requested-to-allowed gateway round trip; the gw_*
+# columns are the gateway's own spans for that round's write.
+print("round,start,end,duration_ms,reverify_ms,train_ms,ckpt_wait_ms,gw_decide_us,gw_audit_us,gw_persist_us,gw_total_us")
 durs = []
 for r in range(cycles):
     if r not in starts or r not in ends or r not in trains:
@@ -227,7 +249,11 @@ for r in range(cycles):
     rev = (trains[r] - starts[r]).total_seconds() * 1000
     tr = (ends[r] - trains[r]).total_seconds() * 1000
     durs.append(d)
-    print(f"{r},{starts[r].isoformat()},{ends[r].isoformat()},{d:.1f},{rev:.1f},{tr:.1f}")
+    wait = f"{(alw[r] - req[r]).total_seconds() * 1000:.1f}" if r in req and r in alw else ''
+    g = spans[r] if r < len(spans) else None
+    gcols = (f"{g['decideMicros']},{g['auditMicros']},{g['persistMicros']},{g['totalMicros']}"
+             if g else ',,,')
+    print(f"{r},{starts[r].isoformat()},{ends[r].isoformat()},{d:.1f},{rev:.1f},{tr:.1f},{wait},{gcols}")
 
 def summary(xs):
     xs = sorted(xs)
@@ -241,20 +267,29 @@ if len(durs) > 1:
 print(f"all rounds (n={len(durs)}): {summary(durs)}")
 total = (ends[cycles - 1] - starts[0]).total_seconds() * 1000
 print(f"run total (round 0 open to last close): {total:.1f} ms")
+waits = [(alw[r] - req[r]).total_seconds() * 1000 for r in range(cycles) if r in req and r in alw]
+if waits:
+    print(f"server ckpt wait (MS requested -> allowed, n={len(waits)}): {summary(waits)}")
+if spans:
+    tot = [g['totalMicros'] for g in spans[:cycles]]
+    aud = [g['auditMicros'] for g in spans[:cycles]]
+    print(f"server gateway write spans (n={len(tot)}): mean total={sum(tot)/len(tot):.0f} us  mean audit={sum(aud)/len(aud):.0f} us")
 PY
 	local rc=$?
-	rm -f "$lines_tmp"
+	rm -f "$lines_tmp" "$ckpt_tmp" "$span_tmp"
 	return "$rc"
 }
 
 measure_rounds() {
 	step "per-round latency from the api-gateway round markers"
 	must_grep "cycle count in the round loop" "$GW_LOG" -F "Running VFL for ${CYCLES} rounds"
-	local round_lines
+	local round_lines ckpt_lines span_lines
 	round_lines=$(echo "$GW_LOG" | grep -E "Running VFL training round|- Sending training request|Intermediate accuracy achieved")
 	echo "$round_lines"
 	echo
-	round_latency_table "$CYCLES" "$round_lines" || fail "round marker parse failed"
+	ckpt_lines=$(echo "${SERVER_MS_LOG:-}" | grep -E "Checkpoint write (requested|allowed): round_index=")
+	span_lines=$(echo "${SERVER_GW_LOG:-}" | grep -F "Write timing")
+	round_latency_table "$CYCLES" "$round_lines" "$ckpt_lines" "$span_lines" || fail "round marker parse failed"
 }
 
 # Payload sizes off the server state PVC via a throwaway inspector pod.

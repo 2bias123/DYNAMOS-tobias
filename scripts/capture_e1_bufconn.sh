@@ -2,7 +2,7 @@
 set -u
 
 # Runs the E1 unit tests (the bufconn half of E1) and saves the raw go test
-# output under results/e1-decision-correctness/bufconn/, adding a line to that
+# output under results/campaign-n50/e1-decision-correctness/bufconn/, adding a line to that
 # experiment's captures.md. Covers the write/read decision tables, identity
 # checks (mismatch + registration latch), the write- and read-refused-when-
 # audit-unavailable rows, the audit-before-rename invariant, the lock-conflict
@@ -14,7 +14,9 @@ set -u
 # Usage: capture_e1_bufconn.sh
 
 root="$(cd "$(dirname "$0")/.." && pwd)"
-out_dir="$root/results/e1-decision-correctness/bufconn"
+# Override for shakedown runs that must not land in the evidence tree.
+results_dir="${E1_RESULTS_DIR:-$root/results/campaign-n50/e1-decision-correctness}"
+out_dir="$results_dir/bufconn"
 ts="$(date +%Y%m%d-%H%M%S)"
 out="$out_dir/${ts}_go-test-bufconn-oracle.txt"
 
@@ -45,8 +47,8 @@ rc=${PIPESTATUS[0]}
 commit="$(git -C "$root" rev-parse --short HEAD)"
 note="E1 bufconn oracle run"
 [ "$rc" -ne 0 ] && note="$note; FAILED (exit=$rc)"
-echo "\`e1-decision-correctness/bufconn/${ts}_go-test-bufconn-oracle.txt | $ts | (cd go && $cmd) | $commit | $note\`" \
-	>> "$root/results/e1-decision-correctness/captures.md"
+echo "\`$(basename "$results_dir")/bufconn/${ts}_go-test-bufconn-oracle.txt | $ts | (cd go && $cmd) | $commit | $note\`" \
+	>> "$results_dir/captures.md"
 
 echo
 echo "captured: $out (exit=$rc)"

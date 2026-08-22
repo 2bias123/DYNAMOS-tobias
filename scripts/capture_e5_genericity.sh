@@ -2,7 +2,7 @@
 set -u
 
 # Runs the E5 genericity scenes against the live aggregateRequest chain and
-# saves the raw output under results/e5-genericity/, adding a line to that
+# saves the raw output under results/campaign-n50/e5-genericity/, adding a line to that
 # experiment's captures.md. The five scenes map onto four blocks; every
 # asserted record must carry the aggregate_result state class.
 #
@@ -28,9 +28,20 @@ set -u
 #                    after the blob ages past the bound: op=expired DELETED
 #                    "retention exceeded" at the boot sweep, read DENY
 #                    "not found", recompute and fresh write.
+#   hit-repeat       one clean-slate miss, then HITS repeat requests, each
+#                    answered by a NEW pod via a governed read of the same
+#                    blob (writtenUnixSeconds constant), zero recomputes.
+#                    Seeds retentionSeconds so every hit fits the bound;
+#                    per-request completion times are the governed series.
+#   ungoverned       the baseline arm: requiresGateway dropped from the
+#                    aggregate chain metadata (ephemeral etcd flip, as in
+#                    the E3 no-gateway config) -> no gateway container, no
+#                    reuse, a recompute per request; per-request completion
+#                    times are the comparison series against hit-repeat.
 #
-# Usage: capture_e5_genericity.sh [miss-hit|denial|revocation-purge|retention|all]
-# Default is all. Blocks reset and seed themselves; ~25 min for all four.
+# Usage: capture_e5_genericity.sh [miss-hit|denial|revocation-purge|retention|hit-repeat|ungoverned|all]
+# Default is all. Blocks reset and seed themselves; the scenes take ~25 min,
+# hit-repeat and ungoverned each add roughly a minute per request.
 # Ordering: revocation-purge destroys the blob the earlier blocks left on the
 # PVC, so standalone it needs state from a prior miss-hit; the other blocks
 # are self-contained (retention writes its own blob in run 1).
@@ -48,7 +59,7 @@ set -u
 EXP=E5
 root="$(cd "$(dirname "$0")/.." && pwd)"
 # Override for shakedown runs that must not land in the evidence tree.
-results_dir="${E5_RESULTS_DIR:-$root/results/e5-genericity}"
+results_dir="${E5_RESULTS_DIR:-$root/results/campaign-n50/e5-genericity}"
 . "$root/scripts/capture_lib.sh"
 
 NS=clientone
@@ -57,6 +68,9 @@ APIPORT="${APIPORT:-8080}"
 ORCHPORT="${ORCHPORT:-8082}"
 RETENTION_CANONICAL=120
 RETENTION_LONG=3600
+HITS="${HITS:-$CAMPAIGN_N}"
+UNGOVERNED_RUNS="${UNGOVERNED_RUNS:-$CAMPAIGN_N}"
+RETENTION_HITS="$(retention_for_hits "$HITS")"
 POD_POLL_MAX="${POD_POLL_MAX:-60}"   # x2s: job pod appear/complete
 
 PIDS=()
@@ -351,6 +365,157 @@ block_retention() {
 		"E5 scene 5: the agreement's own 120s bound -> op=expired DELETED at the boot sweep (confirmed fresh), read DENY not-found, recompute"
 }
 
+do_hit_repeat() {
+	step "reset, then delete the aggregate PVC for a deterministic clean-slate miss"
+	reset_cluster
+	kubectl get pvc -n "$NS" -o name 2>/dev/null | grep aggregaterequest \
+		| xargs -r kubectl delete -n "$NS" --wait=true
+
+	step "seed variant retentionSeconds=${RETENTION_HITS} so all ${HITS} hits fit inside the bound"
+	seed_aggregate "sd['retentionSeconds'] = ${RETENTION_HITS}"
+	verify_sd_field retentionSeconds "$RETENTION_HITS"
+
+	step "run 0: clean-slate miss -> compute -> governed write"
+	local pod aud w1 t0 t1
+	t0=$(date +%s)
+	trigger_aggregate
+	pod=$(wait_new_pod_done "")
+	t1=$(date +%s)
+	echo "job pod: $pod"
+	echo "run 0 (miss, compute + governed write) request_s=$(( t1 - t0 ))"
+	aud=$(gw_log "$pod")
+	must_grep "clean-slate read DENY 'not found'" "$(echo "$aud" | grep '"op":"read"')" -e '"reason":"not found"'
+	must_grep "governed write ALLOW on the aggregate class" "$(echo "$aud" | grep '"op":"write"')" \
+		-e '"decision":"ALLOW".*"stateClass":"aggregate_result"'
+	w1=$(echo "$aud" | grep '"op":"write"' | grep '"decision":"ALLOW"' | tail -1 \
+		| python3 -c "import sys, json; print(json.load(sys.stdin)['writtenUnixSeconds'])")
+	echo "blob: writtenUnixSeconds=$w1"
+
+	step "${HITS} repeat requests: every one must reuse the run-0 blob via a governed read"
+	echo "hit,pod,read_writtenUnixSeconds,blob_age_s,request_s"
+	local k r age
+	local durations=()
+	for k in $(seq 1 "$HITS"); do
+		clear_user_jobs
+		t0=$(date +%s)
+		trigger_aggregate
+		pod=$(wait_new_pod_done "$pod")
+		t1=$(date +%s)
+		aud=$(gw_log "$pod")
+		r=$(echo "$aud" | grep '"op":"read"' | grep '"decision":"ALLOW"' | head -1 \
+			| python3 -c "import sys, json; print(json.load(sys.stdin)['writtenUnixSeconds'])" 2>/dev/null)
+		[ "$r" = "$w1" ] || fail "hit $k read writtenUnixSeconds ($r) != run 0 write ($w1)"
+		echo "$aud" | grep '"op":"write"' | grep -q '"decision":"ALLOW"' \
+			&& fail "hit $k wrote fresh state; a reuse hit must not recompute"
+		echo "$aud" | grep -qE '"op":"(purge|expired)"' \
+			&& fail "hit $k saw a destruction record inside the retention bound"
+		ms_log "$pod" | grep -q "Reusing persisted result" || fail "hit $k missing the reuse line"
+		age=$(( t1 - w1 ))
+		[ "$age" -lt "$RETENTION_HITS" ] || fail "hit $k outside the retention bound (age ${age}s)"
+		echo "$k,$pod,$r,$age,$(( t1 - t0 ))"
+		durations+=("$(( t1 - t0 ))")
+	done
+	echo
+	echo "request completion (trigger accepted -> pod Succeeded), governed reuse:"
+	printf '%s\n' "${durations[@]}" | summarize_series s
+	echo "OK: ${HITS}/${HITS} hits returned the run-0 blob (writtenUnixSeconds=$w1), zero recomputes"
+}
+
+block_hit_repeat() {
+	run_capture hit-repeat governed-reuse "scripts/capture_e5_genericity.sh hit-repeat" do_hit_repeat \
+		"E5 hit-repeat: one clean-slate miss then ${HITS} governed reuse hits inside a ${RETENTION_HITS}s bound; every read returns the run-0 blob, zero recomputes"
+}
+
+# Drop requiresGateway from the aggregate chain metadata in etcd. Ephemeral:
+# the orchestrator re-applies the canonical config on every boot, so any
+# reset restores it.
+flip_aggregate_gateway_off() {
+	local key="/microservices/aggregate-demo/chainMetadata" cur
+	cur=$(kubectl exec -n core etcd-0 -c etcd -- sh -c \
+		"ETCDCTL_API=3 /usr/local/bin/etcdctl --endpoints=localhost:2379 get $key --print-value-only")
+	[ -n "$cur" ] || fail "no chainMetadata in etcd for aggregate-demo"
+	echo "$cur" | python3 -c "
+import sys, json
+m = json.load(sys.stdin)
+m.pop('requiresGateway', None)
+print(json.dumps(m))" | kubectl exec -i -n core etcd-0 -c etcd -- sh -c \
+		"ETCDCTL_API=3 /usr/local/bin/etcdctl --endpoints=localhost:2379 put $key \"\$(cat)\"" >/dev/null \
+		|| fail "chainMetadata etcd put failed"
+	cur=$(kubectl exec -n core etcd-0 -c etcd -- sh -c \
+		"ETCDCTL_API=3 /usr/local/bin/etcdctl --endpoints=localhost:2379 get $key --print-value-only")
+	echo "$cur" | grep -q '"requiresGateway":true' && fail "requiresGateway still true after flip"
+	echo "[flip] aggregate-demo requiresGateway off: $cur"
+}
+
+do_ungoverned() {
+	step "reset + seed, then drop requiresGateway from the aggregate chain metadata"
+	reset_cluster
+	seed_aggregate ""
+	flip_aggregate_gateway_off
+
+	step "${UNGOVERNED_RUNS} ungoverned requests: no gateway container, a recompute per request"
+	echo "run,pod,request_s,dial_s"
+	local k pod="" prev="" t0 t1 containers ms mslog dial_s adj
+	local durations=() adjusted=()
+	for k in $(seq 1 "$UNGOVERNED_RUNS"); do
+		clear_user_jobs
+		t0=$(date +%s)
+		trigger_aggregate
+		pod=$(wait_new_pod_done "$prev")
+		prev="$pod"
+		t1=$(date +%s)
+		if [ "$k" = 1 ]; then
+			containers=$(kubectl get pod "$pod" -n "$NS" -o jsonpath='{.spec.containers[*].name}' 2>/dev/null)
+			echo "[$NS] $pod containers: $containers"
+			echo "$containers" | grep -q policy-checkpoint-gateway \
+				&& fail "gateway container present in the ungoverned run"
+			echo "OK: no gateway container in the chain pod"
+		fi
+		ms=$(ms_log "$pod")
+		echo "$ms" | grep -q "Reusing persisted result" && fail "run $k reused state without a gateway"
+		echo "$ms" | grep -q "Result read requested" && fail "run $k spoke to a gateway"
+		# The MS dials its (absent) gateway before degrading; measure that
+		# window so the wall time can be reported with and without it.
+		mslog=$(kubectl logs -n "$NS" "$pod" -c aggregate-demo --timestamps 2>/dev/null)
+		dial_s=$(echo "$mslog" | python3 -c "
+import sys, re
+from datetime import datetime
+def p(raw):
+    raw = re.sub(r'(\.\d{6})\d*', r'\1', raw).replace('Z', '+00:00')
+    return datetime.fromisoformat(raw)
+first = last = None
+for line in sys.stdin:
+    if 'Gateway not ready' in line and first is None:
+        first = p(line.split()[0])
+    elif 'No policy gateway reachable' in line:
+        last = p(line.split()[0])
+print(('%.1f' % (last - first).total_seconds()) if first and last else '')")
+		echo "$k,$pod,$(( t1 - t0 )),${dial_s}"
+		durations+=("$(( t1 - t0 ))")
+		if [ -n "$dial_s" ]; then
+			adj=$(python3 -c "print('%.1f' % ($(( t1 - t0 )) - $dial_s))")
+			adjusted+=("$adj")
+		fi
+	done
+
+	step "MS degrade evidence (last run)"
+	must_grep "MS degraded to no-gateway mode" "$ms" -e "No policy gateway reachable, continuing without one"
+	echo
+	echo "request completion (trigger accepted -> pod Succeeded), ungoverned recompute:"
+	printf '%s\n' "${durations[@]}" | summarize_series s
+	if [ "${#adjusted[@]}" -gt 0 ]; then
+		echo "minus the fruitless gateway dial window (${#adjusted[@]}/${UNGOVERNED_RUNS} runs with a measured dial span):"
+		printf '%s\n' "${adjusted[@]}" | summarize_series s
+		echo "note: the MS image dials its gateway before degrading (exponential timeouts, ~40s total); the raw wall time includes that integration artifact, the adjusted series removes it"
+	fi
+	echo "note: the flip is ephemeral; the next reset restores requiresGateway"
+}
+
+block_ungoverned() {
+	run_capture ungoverned no-gateway-recompute "scripts/capture_e5_genericity.sh ungoverned" do_ungoverned \
+		"E5 ungoverned baseline: requiresGateway off -> no gateway container, ${UNGOVERNED_RUNS} requests each recomputing, per-request completion series"
+}
+
 # --- main -----------------------------------------------------------------
 
 which="${1:-all}"
@@ -359,11 +524,15 @@ miss-hit) block_miss_hit ;;
 denial) block_denial ;;
 revocation-purge) block_revocation_purge ;;
 retention) block_retention ;;
+hit-repeat) block_hit_repeat ;;
+ungoverned) block_ungoverned ;;
 all)
 	block_miss_hit
 	block_denial
 	block_revocation_purge
 	block_retention
+	block_hit_repeat
+	block_ungoverned
 	;;
-*) echo "usage: $0 [miss-hit|denial|revocation-purge|retention|all]" >&2; exit 2 ;;
+*) echo "usage: $0 [miss-hit|denial|revocation-purge|retention|hit-repeat|ungoverned|all]" >&2; exit 2 ;;
 esac

@@ -265,6 +265,7 @@ def write_client_checkpoint():
             "optimizer_state_dict": vfl_client.optimiser.state_dict() if vfl_client.optimiser is not None else None,
             "round_index": vfl_client.round_index,
         }, buffer)
+        logger.info(f"Checkpoint write requested: round_index={vfl_client.round_index}")
         decision = gateway.request_state_write("vfl_client_model", "latest", buffer.getvalue())
         if decision.allowed:
             logger.info(f"Checkpoint write allowed: round_index={vfl_client.round_index}")

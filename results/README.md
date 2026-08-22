@@ -43,6 +43,11 @@ there and sync forward, not here.
 
 ## Layout
 
+- `campaign-n50/` — the counted re-run campaign (N=50 iterations, instrumented
+  harness). Same per-experiment layout as below, with its own `env/` and its
+  own `captures.md` per experiment. The capture scripts default here; the
+  top-level experiment folders below hold the earlier captures and receive no
+  new files.
 - `env/` — cross-cutting environment snapshots.
 - `e1-decision-correctness/` — HEADLINE. Oracle = plan §1.10 matrices.
   - `bufconn/` — table-driven unit-harness rows (write/read/purge).

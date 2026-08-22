@@ -73,6 +73,7 @@ def read_persisted_result():
     if gateway is None:
         return None
     try:
+        logger.info("Result read requested")
         resp = gateway.validate_state_read(STATE_CLASS, STATE_KEY)
     except Exception as e:
         logger.warning(f"Result read failed ({e}); recomputing")
@@ -90,6 +91,7 @@ def write_result(payload):
     if gateway is None:
         return
     try:
+        logger.info("Result write requested")
         decision = gateway.request_state_write(STATE_CLASS, STATE_KEY, payload)
         if decision.allowed:
             logger.info("Result write allowed")

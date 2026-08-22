@@ -2,7 +2,7 @@
 set -u
 
 # Runs the E1 live rows against a real VFL chain and saves the raw output
-# under results/e1-decision-correctness/, adding a line to that experiment's
+# under results/campaign-n50/e1-decision-correctness/, adding a line to that experiment's
 # captures.md.
 #
 # Each block resets, seeds, triggers, asserts, then captures. Pick one or
@@ -28,7 +28,7 @@ set -u
 EXP=E1
 root="$(cd "$(dirname "$0")/.." && pwd)"
 # Override for shakedown runs that must not land in the evidence tree.
-results_dir="${E1_RESULTS_DIR:-$root/results/e1-decision-correctness}"
+results_dir="${E1_RESULTS_DIR:-$root/results/campaign-n50/e1-decision-correctness}"
 . "$root/scripts/capture_lib.sh"
 
 STEWARD_NS=(server clientone clienttwo clientthree)
