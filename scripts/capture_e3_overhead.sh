@@ -13,9 +13,12 @@ set -u
 #   e  chain roundtrip (config d plus STATE_ROUNDTRIP_CLIENT: the three
 #      client MSs also rehydrate every round, holding state only across the
 #      train/gradient RPC pair, and drop it after the round's write)
+#   f  store-only chain roundtrip (config e with GATEWAY_STORE_ONLY on the
+#      gateways: identity, decisions, and audit are skipped, only the PVC
+#      I/O remains — the governed-minus-ungoverned delta prices governance)
 #
-# Configs d and e belong to their own experiment: they tag failures E7 and
-# default their artifacts to results/e7-pvc-roundtrip, so a forgotten
+# Configs d, e, and f belong to their own experiment: they tag failures E7
+# and default their artifacts to results/e7-pvc-roundtrip, so a forgotten
 # E3_RESULTS_DIR override can never touch the frozen campaign tree.
 #
 # Per-round latency comes from the api-gateway's own round markers ("Running
@@ -35,7 +38,7 @@ set -u
 # canonical microservices config on every boot, so any reset restores
 # requiresGateway:true).
 #
-# Usage: capture_e3_overhead.sh <a|b|c|d|e> [cycles]   (cycles default CAMPAIGN_N)
+# Usage: capture_e3_overhead.sh <a|b|c|d|e|f> [cycles]   (cycles default CAMPAIGN_N)
 
 EXP=E3
 root="$(cd "$(dirname "$0")/.." && pwd)"
@@ -50,7 +53,8 @@ case "$CONFIG" in
 	c) subdir="config-c-enforced" ;;
 	d) subdir="config-d-roundtrip"; EXP=E7; results_dir="${E3_RESULTS_DIR:-$root/results/e7-pvc-roundtrip}" ;;
 	e) subdir="config-e-chain-roundtrip"; EXP=E7; results_dir="${E3_RESULTS_DIR:-$root/results/e7-pvc-roundtrip}" ;;
-	*) echo "usage: $0 <a|b|c|d|e> [cycles]" >&2; exit 2 ;;
+	f) subdir="config-f-store-only"; EXP=E7; results_dir="${E3_RESULTS_DIR:-$root/results/e7-pvc-roundtrip}" ;;
+	*) echo "usage: $0 <a|b|c|d|e|f> [cycles]" >&2; exit 2 ;;
 esac
 export EXP
 
@@ -65,10 +69,11 @@ INSPECTOR=e3-inspector
 
 PIDS=()
 cleanup() {
-	# A failed b, d, or e run must not leave its env flags armed for a later config.
+	# A failed b, d, e, or f run must not leave its env flags armed for a later config.
 	[ "$CONFIG" = b ] && disable_passthrough
 	[ "$CONFIG" = d ] && disable_roundtrip
 	[ "$CONFIG" = e ] && { disable_roundtrip; disable_roundtrip_client; }
+	[ "$CONFIG" = f ] && { disable_roundtrip; disable_roundtrip_client; disable_store_only; }
 	for p in "${PIDS[@]}"; do kill "$p" 2>/dev/null; done
 }
 trap cleanup EXIT
@@ -138,6 +143,22 @@ disable_roundtrip_client() {
 	local ns
 	for ns in "${STEWARD_NS[@]}"; do
 		kubectl set env "deployment/${ns}" -n "$ns" STATE_ROUNDTRIP_CLIENT- >/dev/null 2>&1
+	done
+}
+
+enable_store_only() {
+	local ns
+	for ns in "${STEWARD_NS[@]}"; do
+		kubectl set env "deployment/${ns}" -n "$ns" GATEWAY_STORE_ONLY=true >/dev/null \
+			|| fail "could not set GATEWAY_STORE_ONLY on $ns"
+	done
+	echo "[store-only] GATEWAY_STORE_ONLY=true on all four steward agents"
+}
+
+disable_store_only() {
+	local ns
+	for ns in "${STEWARD_NS[@]}"; do
+		kubectl set env "deployment/${ns}" -n "$ns" GATEWAY_STORE_ONLY- >/dev/null 2>&1
 	done
 }
 
@@ -798,6 +819,92 @@ do_config_e() {
 	disable_roundtrip
 	disable_roundtrip_client
 	echo "[roundtrip] STATE_ROUNDTRIP and STATE_ROUNDTRIP_CLIENT removed from all four steward agents"
+}
+
+do_config_f() {
+	step "arm store-only chain roundtrip (both MS flags + gateway store-only), then reset + canonical seed + clean slate"
+	enable_roundtrip
+	enable_roundtrip_client
+	enable_store_only
+	reset_and_seed
+	delete_state_pvcs
+
+	step "trigger the chain (cycles=${CYCLES}) with ungoverned per-round rehydration"
+	local rid
+	rid=$(trigger "$CYCLES") || exit 1
+
+	config_evidence with-gateway
+
+	step "wait for training to finish"
+	local status
+	status=$(wait_done "$rid") || exit 1
+	r2_series "$status"
+
+	full_logs with-gateway
+
+	local ns v ms_log gw_log ckpt_n wspan_n rspan_n zero_n restore_n
+	for ns in "${STEWARD_NS[@]}"; do
+		if [ "$ns" = server ]; then
+			ms_log="$SERVER_MS_LOG"
+			gw_log="$SERVER_GW_LOG"
+		else
+			v="CLIENT_MS_LOG_${ns}"; ms_log="${!v}"
+			v="CLIENT_GW_LOG_${ns}"; gw_log="${!v}"
+		fi
+		[ -n "$ms_log" ] || fail "no retained MS log for $ns"
+		[ -n "$gw_log" ] || fail "no retained gateway log for $ns"
+		step "store-only evidence on $ns: banner, ungoverned spans, no decision audit"
+		must_grep "store-only banner on the $ns gateway" "$gw_log" \
+			-F "Store-only mode: governance and audit skipped, state I/O only"
+		must_not_grep "no pass-through banner on $ns" "$gw_log" -F "Pass-through mode:"
+		must_grep "variant banner in the $ns MS log" "$ms_log" \
+			-F "State roundtrip mode enabled"
+		ckpt_n=$(echo "$ms_log" | grep -cF "Checkpoint write allowed: round_index=")
+		[ "$ckpt_n" -eq "$CYCLES" ] || fail "expected $CYCLES checkpoint writes in the $ns MS log, got $ckpt_n"
+		[ "$(echo "$gw_log" | grep -c '"op":"write"')" -eq 0 ] || fail "write audit records present on $ns despite store-only"
+		[ "$(echo "$gw_log" | grep -c '"op":"read"')" -eq 0 ] || fail "read audit records present on $ns despite store-only"
+		echo "OK: $ns: zero read/write decision audit records"
+		wspan_n=$(echo "$gw_log" | grep -cF "Write timing")
+		[ "$wspan_n" -eq "$CYCLES" ] || fail "expected $CYCLES write spans on $ns, got $wspan_n"
+		rspan_n=$(echo "$gw_log" | grep -cF "Read timing")
+		[ "$rspan_n" -eq "$((CYCLES - 1))" ] || fail "expected $((CYCLES - 1)) read spans on $ns, got $rspan_n"
+		zero_n=$(echo "$gw_log" | grep -E "Write timing|Read timing" | grep -c '"decideMicros": 0, "auditMicros": 0')
+		[ "$zero_n" -eq "$((CYCLES * 2 - 1))" ] || fail "expected $((CYCLES * 2 - 1)) zero-governance spans on $ns, got $zero_n"
+		echo "OK: $ns: $wspan_n write + $rspan_n read spans, all with zero decide/audit"
+		restore_n=$(echo "$ms_log" | grep -cF "Roundtrip restore timing: round_index=")
+		[ "$restore_n" -eq "$((CYCLES - 1))" ] || fail "expected $((CYCLES - 1)) roundtrip restores on $ns, got $restore_n"
+		echo "OK: $ns: $restore_n restores"
+		if [ "$ns" = server ]; then
+			must_grep "server MS connected to its gateway" "$ms_log" \
+				-F "Successfully connected to gateway"
+			must_not_grep "no pre-shrink stash interleaved with the per-round writes" "$ms_log" \
+				-F "Saving server state before shrinking"
+		else
+			must_not_grep "no column-drift reinit on $ns" "$ms_log" -F "Column order changed"
+			must_not_grep "no width-mismatch reinit on $ns" "$ms_log" -F "does not match dataframe width"
+			must_not_grep "no optimiser restore failure on $ns" "$ms_log" \
+				-F "Persisted optimiser state could not be applied"
+		fi
+		verify_roundtrip_fidelity "$ns" "$ms_log"
+		[ "$ns" = server ] || client_leg_summary "$ns" "$ms_log" "$gw_log"
+	done
+
+	step "pooled client leg summary"
+	client_leg_summary "clients-pooled" \
+		"${CLIENT_MS_LOG_clientone}"$'\n'"${CLIENT_MS_LOG_clienttwo}"$'\n'"${CLIENT_MS_LOG_clientthree}" \
+		"${CLIENT_GW_LOG_clientone}"$'\n'"${CLIENT_GW_LOG_clienttwo}"$'\n'"${CLIENT_GW_LOG_clientthree}"
+
+	measure_rounds
+	payload_sizes_server
+	must_grep "persisted state files on the server PVC" "$PAYLOAD_LISTING" -E "state files: [1-9]"
+	payload_sizes_server clientone
+	must_grep "persisted state files on the clientone PVC" "$PAYLOAD_LISTING" -E "state files: [1-9]"
+
+	step "disarm store-only chain roundtrip"
+	disable_roundtrip
+	disable_roundtrip_client
+	disable_store_only
+	echo "[store-only] all three variant env vars removed from the steward agents"
 }
 
 run_capture "$subdir" overhead-run "scripts/capture_e3_overhead.sh ${CONFIG} ${CYCLES}" "do_config_${CONFIG}" \

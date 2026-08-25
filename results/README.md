@@ -85,7 +85,11 @@ there and sync forward, not here.
   storage growth); unrelated to the unscheduled "ungoverned direct write
   (E3-(d))" item below — the harness arm letter d is a coincidence.
   - `config-c-enforced/` — this experiment's own config (c) baseline runs.
-  - `config-d-roundtrip/` — the roundtrip variant arm.
+  - `config-d-roundtrip/` — the server-only roundtrip variant arm.
+  - `config-e-chain-roundtrip/` — the whole-chain arm: the three client MSs
+    also rehydrate per round (`capture_e3_overhead.sh e`), holding state only
+    across the train/gradient RPC pair; per-client governance ledgers,
+    fidelity pairs, and leg timings on top of config d's server set.
   - `env/` — the session's environment snapshots.
 
 ## Not in this folder

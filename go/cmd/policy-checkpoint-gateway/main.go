@@ -230,6 +230,13 @@ func main() {
 		g.passthrough = true
 		logger.Sugar().Warn("Pass-through mode: decisions and audit only, state writes skipped")
 	}
+	if os.Getenv("GATEWAY_STORE_ONLY") == "true" {
+		if g.passthrough {
+			logger.Sugar().Fatalf("GATEWAY_STORE_ONLY and GATEWAY_PASSTHROUGH are mutually exclusive")
+		}
+		g.storeOnly = true
+		logger.Sugar().Warn("Store-only mode: governance and audit skipped, state I/O only")
+	}
 
 	etcdClient := etcd.GetEtcdClient(etcdEndpoints)
 	g.source = etcdClient

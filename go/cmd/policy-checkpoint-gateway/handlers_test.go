@@ -331,3 +331,48 @@ func TestPassthroughWriteAuditsButDoesNotPersist(t *testing.T) {
 	g.store.auditMu.Unlock()
 	assert.Assert(t, strings.Contains(out, `"decision":"ALLOW"`))
 }
+
+func TestStoreOnlyServesStateWithoutGovernance(t *testing.T) {
+	client, g := newTestServer(t)
+	g.storeOnly = true
+	g.policy = newPolicyCache(60 * time.Second) // no agreement: governed mode would deny
+
+	bad := testIdentity()
+	bad.User = "attacker@x"
+	resp, err := client.RequestStateWrite(context.Background(), &pb.StateWriteRequest{
+		Identity: bad, StateClass: "kv", StateKey: "k1", Payload: []byte("hello"),
+	})
+	assert.NilError(t, err)
+	assert.Assert(t, resp.GetAllowed())
+	assert.Assert(t, resp.GetWrittenUnixSeconds() > 0)
+
+	read, err := client.ValidateStateRead(context.Background(), &pb.StateReadRequest{
+		Identity: bad, StateClass: "kv", StateKey: "k1",
+	})
+	assert.NilError(t, err)
+	assert.Assert(t, read.GetAllowed())
+	assert.Equal(t, string(read.GetPayload()), "hello")
+
+	buf := g.store.auditW.(*bytes.Buffer)
+	g.store.auditMu.Lock()
+	out := buf.String()
+	g.store.auditMu.Unlock()
+	assert.Equal(t, out, "")
+}
+
+func TestStoreOnlyMissingAndInvalidNames(t *testing.T) {
+	client, g := newTestServer(t)
+	g.storeOnly = true
+
+	resp, err := client.ValidateStateRead(context.Background(), &pb.StateReadRequest{
+		Identity: testIdentity(), StateClass: "kv", StateKey: "absent",
+	})
+	assert.NilError(t, err)
+	assert.Assert(t, !resp.GetAllowed())
+	assert.Equal(t, resp.GetReason(), "not found")
+
+	_, err = client.RequestStateWrite(context.Background(), &pb.StateWriteRequest{
+		Identity: testIdentity(), StateClass: "../escape", StateKey: "k", Payload: []byte{1},
+	})
+	assert.Equal(t, status.Code(err), codes.InvalidArgument)
+}

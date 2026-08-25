@@ -1,0 +1,53 @@
+$ date
+Tue Aug 25 10:16:20 AM CEST 2026
+
+$ git rev-parse HEAD
+bcd3a1246e10b423825990faa8d5c44a3e81a252
+
+$ git status --short
+?? results/e7-pvc-roundtrip/config-e-chain-roundtrip/
+
+$ kubectl config current-context
+kind-kind
+
+$ uptime
+ 10:16:20 up 46 min,  1 user,  load average: 4.24, 3.42, 2.43
+
+$ nproc
+16
+
+
+=== arm chain roundtrip (server + client flags), then reset + canonical seed + clean slate
+[roundtrip] STATE_ROUNDTRIP=true on all four steward agents
+[roundtrip] STATE_ROUNDTRIP_CLIENT=true on all four steward agents
+PREFLIGHT OK: B14, B15 applied
+[reset] deleting stale Jobs in steward namespaces
+No resources found
+job.batch "jake-jongejans-487e41c3clientone1" deleted
+job.batch "jake-jongejans-487e41c3clienttwo1" deleted
+job.batch "jake-jongejans-487e41c3clientthree1" deleted
+[reset] clearing /agents/jobs/ etcd keys
+[reset] coordinated rollout of request path
+deployment.apps/api-gateway restarted
+deployment.apps/policy-enforcer restarted
+deployment.apps/orchestrator restarted
+deployment.apps/server restarted
+deployment.apps/clientone restarted
+deployment.apps/clienttwo restarted
+deployment.apps/clientthree restarted
+Waiting for deployment spec update to be observed...
+Waiting for deployment spec update to be observed...
+Waiting for deployment "api-gateway" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "api-gateway" rollout to finish: 1 old replicas are pending termination...
+deployment "api-gateway" successfully rolled out
+Waiting for deployment "policy-enforcer" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "policy-enforcer" rollout to finish: 1 old replicas are pending termination...
+deployment "policy-enforcer" successfully rolled out
+deployment "orchestrator" successfully rolled out
+deployment "server" successfully rolled out
+deployment "clientone" successfully rolled out
+deployment "clienttwo" successfully rolled out
+Waiting for deployment "clientthree" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "clientthree" rollout to finish: 1 old replicas are pending termination...
+deployment "clientthree" successfully rolled out
+[reset] settling 45s for AMQP topology to converge

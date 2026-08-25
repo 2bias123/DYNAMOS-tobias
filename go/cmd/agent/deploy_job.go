@@ -329,6 +329,9 @@ func addGateway(dataStewardName, jobName string, compositionRequest *pb.Composit
 	if os.Getenv("GATEWAY_PASSTHROUGH") == "true" {
 		container.Env = append(container.Env, v1.EnvVar{Name: "GATEWAY_PASSTHROUGH", Value: "true"})
 	}
+	if os.Getenv("GATEWAY_STORE_ONLY") == "true" {
+		container.Env = append(container.Env, v1.EnvVar{Name: "GATEWAY_STORE_ONLY", Value: "true"})
+	}
 	return container
 }
 

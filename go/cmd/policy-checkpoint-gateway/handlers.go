@@ -25,6 +25,10 @@ type gatewayServer struct {
 	// passthrough skips state persistence only; decisions and the audit
 	// record still run. Off unless GATEWAY_PASSTHROUGH=true at boot.
 	passthrough bool
+	// storeOnly skips identity, decisions, and audit on the state RPCs and
+	// keeps only the storage I/O. Overhead measurement only; mutually
+	// exclusive with passthrough. Off unless GATEWAY_STORE_ONLY=true at boot.
+	storeOnly bool
 	// source and regJobName back the one-time job-registration check; either
 	// being unset skips the check (local runs without etcd).
 	source      agreementSource
@@ -173,9 +177,57 @@ func (g *gatewayServer) auditDecision(op, verdict string, d decision, class, key
 	g.audit(decisionRecord(op, verdict, d, class, key, written, id))
 }
 
+// storeOnlyWrite persists without governance: no identity check, no decision,
+// no audit record. Only the name validation stands between the request and the
+// store. Overhead measurement only.
+func (g *gatewayServer) storeOnlyWrite(req *pb.StateWriteRequest, start time.Time) (*pb.StateDecision, error) {
+	if err := g.store.ValidateNames(req.GetStateClass(), req.GetStateKey()); err != nil {
+		return nil, status.Error(codes.InvalidArgument, err.Error())
+	}
+	written := time.Now().Unix()
+	tPersist := time.Now()
+	if err := g.store.Write(req.GetStateClass(), req.GetStateKey(), req.GetPayload()); err != nil {
+		logger.Sugar().Errorw("State write failed", "err", err)
+		return nil, status.Error(codes.Internal, "state write failed")
+	}
+	logger.Sugar().Infow("Write timing",
+		"decideMicros", int64(0), "auditMicros", int64(0),
+		"persistMicros", time.Since(tPersist).Microseconds(), "totalMicros", time.Since(start).Microseconds())
+	return &pb.StateDecision{Allowed: true, WrittenUnixSeconds: written}, nil
+}
+
+// storeOnlyRead serves the payload without governance; a missing file is the
+// only denial. Overhead measurement only.
+func (g *gatewayServer) storeOnlyRead(req *pb.StateReadRequest, start time.Time) (*pb.StateReadResponse, error) {
+	writtenAt, statErr := g.store.WrittenAt(req.GetStateClass(), req.GetStateKey())
+	if statErr != nil {
+		if errors.Is(statErr, errInvalidName) {
+			return nil, status.Error(codes.InvalidArgument, statErr.Error())
+		}
+		if errors.Is(statErr, os.ErrNotExist) {
+			return &pb.StateReadResponse{Allowed: false, Reason: "not found"}, nil
+		}
+		logger.Sugar().Errorw("State stat failed", "err", statErr)
+		return nil, status.Error(codes.Internal, "state read failed")
+	}
+	tRead := time.Now()
+	payload, err := g.store.Read(req.GetStateClass(), req.GetStateKey())
+	if err != nil {
+		logger.Sugar().Errorw("State read failed", "err", err)
+		return nil, status.Error(codes.Internal, "state read failed")
+	}
+	logger.Sugar().Infow("Read timing",
+		"decideMicros", int64(0), "auditMicros", int64(0),
+		"readMicros", time.Since(tRead).Microseconds(), "totalMicros", time.Since(start).Microseconds())
+	return &pb.StateReadResponse{Allowed: true, Payload: payload, WrittenUnixSeconds: writtenAt.Unix()}, nil
+}
+
 func (g *gatewayServer) RequestStateWrite(ctx context.Context, req *pb.StateWriteRequest) (*pb.StateDecision, error) {
 	g.touchActivity()
 	start := time.Now()
+	if g.storeOnly {
+		return g.storeOnlyWrite(req, start)
+	}
 	if err := g.authorize(req.GetIdentity()); err != nil {
 		return nil, err
 	}
@@ -230,6 +282,9 @@ func (g *gatewayServer) RequestStateWrite(ctx context.Context, req *pb.StateWrit
 func (g *gatewayServer) ValidateStateRead(ctx context.Context, req *pb.StateReadRequest) (*pb.StateReadResponse, error) {
 	g.touchActivity()
 	start := time.Now()
+	if g.storeOnly {
+		return g.storeOnlyRead(req, start)
+	}
 	if err := g.authorize(req.GetIdentity()); err != nil {
 		return nil, err
 	}
