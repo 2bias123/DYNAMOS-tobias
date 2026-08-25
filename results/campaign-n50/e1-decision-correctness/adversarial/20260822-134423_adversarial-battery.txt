@@ -1,0 +1,132 @@
+$ date
+Sat Aug 22 01:44:23 PM CEST 2026
+
+$ git rev-parse HEAD
+fa6d3f7e557228f8b585bba89be4c0172b894889
+
+$ git status --short
+?? results/campaign-n50/
+
+$ kubectl config current-context
+kind-kind
+
+
+=== reset + canonical seed + long chain (cycles=300) so the gateway outlives the battery
+PREFLIGHT OK: B14, B15 applied
+[reset] deleting stale Jobs in steward namespaces
+job.batch "jake-jongejans-30161a3fserver1" deleted
+job.batch "jake-jongejans-30161a3fclientone1" deleted
+job.batch "jake-jongejans-30161a3fclienttwo1" deleted
+job.batch "jake-jongejans-30161a3fclientthree1" deleted
+[reset] clearing /agents/jobs/ etcd keys
+[reset] coordinated rollout of request path
+deployment.apps/api-gateway restarted
+deployment.apps/policy-enforcer restarted
+deployment.apps/orchestrator restarted
+deployment.apps/server restarted
+deployment.apps/clientone restarted
+deployment.apps/clienttwo restarted
+deployment.apps/clientthree restarted
+Waiting for deployment "api-gateway" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "api-gateway" rollout to finish: 1 old replicas are pending termination...
+deployment "api-gateway" successfully rolled out
+deployment "policy-enforcer" successfully rolled out
+Waiting for deployment "orchestrator" rollout to finish: 1 old replicas are pending termination...
+deployment "orchestrator" successfully rolled out
+deployment "server" successfully rolled out
+deployment "clientone" successfully rolled out
+Waiting for deployment "clienttwo" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "clienttwo" rollout to finish: 1 old replicas are pending termination...
+deployment "clienttwo" successfully rolled out
+deployment "clientthree" successfully rolled out
+[reset] settling 45s for AMQP topology to converge
+[reset] OK
+[seed] server: OK
+[seed] clientone: OK
+[seed] clienttwo: OK
+[seed] clientthree: OK
+[seed] verified in etcd for all stewards: allowed=True
+trigger: {"request_id":"faf4d8ad-b1b6-4f2e-8157-5d5529948e94","status":"pending"}
+
+=== wait for the server gateway container
+gateway pod: jake-jongejans-a68706bfserver1-fwzd6
+pod identity: {"steward": "SERVER", "user": "jake.jongejans@student.uva.nl", "request_type": "vflTrainModelRequest", "job_id": "jake-jongejans-a68706bfserver1", "local_job_name": "jake-jongejans-a68706bfserver1"}
+
+=== (a) identity mismatch -> strict PermissionDenied + identity_mismatch audit
+tampered identity: {"steward": "TAMPERED", "user": "jake.jongejans@student.uva.nl", "request_type": "vflTrainModelRequest", "job_id": "jake-jongejans-a68706bfserver1", "local_job_name": "jake-jongejans-a68706bfserver1"}
+ERROR:
+  Code: PermissionDenied
+  Message: identity mismatch
+OK: identity_mismatch audited
+    {"op":"identity_mismatch","reason":"identity does not match gateway env","identity":{"steward":"TAMPERED","user":"jake.jongejans@student.uva.nl","requestType":"vflTrainModelRequest","jobId":"jake-jongejans-a68706bfserver1","localJobName":"jake-jongejans-a68706bfserver1"}}
+OK: no state file from the tampered write
+
+=== (c) 8 concurrent writes to one slot through the single mediator
+/tmp/tmp.VYDW48a5Na/1.out:  "allowed": true,
+/tmp/tmp.VYDW48a5Na/2.out:  "allowed": true,
+/tmp/tmp.VYDW48a5Na/3.out:  "allowed": true,
+/tmp/tmp.VYDW48a5Na/4.out:  "allowed": true,
+/tmp/tmp.VYDW48a5Na/5.out:  "allowed": true,
+/tmp/tmp.VYDW48a5Na/6.out:  "allowed": true,
+/tmp/tmp.VYDW48a5Na/7.out:  "allowed": true,
+/tmp/tmp.VYDW48a5Na/8.out:  "allowed": true,
+-rw-------    1 root     root             3 Aug 22 11:45 /state/data/adversarial/concurrent-slot.bin
+OK: 8/8 ALLOW responses, one intact slot file, 8 audit lines
+
+=== (b) direct write bypassing the gateway; the completeness check must flag it
+state files: 3  audit lines: 233  allow-writes: 2
+MISSING audit line for state file: adversarial/rogue.bin
+COMPLETENESS FAIL: 1 unaudited state file(s)
+OK: bypass write detected (exit=1)
+planted file removed
+
+=== closing invariant: completeness PASS on all four stewards
+[server / jake-jongejans-a68706bfserver1-fwzd6]
+state files: 2  audit lines: 233  allow-writes: 2
+COMPLETENESS PASS: every state file has an ALLOW audit line
+[clientone / jake-jongejans-a68706bfclientone1-rs6gl]
+state files: 1  audit lines: 229  allow-writes: 1
+COMPLETENESS PASS: every state file has an ALLOW audit line
+[clienttwo / jake-jongejans-a68706bfclienttwo1-qsv2m]
+state files: 1  audit lines: 229  allow-writes: 1
+COMPLETENESS PASS: every state file has an ALLOW audit line
+[clientthree / jake-jongejans-a68706bfclientthree1-wbnkx]
+state files: 1  audit lines: 230  allow-writes: 1
+COMPLETENESS PASS: every state file has an ALLOW audit line
+
+=== wait for the long chain to finish
+poll 1: pending
+poll 2: pending
+poll 3: pending
+poll 4: pending
+poll 5: pending
+poll 6: pending
+poll 7: pending
+poll 8: pending
+poll 9: pending
+poll 10: pending
+poll 11: pending
+poll 12: pending
+poll 13: pending
+poll 14: pending
+poll 15: pending
+poll 16: pending
+poll 17: pending
+poll 18: pending
+poll 19: pending
+poll 20: pending
+poll 21: pending
+poll 22: pending
+poll 23: pending
+poll 24: pending
+poll 25: pending
+poll 26: pending
+poll 27: pending
+poll 28: pending
+poll 29: pending
+poll 30: pending
+poll 31: pending
+poll 32: pending
+poll 33: done
+status: done rounds: 300
+first r2: 0.6703517436981201 last r2: 0.48601216077804565

@@ -1,0 +1,38 @@
+$ date
+Sun Aug 23 03:30:45 PM CEST 2026
+
+$ git rev-parse HEAD
+23b5bf29b93993db5d64b70005d0f6cb237f9404
+
+$ git status --short
+?? results/campaign-n50/e3-overhead/
+
+$ kubectl config current-context
+kind-kind
+
+$ uptime
+ 15:30:45 up 1 day,  3:04,  1 user,  load average: 1.03, 1.60, 1.98
+
+$ nproc
+16
+
+
+=== reset + canonical seed, then drop requiresGateway from the chain metadata
+PREFLIGHT OK: B14, B15 applied
+[reset] deleting stale Jobs in steward namespaces
+No resources found
+No resources found
+No resources found
+No resources found
+[reset] clearing /agents/jobs/ etcd keys
+[reset] coordinated rollout of request path
+deployment.apps/api-gateway restarted
+deployment.apps/policy-enforcer restarted
+deployment.apps/orchestrator restarted
+deployment.apps/server restarted
+deployment.apps/clientone restarted
+deployment.apps/clienttwo restarted
+deployment.apps/clientthree restarted
+Waiting for deployment "api-gateway" rollout to finish: 1 old replicas are pending termination...
+error: timed out waiting for the condition
+E3 FAIL: reset.sh failed

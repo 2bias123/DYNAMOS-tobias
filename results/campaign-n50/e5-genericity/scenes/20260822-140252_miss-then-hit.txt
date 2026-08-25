@@ -1,0 +1,155 @@
+$ date
+Sat Aug 22 02:02:52 PM CEST 2026
+
+$ git rev-parse HEAD
+9afc976782415dad03376a1cd546dafdfad45b2b
+
+$ git status --short
+?? results/campaign-n50/e5-genericity/
+
+$ kubectl config current-context
+kind-kind
+
+
+=== reset, then delete the aggregate PVC for a deterministic clean-slate miss
+PREFLIGHT OK: B14, B15 applied
+[reset] deleting stale Jobs in steward namespaces
+job.batch "jake-jongejans-7f51522eserver1" deleted
+job.batch "jake-jongejans-7f51522eclientone1" deleted
+job.batch "jake-jongejans-7f51522eclienttwo1" deleted
+job.batch "jake-jongejans-7f51522eclientthree1" deleted
+[reset] clearing /agents/jobs/ etcd keys
+[reset] coordinated rollout of request path
+deployment.apps/api-gateway restarted
+deployment.apps/policy-enforcer restarted
+deployment.apps/orchestrator restarted
+deployment.apps/server restarted
+deployment.apps/clientone restarted
+deployment.apps/clienttwo restarted
+deployment.apps/clientthree restarted
+Waiting for deployment "api-gateway" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "api-gateway" rollout to finish: 1 old replicas are pending termination...
+deployment "api-gateway" successfully rolled out
+deployment "policy-enforcer" successfully rolled out
+deployment "orchestrator" successfully rolled out
+deployment "server" successfully rolled out
+deployment "clientone" successfully rolled out
+deployment "clienttwo" successfully rolled out
+deployment "clientthree" successfully rolled out
+[reset] settling 45s for AMQP topology to converge
+[reset] OK
+
+=== seed canonical (retentionSeconds=120)
+[seed] aggregateRequest config seeded
+[seed] verified in etcd: retentionSeconds=120
+
+=== run 1: expect miss -> compute -> governed write
+trigger: {"request_id":"c4da424d-1fdf-4732-91dc-8c2f4ee77657","status":"pending"}
+job pod: jorrit-stutterheim-b26fd781clientone1-2cd85
+
+--- gateway audit (run 1) ---
+1.7874002357706983e+09	[34mINFO[0m	/app/cmd/policy-checkpoint-gateway/main.go:142	Serving on 50050
+1.7874002357746644e+09	[34mINFO[0m	/app/cmd/policy-checkpoint-gateway/watch.go:56	Agreement loaded ceb07167eca18e482756f2a54155a8fe68456f4e1043d4da2d712f38bcd53737
+{"op":"read","decision":"DENY","reason":"not found","identity":{"steward":"CLIENTONE","user":"jorrit.stutterheim@cloudnation.nl","requestType":"aggregateRequest","jobId":"jorrit-stutterheim-b26fd781clientone1","localJobName":"jorrit-stutterheim-b26fd781clientone1"},"stateClass":"aggregate_result","stateKey":"latest","agreementHash":"ceb07167eca18e482756f2a54155a8fe68456f4e1043d4da2d712f38bcd53737","policySource":"cached","cacheAgeMs":516,"relationId":"GUID-state-aware-aggregate","directives":{"allowed":true,"retentionSeconds":120,"resumeAllowed":true,"onRevocation":"purge"}}
+{"op":"subscribe","reason":"subscription established","identity":{"steward":"CLIENTONE","user":"jorrit.stutterheim@cloudnation.nl","requestType":"aggregateRequest","jobId":"jorrit-stutterheim-b26fd781clientone1","localJobName":"jorrit-stutterheim-b26fd781clientone1"},"agreementHash":"ceb07167eca18e482756f2a54155a8fe68456f4e1043d4da2d712f38bcd53737","policySource":"cached"}
+{"op":"write","decision":"ALLOW","identity":{"steward":"CLIENTONE","user":"jorrit.stutterheim@cloudnation.nl","requestType":"aggregateRequest","jobId":"jorrit-stutterheim-b26fd781clientone1","localJobName":"jorrit-stutterheim-b26fd781clientone1"},"stateClass":"aggregate_result","stateKey":"latest","writtenUnixSeconds":1787400236,"agreementHash":"ceb07167eca18e482756f2a54155a8fe68456f4e1043d4da2d712f38bcd53737","policySource":"cached","cacheAgeMs":576,"relationId":"GUID-state-aware-aggregate","directives":{"allowed":true,"retentionSeconds":120,"resumeAllowed":true,"onRevocation":"purge"}}
+1.7874002363522532e+09	[34mINFO[0m	/app/cmd/policy-checkpoint-gateway/handlers.go:218	Write timing	{"decideMicros": 1, "auditMicros": 546, "persistMicros": 109, "totalMicros": 662}
+{"op":"shutdown","reason":"ms_exit","identity":{"steward":"CLIENTONE","user":"jorrit.stutterheim@cloudnation.nl","requestType":"aggregateRequest","jobId":"jorrit-stutterheim-b26fd781clientone1","localJobName":"jorrit-stutterheim-b26fd781clientone1"}}
+1.787400236354401e+09	[34mINFO[0m	/app/cmd/policy-checkpoint-gateway/main.go:210	Stopping gateway, draining briefly before stop
+1.7874002383560014e+09	[34mINFO[0m	/app/cmd/policy-checkpoint-gateway/main.go:258	Exiting gateway server
+
+--- MS log (run 1) ---
+2026-08-22 12:03:56,264 - main.py - main.py:155 - INFO - Waiting for sidecar gRPC on localhost:50051 ...
+2026-08-22 12:03:56,265 - main.py - ms_init.py:183 - DEBUG - NewConfiguration aggregate-demo, 
+job_name: jorrit-stutterheim-b26fd781clientone1 
+port: 50053,  
+first_service: 1,  
+last_service: 1
+2026-08-22 12:03:56,274 - main.py - grpc_client.py:72 - DEBUG - Try connecting to: localhost:50051
+2026-08-22 12:03:56,275 - main.py - grpc_server.py:162 - INFO - gRPC server started on localhost:50053
+2026-08-22 12:03:56,279 - main.py - grpc_client.py:78 - INFO - Successfully connected to gRPC server at localhost:50051
+2026-08-22 12:03:56,285 - main.py - gateway_client.py:95 - DEBUG - Try connecting to gateway at: localhost:50050
+2026-08-22 12:03:56,286 - main.py - gateway_client.py:99 - INFO - Successfully connected to gateway at localhost:50050
+2026-08-22 12:03:56,287 - main.py - gateway_lifecycle.py:67 - INFO - Gateway connected, state-event listener started (aggregate-demo)
+2026-08-22 12:03:56,287 - main.py - grpc_server.py:56 - INFO - Received health check request
+2026-08-22 12:03:56,289 - main.py - grpc_server.py:97 - DEBUG - Starting MicroserviceServicer grpc_server.py/SendData: jorrit-stutterheim-b26fd781clientone1
+2026-08-22 12:03:56,290 - main.py - grpc_server.py:109 - DEBUG - msComm type: <class 'microserviceCommunication_pb2.MicroserviceCommunication'>
+2026-08-22 12:03:56,290 - main.py - ms_init.py:108 - DEBUG - 1. scMap: {'SpanID': '21ea325617e5c5c9', 'TraceID': '2b07ca9a59c7d8376082e280f06d7880'}
+2026-08-22 12:03:56,290 - main.py - ms_init.py:109 - DEBUG - 1. state: ['{key=sampled, value=1}']
+2026-08-22 12:03:56,290 - main.py - ms_init.py:120 - DEBUG - 2
+2026-08-22 12:03:56,290 - main.py - main.py:107 - INFO - Received original request type: aggregateRequest
+2026-08-22 12:03:56,290 - main.py - main.py:76 - INFO - Result read requested
+2026-08-22 12:03:56,291 - main.py - gateway_lifecycle.py:60 - INFO - Gateway state event: AGREEMENT_CHANGED reason=subscription established
+2026-08-22 12:03:56,292 - main.py - main.py:82 - INFO - Result read denied (not found); recomputing
+2026-08-22 12:03:56,351 - main.py - main.py:94 - INFO - Result write requested
+2026-08-22 12:03:56,352 - main.py - main.py:97 - INFO - Result write allowed
+2026-08-22 12:03:56,352 - main.py - grpc_client.py:139 - DEBUG - Sending message to <microserviceCommunication_pb2_grpc.MicroserviceStub object at 0x7f8c5a5f5b80>
+2026-08-22 12:03:56,354 - main.py - gateway_client.py:170 - INFO - Requested gateway shutdown: ms_exit
+2026-08-22 12:03:56,354 - main.py - grpc_server.py:181 - INFO - Stopping gRPC server...
+2026-08-22 12:03:56,355 - main.py - grpc_server.py:167 - INFO - Server stopped
+2026-08-22 12:03:56,355 - main.py - grpc_server.py:186 - INFO - gRPC server stopped
+2026-08-22 12:03:56,355 - main.py - grpc_client.py:52 - DEBUG - Closed gRPC channel
+2026-08-22 12:03:58,355 - main.py - main.py:173 - DEBUG - Exiting aggregate-demo
+OK: clean-slate read DENY 'not found'
+    {"op":"read","decision":"DENY","reason":"not found","identity":{"steward":"CLIENTONE","user":"jorrit.stutterheim@cloudnation.nl","requestType":"aggregateRequest","jobId":"jorrit-stutterheim-b26fd781clientone1","localJobName":"jorrit-stutterheim-b26fd781clientone1"},"stateClass":"aggregate_result","stateKey":"latest","agreementHash":"ceb07167eca18e482756f2a54155a8fe68456f4e1043d4da2d712f38bcd53737","policySource":"cached","cacheAgeMs":516,"relationId":"GUID-state-aware-aggregate","directives":{"allowed":true,"retentionSeconds":120,"resumeAllowed":true,"onRevocation":"purge"}}
+OK: governed write ALLOW on the new state class
+    {"op":"write","decision":"ALLOW","identity":{"steward":"CLIENTONE","user":"jorrit.stutterheim@cloudnation.nl","requestType":"aggregateRequest","jobId":"jorrit-stutterheim-b26fd781clientone1","localJobName":"jorrit-stutterheim-b26fd781clientone1"},"stateClass":"aggregate_result","stateKey":"latest","writtenUnixSeconds":1787400236,"agreementHash":"ceb07167eca18e482756f2a54155a8fe68456f4e1043d4da2d712f38bcd53737","policySource":"cached","cacheAgeMs":576,"relationId":"GUID-state-aware-aggregate","directives":{"allowed":true,"retentionSeconds":120,"resumeAllowed":true,"onRevocation":"purge"}}
+OK: write record names the aggregate relation
+    {"op":"write","decision":"ALLOW","identity":{"steward":"CLIENTONE","user":"jorrit.stutterheim@cloudnation.nl","requestType":"aggregateRequest","jobId":"jorrit-stutterheim-b26fd781clientone1","localJobName":"jorrit-stutterheim-b26fd781clientone1"},"stateClass":"aggregate_result","stateKey":"latest","writtenUnixSeconds":1787400236,"agreementHash":"ceb07167eca18e482756f2a54155a8fe68456f4e1043d4da2d712f38bcd53737","policySource":"cached","cacheAgeMs":576,"relationId":"GUID-state-aware-aggregate","directives":{"allowed":true,"retentionSeconds":120,"resumeAllowed":true,"onRevocation":"purge"}}
+OK: MS computed and persisted
+    2026-08-22 12:03:56,352 - main.py - main.py:97 - INFO - Result write allowed
+OK: absent as expected: no reuse on a clean slate
+run 1 write: writtenUnixSeconds=1787400236
+
+=== run 2: repeat request, no reset (inside the retention bound); clear this user's Jobs to break the pinned-jobName wedge
+job.batch "jorrit-stutterheim-b26fd781clientone1" deleted
+trigger: {"request_id":"65e2bbe7-9b12-4c6d-9acf-46d1e1fb2b9a","status":"pending"}
+job pod: jorrit-stutterheim-b26fd781clientone2-9qsjx
+
+--- gateway audit (run 2) ---
+1.7874002476610134e+09	[34mINFO[0m	/app/cmd/policy-checkpoint-gateway/main.go:142	Serving on 50050
+1.7874002476660438e+09	[34mINFO[0m	/app/cmd/policy-checkpoint-gateway/watch.go:56	Agreement loaded ceb07167eca18e482756f2a54155a8fe68456f4e1043d4da2d712f38bcd53737
+{"op":"subscribe","reason":"subscription established","identity":{"steward":"CLIENTONE","user":"jorrit.stutterheim@cloudnation.nl","requestType":"aggregateRequest","jobId":"jorrit-stutterheim-b26fd781clientone1","localJobName":"jorrit-stutterheim-b26fd781clientone1"},"agreementHash":"ceb07167eca18e482756f2a54155a8fe68456f4e1043d4da2d712f38bcd53737","policySource":"cached"}
+{"op":"read","decision":"ALLOW","identity":{"steward":"CLIENTONE","user":"jorrit.stutterheim@cloudnation.nl","requestType":"aggregateRequest","jobId":"jorrit-stutterheim-b26fd781clientone1","localJobName":"jorrit-stutterheim-b26fd781clientone1"},"stateClass":"aggregate_result","stateKey":"latest","writtenUnixSeconds":1787400236,"agreementHash":"ceb07167eca18e482756f2a54155a8fe68456f4e1043d4da2d712f38bcd53737","policySource":"cached","cacheAgeMs":415,"relationId":"GUID-state-aware-aggregate","directives":{"allowed":true,"retentionSeconds":120,"resumeAllowed":true,"onRevocation":"purge"}}
+1.7874002480903153e+09	[34mINFO[0m	/app/cmd/policy-checkpoint-gateway/handlers.go:285	Read timing	{"decideMicros": 2, "auditMicros": 8993, "readMicros": 72, "totalMicros": 11033}
+{"op":"shutdown","reason":"ms_exit","identity":{"steward":"CLIENTONE","user":"jorrit.stutterheim@cloudnation.nl","requestType":"aggregateRequest","jobId":"jorrit-stutterheim-b26fd781clientone1","localJobName":"jorrit-stutterheim-b26fd781clientone1"}}
+1.7874002480932496e+09	[34mINFO[0m	/app/cmd/policy-checkpoint-gateway/main.go:210	Stopping gateway, draining briefly before stop
+1.7874002500943646e+09	[34mINFO[0m	/app/cmd/policy-checkpoint-gateway/main.go:258	Exiting gateway server
+
+--- MS log (run 2) ---
+2026-08-22 12:04:08,036 - main.py - main.py:155 - INFO - Waiting for sidecar gRPC on localhost:50051 ...
+2026-08-22 12:04:08,038 - main.py - ms_init.py:183 - DEBUG - NewConfiguration aggregate-demo, 
+job_name: jorrit-stutterheim-b26fd781clientone1 
+port: 50053,  
+first_service: 1,  
+last_service: 1
+2026-08-22 12:04:08,048 - main.py - grpc_client.py:72 - DEBUG - Try connecting to: localhost:50051
+2026-08-22 12:04:08,048 - main.py - grpc_server.py:162 - INFO - gRPC server started on localhost:50053
+2026-08-22 12:04:08,052 - main.py - grpc_client.py:78 - INFO - Successfully connected to gRPC server at localhost:50051
+2026-08-22 12:04:08,064 - main.py - gateway_client.py:95 - DEBUG - Try connecting to gateway at: localhost:50050
+2026-08-22 12:04:08,066 - main.py - grpc_server.py:56 - INFO - Received health check request
+2026-08-22 12:04:08,067 - main.py - gateway_client.py:99 - INFO - Successfully connected to gateway at localhost:50050
+2026-08-22 12:04:08,067 - main.py - gateway_lifecycle.py:67 - INFO - Gateway connected, state-event listener started (aggregate-demo)
+2026-08-22 12:04:08,068 - main.py - grpc_server.py:97 - DEBUG - Starting MicroserviceServicer grpc_server.py/SendData: jorrit-stutterheim-b26fd781clientone1
+2026-08-22 12:04:08,077 - main.py - grpc_server.py:109 - DEBUG - msComm type: <class 'microserviceCommunication_pb2.MicroserviceCommunication'>
+2026-08-22 12:04:08,078 - main.py - ms_init.py:108 - DEBUG - 1. scMap: {'SpanID': '7eeb3cdf3b46fb59', 'TraceID': '033863fbbe0b79b25a44b385e611db77'}
+2026-08-22 12:04:08,078 - main.py - ms_init.py:109 - DEBUG - 1. state: ['{key=sampled, value=1}']
+2026-08-22 12:04:08,078 - main.py - ms_init.py:120 - DEBUG - 2
+2026-08-22 12:04:08,078 - main.py - main.py:107 - INFO - Received original request type: aggregateRequest
+2026-08-22 12:04:08,078 - main.py - main.py:76 - INFO - Result read requested
+2026-08-22 12:04:08,081 - main.py - gateway_lifecycle.py:60 - INFO - Gateway state event: AGREEMENT_CHANGED reason=subscription established
+2026-08-22 12:04:08,090 - main.py - main.py:84 - INFO - Reusing persisted result: written_unix_seconds=1787400236
+2026-08-22 12:04:08,091 - main.py - grpc_client.py:139 - DEBUG - Sending message to <microserviceCommunication_pb2_grpc.MicroserviceStub object at 0x7f33fd3797f0>
+2026-08-22 12:04:08,093 - main.py - gateway_client.py:170 - INFO - Requested gateway shutdown: ms_exit
+2026-08-22 12:04:08,094 - main.py - grpc_server.py:181 - INFO - Stopping gRPC server...
+2026-08-22 12:04:08,095 - main.py - grpc_server.py:167 - INFO - Server stopped
+2026-08-22 12:04:08,095 - main.py - grpc_server.py:186 - INFO - gRPC server stopped
+2026-08-22 12:04:08,095 - main.py - grpc_client.py:52 - DEBUG - Closed gRPC channel
+2026-08-22 12:04:10,095 - main.py - main.py:173 - DEBUG - Exiting aggregate-demo
+OK: gateway-mediated read ALLOW on the new state class
+    {"op":"read","decision":"ALLOW","identity":{"steward":"CLIENTONE","user":"jorrit.stutterheim@cloudnation.nl","requestType":"aggregateRequest","jobId":"jorrit-stutterheim-b26fd781clientone1","localJobName":"jorrit-stutterheim-b26fd781clientone1"},"stateClass":"aggregate_result","stateKey":"latest","writtenUnixSeconds":1787400236,"agreementHash":"ceb07167eca18e482756f2a54155a8fe68456f4e1043d4da2d712f38bcd53737","policySource":"cached","cacheAgeMs":415,"relationId":"GUID-state-aware-aggregate","directives":{"allowed":true,"retentionSeconds":120,"resumeAllowed":true,"onRevocation":"purge"}}
+OK: read returned run 1's blob (writtenUnixSeconds=1787400236), across pods and PVC remounts
+OK: MS reused, no recompute
+    2026-08-22 12:04:08,090 - main.py - main.py:84 - INFO - Reusing persisted result: written_unix_seconds=1787400236
+OK: absent as expected: no fresh write on the hit
+write-to-hit window: 28s (bound 120s)

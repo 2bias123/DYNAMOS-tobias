@@ -1,0 +1,3 @@
+`e7-pvc-roundtrip/config-c-enforced/20260824-161753_overhead-run.txt | 20260824-161753 | scripts/capture_e3_overhead.sh c 50 | 4a26831 | E3 config c (enforced): per-round latency + r2 + full logs, cycles=50`
+`e7-pvc-roundtrip/config-d-roundtrip/20260824-162030_overhead-run.txt | 20260824-162030 | scripts/capture_e3_overhead.sh d 50 | 9d7059d | E7 config d (roundtrip): per-round latency + r2 + full logs, cycles=50`
+`e7-pvc-roundtrip/config-c-enforced/20260824-162316_overhead-run.txt | 20260824-162316 | scripts/capture_e3_overhead.sh c 50 | 2dd80c1 | E3 config c (enforced): per-round latency + r2 + full logs, cycles=50`

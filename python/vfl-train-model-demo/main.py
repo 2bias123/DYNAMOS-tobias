@@ -46,6 +46,9 @@ wait_for_setup_condition = threading.Condition()
 
 ms_config = None
 vfl_server = None
+# Server dataset loaded once at boot; the roundtrip variant rebuilds the
+# aggregator from it every round without re-reading the CSV.
+server_data = None
 gateway = None
 purge_pending = threading.Event()
 
@@ -67,6 +70,9 @@ DEFAULT_NOF_CLIENTS = 3  # TODO: make it dynamic
 # Gateway state key for the pre-shrink stash; separate from the per-round
 # "latest" slot so a backtrack stash never clobbers the resume checkpoint.
 PRESHRINK_STATE_KEY = "preshrink"
+# Overhead-experiment variant: rehydrate the aggregator from the gateway every
+# round and drop it after the checkpoint write, instead of keeping it in memory.
+STATE_ROUNDTRIP = os.getenv("STATE_ROUNDTRIP") == "true"
 
 # Just for testing, mark so I can see if it works
 def fp(s):
@@ -326,12 +332,35 @@ def on_gateway_purge(event):
     logger.warning("Policy purge: cleared in-memory server model")
 
 
+# Order-stable digest over exactly what the checkpoint carries; the write-side
+# and restore-side values must match when a rehydration is faithful.
+def state_fingerprint():
+    h = hashlib.sha256()
+    model_state = vfl_server.model.state_dict()
+    for key in sorted(model_state):
+        h.update(key.encode())
+        h.update(model_state[key].detach().cpu().numpy().tobytes())
+    optimizer_state = vfl_server.optimizer.state_dict()["state"]
+    for idx in sorted(optimizer_state):
+        entry = optimizer_state[idx]
+        for key in sorted(entry):
+            h.update(f"{idx}/{key}".encode())
+            value = entry[key]
+            if torch.is_tensor(value):
+                h.update(value.detach().cpu().numpy().tobytes())
+            else:
+                h.update(repr(value).encode())
+    h.update(f"{vfl_server.round_index}/{vfl_server.nof_clients}".encode())
+    return h.hexdigest()[:16]
+
+
 # Persist the aggregator state through the gateway after a round. A denied or
 # failed write never disturbs the round: training continues, persistence stops.
 def write_server_checkpoint():
     if gateway is None or vfl_server is None:
         return
     try:
+        t_serialize = time.perf_counter()
         buffer = io.BytesIO()
         torch.save({
             "model_state_dict": vfl_server.model.state_dict(),
@@ -339,14 +368,72 @@ def write_server_checkpoint():
             "round_index": vfl_server.round_index,
             "nof_clients": vfl_server.nof_clients,
         }, buffer)
+        serialize_ms = (time.perf_counter() - t_serialize) * 1000
+        payload = buffer.getvalue()
         logger.info(f"Checkpoint write requested: round_index={vfl_server.round_index}")
-        decision = gateway.request_state_write("vfl_server_model", "latest", buffer.getvalue())
+        t_rpc = time.perf_counter()
+        decision = gateway.request_state_write("vfl_server_model", "latest", payload)
+        write_rpc_ms = (time.perf_counter() - t_rpc) * 1000
         if decision.allowed:
             logger.info(f"Checkpoint write allowed: round_index={vfl_server.round_index}")
         else:
             logger.warning(f"Checkpoint write denied ({decision.reason}); continuing without persistence: round_index={vfl_server.round_index}")
+        logger.info(
+            f"Checkpoint write timing: round_index={vfl_server.round_index} "
+            f"serialize_ms={serialize_ms:.3f} write_rpc_ms={write_rpc_ms:.3f} bytes={len(payload)} "
+            f"sha256={hashlib.sha256(payload).hexdigest()[:16]} state_fp={state_fingerprint()}"
+        )
     except Exception as e:
         logger.warning(f"Checkpoint write failed ({e}); continuing without persistence")
+
+
+# The persisted nof_clients must size the aggregator before the state dicts
+# are loaded, or load_state_dict rejects the shapes.
+def apply_checkpoint_state(state):
+    nof_clients = state["nof_clients"]
+    if nof_clients != vfl_server.nof_clients:
+        vfl_server.nof_clients = nof_clients
+        vfl_server.model = ServerModel(vfl_server.intermediate_neurons * nof_clients)
+        vfl_server.optimizer = optim.Adam(vfl_server.model.parameters(), lr=DEFAULT_LEARNING_RATE, weight_decay=1e-4)
+    vfl_server.model.load_state_dict(state["model_state_dict"])
+    vfl_server.optimizer.load_state_dict(state["optimizer_state_dict"])
+    vfl_server.round_index = state["round_index"]
+
+
+# Per-round rehydrate for the roundtrip variant: rebuild the aggregator from
+# the governed checkpoint, or leave it None so the fresh-init path runs.
+def load_server_from_checkpoint():
+    global vfl_server
+    vfl_server = None
+    if gateway is None:
+        return
+    t_read = time.perf_counter()
+    try:
+        resp = gateway.validate_state_read("vfl_server_model", "latest")
+    except Exception as e:
+        logger.warning(f"Roundtrip read failed ({e}); reinitializing")
+        return
+    read_rpc_ms = (time.perf_counter() - t_read) * 1000
+    if not resp.allowed:
+        logger.info(f"Roundtrip read denied ({resp.reason}); reinitializing")
+        return
+    t_construct = time.perf_counter()
+    vfl_server = VFLServer(server_data)
+    construct_ms = (time.perf_counter() - t_construct) * 1000
+    t_deserialize = time.perf_counter()
+    try:
+        state = torch.load(io.BytesIO(resp.payload))
+        apply_checkpoint_state(state)
+    except Exception as e:
+        logger.warning(f"Roundtrip checkpoint could not be applied ({e}); reinitializing")
+        vfl_server = VFLServer(server_data)
+        return
+    deserialize_ms = (time.perf_counter() - t_deserialize) * 1000
+    logger.info(
+        f"Roundtrip restore timing: round_index={vfl_server.round_index} "
+        f"read_rpc_ms={read_rpc_ms:.3f} construct_ms={construct_ms:.3f} deserialize_ms={deserialize_ms:.3f} "
+        f"bytes={len(resp.payload)} sha256={hashlib.sha256(resp.payload).hexdigest()[:16]} state_fp={state_fingerprint()}"
+    )
 
 
 # One-shot resume read at startup. Anything but an ALLOW with an applicable
@@ -366,15 +453,8 @@ def rehydrate_server():
         return
     try:
         state = torch.load(io.BytesIO(resp.payload))
-        nof_clients = state["nof_clients"]
-        if nof_clients != vfl_server.nof_clients:
-            vfl_server.nof_clients = nof_clients
-            vfl_server.model = ServerModel(vfl_server.intermediate_neurons * nof_clients)
-            vfl_server.optimizer = optim.Adam(vfl_server.model.parameters(), lr=DEFAULT_LEARNING_RATE, weight_decay=1e-4)
-        vfl_server.model.load_state_dict(state["model_state_dict"])
-        vfl_server.optimizer.load_state_dict(state["optimizer_state_dict"])
-        vfl_server.round_index = state["round_index"]
-        logger.info(f"Resumed server model from checkpoint: round_index={vfl_server.round_index} nof_clients={nof_clients} written_unix_seconds={resp.written_unix_seconds}")
+        apply_checkpoint_state(state)
+        logger.info(f"Resumed server model from checkpoint: round_index={vfl_server.round_index} nof_clients={vfl_server.nof_clients} written_unix_seconds={resp.written_unix_seconds}")
     except Exception as e:
         logger.warning(f"Checkpoint could not be applied ({e}); starting fresh")
         vfl_server = VFLServer(load_data())
@@ -423,18 +503,23 @@ def handleAggregateRequest(msComm):
     except Exception as e:
         logger.warning(f"[SERVER] Could not log DP verification stats: {e}")
 
+    if STATE_ROUNDTRIP:
+        load_server_from_checkpoint()
+
     if vfl_server is None:
         if purge_pending.is_set():
             purge_pending.clear()
             logger.warning("Server model was purged by policy; reinitializing from scratch")
         else:
             logger.warning("Server model missing; reinitializing")
-        vfl_server = VFLServer(load_data())
+        vfl_server = VFLServer(server_data if server_data is not None else load_data())
 
     try:
         data = vfl_server.aggregate_fit(clients_embeddings, backtrack)
         vfl_server.round_index += 1
         write_server_checkpoint()
+        if STATE_ROUNDTRIP:
+            vfl_server = None
     except Exception as e:
         if purge_pending.is_set():
             purge_pending.clear()
@@ -498,6 +583,7 @@ def main():
     global config
     global ms_config
     global vfl_server
+    global server_data
     global gateway
 
     # Wait for sidecar to be up
@@ -509,9 +595,11 @@ def main():
     ds = os.getenv("DATA_STEWARD_NAME", "").lower()
 
     if ds == "server":
-        data = load_data()
-        vfl_server = VFLServer(data)
+        server_data = load_data()
+        vfl_server = VFLServer(server_data)
         logger.info("Initialized VFLServer (server mode)")
+        if STATE_ROUNDTRIP:
+            logger.info("State roundtrip mode enabled: rehydrating server state from the gateway every round")
     else:
         vfl_server = None
         logger.info(f"Not server ({ds}); running in relay mode (no dataset load)")
@@ -521,7 +609,7 @@ def main():
 
     gateway = connect_gateway(config.service_name, on_gateway_purge)
 
-    if ds == "server":
+    if ds == "server" and not STATE_ROUNDTRIP:
         rehydrate_server()
 
     # Signal the message handler that all connections have been created

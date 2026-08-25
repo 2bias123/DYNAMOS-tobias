@@ -1,0 +1,4 @@
+`e3-overhead/config-a-no-gateway/20260823-153045_overhead-run.txt | 20260823-153045 | scripts/capture_e3_overhead.sh a 50 | 23b5bf2 | E3 config a (no-gateway): per-round latency + r2 + full logs, cycles=50; FAILED (exit=1)`
+`e3-overhead/config-a-no-gateway/20260823-192638_overhead-run.txt | 20260823-192638 | scripts/capture_e3_overhead.sh a 50 | 33d2a85 | E3 config a (no-gateway): per-round latency + r2 + full logs, cycles=50`
+`e3-overhead/config-b-passthrough/20260823-195305_overhead-run.txt | 20260823-195305 | scripts/capture_e3_overhead.sh b 50 | 876246b | E3 config b (passthrough): per-round latency + r2 + full logs, cycles=50`
+`e3-overhead/config-c-enforced/20260823-195636_overhead-run.txt | 20260823-195636 | scripts/capture_e3_overhead.sh c 50 | a6943c9 | E3 config c (enforced): per-round latency + r2 + full logs, cycles=50`

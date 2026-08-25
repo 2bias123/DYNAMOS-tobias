@@ -1,0 +1,87 @@
+$ date
+Sat Aug 22 08:27:54 PM CEST 2026
+
+$ git rev-parse HEAD
+ff23c84edce3c42142cd524e01a2defa28d3cb1c
+
+$ git status --short
+?? results/campaign-n50/e2-policy-latency/
+
+$ kubectl config current-context
+kind-kind
+
+
+=== boot a governed chain (cycles=1200) with allowed=true
+PREFLIGHT OK: B14, B15 applied
+[reset] deleting stale Jobs in steward namespaces
+No resources found
+No resources found
+No resources found
+No resources found
+[reset] clearing /agents/jobs/ etcd keys
+[reset] coordinated rollout of request path
+deployment.apps/api-gateway restarted
+deployment.apps/policy-enforcer restarted
+deployment.apps/orchestrator restarted
+deployment.apps/server restarted
+deployment.apps/clientone restarted
+deployment.apps/clienttwo restarted
+deployment.apps/clientthree restarted
+Waiting for deployment "api-gateway" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "api-gateway" rollout to finish: 1 old replicas are pending termination...
+deployment "api-gateway" successfully rolled out
+Waiting for deployment "policy-enforcer" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "policy-enforcer" rollout to finish: 1 old replicas are pending termination...
+deployment "policy-enforcer" successfully rolled out
+Waiting for deployment "orchestrator" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "orchestrator" rollout to finish: 1 old replicas are pending termination...
+deployment "orchestrator" successfully rolled out
+Waiting for deployment "server" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "server" rollout to finish: 1 old replicas are pending termination...
+deployment "server" successfully rolled out
+Waiting for deployment "clientone" rollout to finish: 1 old replicas are pending termination...
+deployment "clientone" successfully rolled out
+Waiting for deployment "clienttwo" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "clienttwo" rollout to finish: 1 old replicas are pending termination...
+deployment "clienttwo" successfully rolled out
+Waiting for deployment "clientthree" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "clientthree" rollout to finish: 1 old replicas are pending termination...
+deployment "clientthree" successfully rolled out
+[reset] settling 45s for AMQP topology to converge
+[reset] OK
+[seed] state_aware_server.json: OK
+[seed] state_aware_clientone.json: OK
+[seed] state_aware_clienttwo.json: OK
+[seed] state_aware_clientthree.json: OK
+[seed] verifying stateDirectives present in etcd
+[seed] server: stateDirectives in etcd
+[seed] clientone: stateDirectives in etcd
+[seed] clienttwo: stateDirectives in etcd
+[seed] clientthree: stateDirectives in etcd
+[seed] OK
+trigger: {"request_id":"f76bb7af-118e-4971-8d06-44aa3a966b4d","status":"pending"}
+server pod: jake-jongejans-ef7bfef8server1-pz54b
+
+=== start the in-pod aggregator writer (state_class=e2_probe)
+writer steady: ALLOW flowing
+
+trial,t_reenable,t_allow_confirmed,t_flip,t_deny,interval_ms,observe_ms,enforce_ms
+1,1787423346.359886618,1787423346.362758,1787423347.511374445,1787423347.515136,3.8,-5.3,9.1
+  gateway DENY record: 2026-08-22T18:29:07.514845668Z {"op":"write","decision":"DENY","reason":"allowed = false","identity":{"steward":"SERVER","user":"jake.jongejans@student.uva.nl","requestType":"vflTrainModelRequest","jobId":"jake-jongejans-ef7bfef8server1","localJobName":"jake-jongejans-ef7bfef8server1"},"stateClass":"e2_probe","stateKey":"probe","agreementHash":"1fe2344b3ac63c17fa234798a498775bf2f5fd0e90a15fa80d924a2abb7c46f9","policySource":"cached","cacheAgeMs":3,"relationId":"GUID-state-aware","directives":{"allowed":false,"retentionSeconds":900,"resumeAllowed":true,"onRevocation":"purge"}}
+2,1787423347.813607629,1787423347.857672,1787423349.051999888,1787423349.056507,4.5,-6.4,10.9
+  gateway DENY record: 2026-08-22T18:29:09.056180511Z {"op":"write","decision":"DENY","reason":"allowed = false","identity":{"steward":"SERVER","user":"jake.jongejans@student.uva.nl","requestType":"vflTrainModelRequest","jobId":"jake-jongejans-ef7bfef8server1","localJobName":"jake-jongejans-ef7bfef8server1"},"stateClass":"e2_probe","stateKey":"probe","agreementHash":"1fe2344b3ac63c17fa234798a498775bf2f5fd0e90a15fa80d924a2abb7c46f9","policySource":"cached","cacheAgeMs":5,"relationId":"GUID-state-aware","directives":{"allowed":false,"retentionSeconds":900,"resumeAllowed":true,"onRevocation":"purge"}}
+3,1787423349.388290778,1787423349.441561,1787423350.612844611,1787423350.614820,2.0,-6.2,8.2
+  gateway DENY record: 2026-08-22T18:29:10.614051788Z {"op":"write","decision":"DENY","reason":"allowed = false","identity":{"steward":"SERVER","user":"jake.jongejans@student.uva.nl","requestType":"vflTrainModelRequest","jobId":"jake-jongejans-ef7bfef8server1","localJobName":"jake-jongejans-ef7bfef8server1"},"stateClass":"e2_probe","stateKey":"probe","agreementHash":"1fe2344b3ac63c17fa234798a498775bf2f5fd0e90a15fa80d924a2abb7c46f9","policySource":"cached","cacheAgeMs":0,"relationId":"GUID-state-aware","directives":{"allowed":false,"retentionSeconds":900,"resumeAllowed":true,"onRevocation":"purge"}}
+4,1787423350.945527690,1787423351.016803,1787423352.244902013,1787423352.245012,0.1,-8.4,8.5
+  gateway DENY record: 2026-08-22T18:29:12.244431124Z {"op":"write","decision":"DENY","reason":"allowed = false","identity":{"steward":"SERVER","user":"jake.jongejans@student.uva.nl","requestType":"vflTrainModelRequest","jobId":"jake-jongejans-ef7bfef8server1","localJobName":"jake-jongejans-ef7bfef8server1"},"stateClass":"e2_probe","stateKey":"probe","agreementHash":"1fe2344b3ac63c17fa234798a498775bf2f5fd0e90a15fa80d924a2abb7c46f9","policySource":"cached","cacheAgeMs":2,"relationId":"GUID-state-aware","directives":{"allowed":false,"retentionSeconds":900,"resumeAllowed":true,"onRevocation":"purge"}}
+5,1787423352.619216289,1787423352.684920,1787423353.879082569,1787423353.887174,8.1,-5.0,13.1
+  gateway DENY record: 2026-08-22T18:29:13.886840433Z {"op":"write","decision":"DENY","reason":"allowed = false","identity":{"steward":"SERVER","user":"jake.jongejans@student.uva.nl","requestType":"vflTrainModelRequest","jobId":"jake-jongejans-ef7bfef8server1","localJobName":"jake-jongejans-ef7bfef8server1"},"stateClass":"e2_probe","stateKey":"probe","agreementHash":"1fe2344b3ac63c17fa234798a498775bf2f5fd0e90a15fa80d924a2abb7c46f9","policySource":"cached","cacheAgeMs":4,"relationId":"GUID-state-aware","directives":{"allowed":false,"retentionSeconds":900,"resumeAllowed":true,"onRevocation":"purge"}}
+6,1787423354.228071219,1787423354.284847,1787423355.551487480,1787423355.552644,1.2,-6.0,7.1
+  gateway DENY record: 2026-08-22T18:29:15.552289029Z {"op":"write","decision":"DENY","reason":"allowed = false","identity":{"steward":"SERVER","user":"jake.jongejans@student.uva.nl","requestType":"vflTrainModelRequest","jobId":"jake-jongejans-ef7bfef8server1","localJobName":"jake-jongejans-ef7bfef8server1"},"stateClass":"e2_probe","stateKey":"probe","agreementHash":"1fe2344b3ac63c17fa234798a498775bf2f5fd0e90a15fa80d924a2abb7c46f9","policySource":"cached","cacheAgeMs":0,"relationId":"GUID-state-aware","directives":{"allowed":false,"retentionSeconds":900,"resumeAllowed":true,"onRevocation":"purge"}}
+7,1787423355.931088317,1787423355.983485,1787423357.181797690,1787423357.186450,4.7,-5.9,10.5
+  gateway DENY record: 2026-08-22T18:29:17.185980210Z {"op":"write","decision":"DENY","reason":"allowed = false","identity":{"steward":"SERVER","user":"jake.jongejans@student.uva.nl","requestType":"vflTrainModelRequest","jobId":"jake-jongejans-ef7bfef8server1","localJobName":"jake-jongejans-ef7bfef8server1"},"stateClass":"e2_probe","stateKey":"probe","agreementHash":"1fe2344b3ac63c17fa234798a498775bf2f5fd0e90a15fa80d924a2abb7c46f9","policySource":"cached","cacheAgeMs":1,"relationId":"GUID-state-aware","directives":{"allowed":false,"retentionSeconds":900,"resumeAllowed":true,"onRevocation":"purge"}}
+8,1787423357.545639138,1787423357.603743,1787423358.860382659,1787423358.865426,5.0,-6.0,11.1
+  gateway DENY record: 2026-08-22T18:29:18.864990783Z {"op":"write","decision":"DENY","reason":"allowed = false","identity":{"steward":"SERVER","user":"jake.jongejans@student.uva.nl","requestType":"vflTrainModelRequest","jobId":"jake-jongejans-ef7bfef8server1","localJobName":"jake-jongejans-ef7bfef8server1"},"stateClass":"e2_probe","stateKey":"probe","agreementHash":"1fe2344b3ac63c17fa234798a498775bf2f5fd0e90a15fa80d924a2abb7c46f9","policySource":"cached","cacheAgeMs":6,"relationId":"GUID-state-aware","directives":{"allowed":false,"retentionSeconds":900,"resumeAllowed":true,"onRevocation":"purge"}}
+9,1787423359.342973877,1787423359.394047,1787423360.713811366,1787423360.719204,5.4,-6.1,11.5
+  gateway DENY record: 2026-08-22T18:29:20.718941153Z {"op":"write","decision":"DENY","reason":"allowed = false","identity":{"steward":"SERVER","user":"jake.jongejans@student.uva.nl","requestType":"vflTrainModelRequest","jobId":"jake-jongejans-ef7bfef8server1","localJobName":"jake-jongejans-ef7bfef8server1"},"stateClass":"e2_probe","stateKey":"probe","agreementHash":"1fe2344b3ac63c17fa234798a498775bf2f5fd0e90a15fa80d924a2abb7c46f9","policySource":"cached","cacheAgeMs":4,"relationId":"GUID-state-aware","directives":{"allowed":false,"retentionSeconds":900,"resumeAllowed":true,"onRevocation":"purge"}}
+E2 FAIL: no confirmed ALLOW after re-enable (trial 10)

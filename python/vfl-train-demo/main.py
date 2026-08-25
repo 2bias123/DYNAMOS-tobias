@@ -4,6 +4,7 @@ import sys
 import os
 import io
 import json
+import hashlib
 import torch
 import time
 import base64
@@ -48,8 +49,14 @@ purge_pending = threading.Event()
 ANON_DIR = os.getenv("ANON_DIR", "/shared")
 DATA_CACHE = {}
 
-DEFAULT_LEARNING_RATE = 0.1 
+DEFAULT_LEARNING_RATE = 0.1
 DEFAULT_WEIGHT_DECAY = 1e-4
+# Overhead-experiment variant: rehydrate the client model from the gateway at
+# every training round and drop it after the round's checkpoint write. The
+# in-memory window spans the train/gradient RPC pair: the autograd graph on the
+# sent embeddings cannot be checkpointed, and recomputing the forward pass
+# would draw a fresh dropout mask.
+STATE_ROUNDTRIP_CLIENT = os.getenv("STATE_ROUNDTRIP_CLIENT") == "true"
 
 # --- END DYNAMOS Interface code At the TOP ----------------------
 
@@ -253,55 +260,104 @@ def on_gateway_purge(event):
     logger.warning("Policy purge: cleared in-memory client model")
 
 
+# Order-stable digest over exactly what the checkpoint carries; the write-side
+# and restore-side values must match when a rehydration is faithful. On the
+# restore side the optimiser state may still be pending its lazy creation.
+def state_fingerprint():
+    h = hashlib.sha256()
+    model_state = vfl_client.model.state_dict()
+    for key in sorted(model_state):
+        h.update(key.encode())
+        h.update(model_state[key].detach().cpu().numpy().tobytes())
+    if vfl_client.optimiser is not None:
+        optimiser_state = vfl_client.optimiser.state_dict()["state"]
+    elif vfl_client._pending_optimiser_state is not None:
+        optimiser_state = vfl_client._pending_optimiser_state["state"]
+    else:
+        optimiser_state = {}
+    for idx in sorted(optimiser_state):
+        entry = optimiser_state[idx]
+        for key in sorted(entry):
+            h.update(f"{idx}/{key}".encode())
+            value = entry[key]
+            if torch.is_tensor(value):
+                h.update(value.detach().cpu().numpy().tobytes())
+            else:
+                h.update(repr(value).encode())
+    h.update(str(vfl_client.round_index).encode())
+    return h.hexdigest()[:16]
+
+
 # Persist the client state through the gateway after a round. A denied or
 # failed write never disturbs the round: training continues, persistence stops.
 def write_client_checkpoint():
     if gateway is None or vfl_client is None:
         return
     try:
+        t_serialize = time.perf_counter()
         buffer = io.BytesIO()
         torch.save({
             "model_state_dict": vfl_client.model.state_dict(),
             "optimizer_state_dict": vfl_client.optimiser.state_dict() if vfl_client.optimiser is not None else None,
             "round_index": vfl_client.round_index,
         }, buffer)
+        serialize_ms = (time.perf_counter() - t_serialize) * 1000
+        payload = buffer.getvalue()
         logger.info(f"Checkpoint write requested: round_index={vfl_client.round_index}")
-        decision = gateway.request_state_write("vfl_client_model", "latest", buffer.getvalue())
+        t_rpc = time.perf_counter()
+        decision = gateway.request_state_write("vfl_client_model", "latest", payload)
+        write_rpc_ms = (time.perf_counter() - t_rpc) * 1000
         if decision.allowed:
             logger.info(f"Checkpoint write allowed: round_index={vfl_client.round_index}")
         else:
             logger.warning(f"Checkpoint write denied ({decision.reason}); continuing without persistence: round_index={vfl_client.round_index}")
+        logger.info(
+            f"Checkpoint write timing: round_index={vfl_client.round_index} "
+            f"serialize_ms={serialize_ms:.3f} write_rpc_ms={write_rpc_ms:.3f} bytes={len(payload)} "
+            f"sha256={hashlib.sha256(payload).hexdigest()[:16]} state_fp={state_fingerprint()}"
+        )
     except Exception as e:
         logger.warning(f"Checkpoint write failed ({e}); continuing without persistence")
 
 
 # Resume read at first model construction; the model shape depends on the
 # incoming dataframe, so this cannot run at process startup. Anything but an
-# ALLOW with a matching feature width means a fresh model.
+# ALLOW with a matching feature width means a fresh model. The metrics dict is
+# None whenever the model starts fresh.
 def read_client_checkpoint(expected_features):
     if gateway is None:
-        return None, None, 0
+        return None, None, 0, None
+    t_read = time.perf_counter()
     try:
         resp = gateway.validate_state_read("vfl_client_model", "latest")
     except Exception as e:
         logger.warning(f"Resume read failed ({e}); starting fresh")
-        return None, None, 0
+        return None, None, 0, None
+    read_rpc_ms = (time.perf_counter() - t_read) * 1000
     if not resp.allowed:
         logger.info(f"Resume read denied ({resp.reason}); starting fresh")
-        return None, None, 0
+        return None, None, 0, None
     try:
+        t_deserialize = time.perf_counter()
         state = torch.load(io.BytesIO(resp.payload))
         model_state = state["model_state_dict"]
         persisted_features = model_state["fc1.weight"].shape[1]
         if persisted_features != expected_features:
             logger.warning(f"Persisted feature width {persisted_features} does not match dataframe width {expected_features}; starting fresh")
-            return None, None, 0
+            return None, None, 0, None
+        deserialize_ms = (time.perf_counter() - t_deserialize) * 1000
         round_index = state["round_index"]
         logger.info(f"Resuming client model from checkpoint: round_index={round_index} written_unix_seconds={resp.written_unix_seconds}")
-        return model_state, state["optimizer_state_dict"], round_index
+        metrics = {
+            "read_rpc_ms": read_rpc_ms,
+            "deserialize_ms": deserialize_ms,
+            "bytes": len(resp.payload),
+            "sha256": hashlib.sha256(resp.payload).hexdigest()[:16],
+        }
+        return model_state, state["optimizer_state_dict"], round_index, metrics
     except Exception as e:
         logger.warning(f"Checkpoint could not be applied ({e}); starting fresh")
-        return None, None, 0
+        return None, None, 0, None
 
 
 def request_handler(msComm: msCommTypes.MicroserviceCommunication,
@@ -358,10 +414,18 @@ def request_handler(msComm: msCommTypes.MicroserviceCommunication,
                     # Had mismatch issues earlier, just as a safeguard
                     if vfl_client is None:
                         logger.info("Initializing VFLClient from incoming dataframe.")
-                        model_state, optimiser_state, resumed_round = read_client_checkpoint(df.shape[1])
+                        model_state, optimiser_state, resumed_round, restore_metrics = read_client_checkpoint(df.shape[1])
+                        t_construct = time.perf_counter()
                         vfl_client = VFLClient(df, model_state=model_state, optimiser_state=optimiser_state)
+                        construct_ms = (time.perf_counter() - t_construct) * 1000
                         vfl_client.round_index = resumed_round
                         vfl_client.columns = current_cols
+                        if restore_metrics is not None:
+                            logger.info(
+                                f"Roundtrip restore timing: round_index={vfl_client.round_index} "
+                                f"read_rpc_ms={restore_metrics['read_rpc_ms']:.3f} construct_ms={construct_ms:.3f} deserialize_ms={restore_metrics['deserialize_ms']:.3f} "
+                                f"bytes={restore_metrics['bytes']} sha256={restore_metrics['sha256']} state_fp={state_fingerprint()}"
+                            )
                         purge_pending.clear()
                     else:
                         if df.shape[1] != vfl_client.model.fc1.in_features:
@@ -418,6 +482,8 @@ def request_handler(msComm: msCommTypes.MicroserviceCommunication,
                     vfl_client.gradient_descent(gradients)
                     vfl_client.round_index += 1
                     write_client_checkpoint()
+                    if STATE_ROUNDTRIP_CLIENT:
+                        vfl_client = None
                 except Exception as e:
                     if purge_pending.is_set():
                         purge_pending.clear()
@@ -455,6 +521,8 @@ def main():
     global gateway
 
     vfl_client = None
+    if STATE_ROUNDTRIP_CLIENT:
+        logger.info("State roundtrip mode enabled: rehydrating client state from the gateway every round")
     sidecar_port = int(os.getenv("SIDECAR_PORT", "50051"))
     logger.info(f"Waiting for sidecar gRPC on localhost:{sidecar_port} ...")
     wait_for_port("127.0.0.1", sidecar_port, wait_time=90)

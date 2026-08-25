@@ -73,6 +73,20 @@ there and sync forward, not here.
 - `e5-genericity/` (v13: formerly E6) — by-construction artifacts: build/config
   output showing one unchanged gateway binary governs both `vfl_server_model`
   and `vfl_client_model`.
+- `e6-purge-latency/` — revocation-to-purge latency.
+  - `watch-regime/` — flip→purge-complete trials, watch delivered.
+  - `induced-staleness/` — outage → no destruction on a non-fresh view →
+    recovery → the deferred purge completes fresh.
+- `e7-pvc-roundtrip/` — PVC round-trip overhead: the server MS rehydrates from
+  the governed checkpoint every round and drops its in-memory model after the
+  write (`capture_e3_overhead.sh d`, which defaults its artifacts here).
+  Per-leg timings (serialize/RPC/gateway spans/deserialize) plus the
+  fingerprint fidelity oracle. Post-v13 number (pre-v13 documents used E7 for
+  storage growth); unrelated to the unscheduled "ungoverned direct write
+  (E3-(d))" item below — the harness arm letter d is a coincidence.
+  - `config-c-enforced/` — this experiment's own config (c) baseline runs.
+  - `config-d-roundtrip/` — the roundtrip variant arm.
+  - `env/` — the session's environment snapshots.
 
 ## Not in this folder
 

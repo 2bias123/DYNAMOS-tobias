@@ -209,6 +209,14 @@ func deployJob(ctx context.Context, msChain []mschain.MicroserviceMetadata, jobN
 			},
 		}
 
+		if os.Getenv("STATE_ROUNDTRIP") == "true" {
+			container.Env = append(container.Env, v1.EnvVar{Name: "STATE_ROUNDTRIP", Value: "true"})
+		}
+
+		if os.Getenv("STATE_ROUNDTRIP_CLIENT") == "true" {
+			container.Env = append(container.Env, v1.EnvVar{Name: "STATE_ROUNDTRIP_CLIENT", Value: "true"})
+		}
+
 		job.Spec.Template.Spec.Containers = append(job.Spec.Template.Spec.Containers, container)
 		firstService = "0"
 	}

@@ -1,0 +1,211 @@
+$ date
+Sat Aug 22 02:20:43 PM CEST 2026
+
+$ git rev-parse HEAD
+9afc976782415dad03376a1cd546dafdfad45b2b
+
+$ git status --short
+?? results/campaign-n50/e5-genericity/
+
+$ kubectl config current-context
+kind-kind
+
+
+=== reset + seed, then drop requiresGateway from the aggregate chain metadata
+PREFLIGHT OK: B14, B15 applied
+[reset] deleting stale Jobs in steward namespaces
+No resources found
+job.batch "jorrit-stutterheim-4ee1c158clientone51" deleted
+No resources found
+No resources found
+[reset] clearing /agents/jobs/ etcd keys
+[reset] coordinated rollout of request path
+deployment.apps/api-gateway restarted
+deployment.apps/policy-enforcer restarted
+deployment.apps/orchestrator restarted
+deployment.apps/server restarted
+deployment.apps/clientone restarted
+deployment.apps/clienttwo restarted
+deployment.apps/clientthree restarted
+Waiting for deployment "api-gateway" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "api-gateway" rollout to finish: 1 old replicas are pending termination...
+deployment "api-gateway" successfully rolled out
+deployment "policy-enforcer" successfully rolled out
+deployment "orchestrator" successfully rolled out
+Waiting for deployment "server" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "server" rollout to finish: 1 old replicas are pending termination...
+deployment "server" successfully rolled out
+deployment "clientone" successfully rolled out
+Waiting for deployment "clienttwo" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "clienttwo" rollout to finish: 1 old replicas are pending termination...
+deployment "clienttwo" successfully rolled out
+deployment "clientthree" successfully rolled out
+[reset] settling 45s for AMQP topology to converge
+[reset] OK
+[seed] aggregateRequest config seeded
+[flip] aggregate-demo requiresGateway off: {"name": "aggregate-demo", "label": "computeProvider", "allowedOutputs": [], "invalidArchetypes": []}
+
+=== 50 ungoverned requests: no gateway container, a recompute per request
+run,pod,request_s,dial_s
+trigger: {"request_id":"1e68f8e3-0ea1-41b6-bf52-5912c5be3f37","status":"pending"}
+[clientone] jorrit-stutterheim-348a87caclientone1-zjzv9 containers: aggregate-demo sidecar
+OK: no gateway container in the chain pod
+1,jorrit-stutterheim-348a87caclientone1-zjzv9,51,39.0
+job.batch "jorrit-stutterheim-348a87caclientone1" deleted
+trigger: {"request_id":"1ef488a9-0895-4e2a-9da6-52388ff4aa42","status":"pending"}
+2,jorrit-stutterheim-348a87caclientone2-rpjlx,51,39.0
+job.batch "jorrit-stutterheim-348a87caclientone2" deleted
+trigger: {"request_id":"b38fe470-797f-40ae-81a2-d2270acb9f3c","status":"pending"}
+3,jorrit-stutterheim-348a87caclientone3-htxlb,50,39.0
+job.batch "jorrit-stutterheim-348a87caclientone3" deleted
+trigger: {"request_id":"7d0cc9a0-8bbc-4f12-8243-c33cbb35ae35","status":"pending"}
+4,jorrit-stutterheim-348a87caclientone4-6978d,50,39.0
+job.batch "jorrit-stutterheim-348a87caclientone4" deleted
+trigger: {"request_id":"d83f3f99-872a-4594-9c5b-1a95471d6af0","status":"pending"}
+5,jorrit-stutterheim-348a87caclientone5-9d9l9,50,39.0
+job.batch "jorrit-stutterheim-348a87caclientone5" deleted
+trigger: {"request_id":"b4184967-8449-4208-a363-b488494c4711","status":"pending"}
+6,jorrit-stutterheim-348a87caclientone6-p2vbc,50,39.0
+job.batch "jorrit-stutterheim-348a87caclientone6" deleted
+trigger: {"request_id":"6fe2cf09-6c93-428f-a286-056bb51854fa","status":"pending"}
+7,jorrit-stutterheim-348a87caclientone7-k8swl,50,39.0
+job.batch "jorrit-stutterheim-348a87caclientone7" deleted
+trigger: {"request_id":"47cd86e9-ba22-4d15-b833-3be33200f6aa","status":"pending"}
+8,jorrit-stutterheim-348a87caclientone8-sfccn,51,39.0
+job.batch "jorrit-stutterheim-348a87caclientone8" deleted
+trigger: {"request_id":"a18d70db-28c1-4855-9544-ed89416b6902","status":"pending"}
+9,jorrit-stutterheim-348a87caclientone9-chzsm,51,39.0
+job.batch "jorrit-stutterheim-348a87caclientone9" deleted
+trigger: {"request_id":"d474404e-3993-4195-82ab-66955017cacd","status":"pending"}
+10,jorrit-stutterheim-348a87caclientone10-d2r2s,51,39.0
+job.batch "jorrit-stutterheim-348a87caclientone10" deleted
+trigger: {"request_id":"2a762b51-224e-405b-a4ad-139028160b9d","status":"pending"}
+11,jorrit-stutterheim-348a87caclientone11-2vxv9,51,39.0
+job.batch "jorrit-stutterheim-348a87caclientone11" deleted
+trigger: {"request_id":"ac16ba0d-cb01-49ad-bcad-52bdd89d87df","status":"pending"}
+12,jorrit-stutterheim-348a87caclientone12-65wk6,51,39.0
+job.batch "jorrit-stutterheim-348a87caclientone12" deleted
+trigger: {"request_id":"01ee78e3-7c6d-48fb-b415-b33aedc7a51a","status":"pending"}
+13,jorrit-stutterheim-348a87caclientone13-9dmg7,51,39.0
+job.batch "jorrit-stutterheim-348a87caclientone13" deleted
+trigger: {"request_id":"d9980c03-d2b1-4f63-a3a7-7cd04360db28","status":"pending"}
+14,jorrit-stutterheim-348a87caclientone14-jljtx,51,39.0
+job.batch "jorrit-stutterheim-348a87caclientone14" deleted
+trigger: {"request_id":"080e94ec-3275-4367-b6af-314dcde9bba4","status":"pending"}
+15,jorrit-stutterheim-348a87caclientone15-vm7vs,52,39.0
+job.batch "jorrit-stutterheim-348a87caclientone15" deleted
+trigger: {"request_id":"955d7329-3943-4487-ae7e-963bbc2b5def","status":"pending"}
+16,jorrit-stutterheim-348a87caclientone16-t9469,51,39.0
+job.batch "jorrit-stutterheim-348a87caclientone16" deleted
+trigger: {"request_id":"d1215f84-157e-4b7f-8992-0943bac0b19e","status":"pending"}
+17,jorrit-stutterheim-348a87caclientone17-4pvss,51,39.0
+job.batch "jorrit-stutterheim-348a87caclientone17" deleted
+trigger: {"request_id":"d6002040-f1fe-4b0e-a782-c33fc7ce4a22","status":"pending"}
+18,jorrit-stutterheim-348a87caclientone18-hvz66,51,39.0
+job.batch "jorrit-stutterheim-348a87caclientone18" deleted
+trigger: {"request_id":"844eed53-37ce-45d4-a631-d2e4ab7eefc3","status":"pending"}
+19,jorrit-stutterheim-348a87caclientone19-6sfxt,52,39.0
+job.batch "jorrit-stutterheim-348a87caclientone19" deleted
+trigger: {"request_id":"0875521f-4495-4c23-9bba-e1db0a127c65","status":"pending"}
+20,jorrit-stutterheim-348a87caclientone20-25zmf,51,39.0
+job.batch "jorrit-stutterheim-348a87caclientone20" deleted
+trigger: {"request_id":"c25da3a9-afe1-4ded-9d42-dd54716ac7a8","status":"pending"}
+21,jorrit-stutterheim-348a87caclientone21-mxw7b,51,39.0
+job.batch "jorrit-stutterheim-348a87caclientone21" deleted
+trigger: {"request_id":"61f7a28f-5fc4-4f86-96a5-23f88178c738","status":"pending"}
+22,jorrit-stutterheim-348a87caclientone22-h2s9j,51,39.0
+job.batch "jorrit-stutterheim-348a87caclientone22" deleted
+trigger: {"request_id":"a481b7e4-0f76-4954-8043-79584825fbd4","status":"pending"}
+23,jorrit-stutterheim-348a87caclientone23-bvlgh,52,39.0
+job.batch "jorrit-stutterheim-348a87caclientone23" deleted
+trigger: {"request_id":"41997bc2-783f-42dd-a25a-3cd9c3761c53","status":"pending"}
+24,jorrit-stutterheim-348a87caclientone24-pbwp5,51,39.0
+job.batch "jorrit-stutterheim-348a87caclientone24" deleted
+trigger: {"request_id":"466191cf-d047-42f5-bdec-60a3a6d465bf","status":"pending"}
+25,jorrit-stutterheim-348a87caclientone25-n6lmd,51,39.0
+job.batch "jorrit-stutterheim-348a87caclientone25" deleted
+trigger: {"request_id":"dfc3aae7-313b-46e5-808e-6c55e879e492","status":"pending"}
+26,jorrit-stutterheim-348a87caclientone26-nmbj6,51,39.0
+job.batch "jorrit-stutterheim-348a87caclientone26" deleted
+trigger: {"request_id":"232083cb-6588-4d55-ae9f-8c1619cd5a90","status":"pending"}
+27,jorrit-stutterheim-348a87caclientone27-nmwcw,52,39.0
+job.batch "jorrit-stutterheim-348a87caclientone27" deleted
+trigger: {"request_id":"ed752d61-31ef-4324-9484-39c23cbbb48e","status":"pending"}
+28,jorrit-stutterheim-348a87caclientone28-h529n,52,39.0
+job.batch "jorrit-stutterheim-348a87caclientone28" deleted
+trigger: {"request_id":"71bdc710-e656-4157-a4e4-bff01d40d7b4","status":"pending"}
+29,jorrit-stutterheim-348a87caclientone29-txzvk,51,39.0
+job.batch "jorrit-stutterheim-348a87caclientone29" deleted
+trigger: {"request_id":"88f12ab1-226a-4062-9ed7-5d68dde20fa3","status":"pending"}
+30,jorrit-stutterheim-348a87caclientone30-zvqgp,51,39.0
+job.batch "jorrit-stutterheim-348a87caclientone30" deleted
+trigger: {"request_id":"09059b4b-cc3e-4e00-9efd-a781a7f0a320","status":"pending"}
+31,jorrit-stutterheim-348a87caclientone31-tbvhc,51,39.0
+job.batch "jorrit-stutterheim-348a87caclientone31" deleted
+trigger: {"request_id":"656ed2dc-aac6-46ad-8f10-1878f6d5d61d","status":"pending"}
+32,jorrit-stutterheim-348a87caclientone32-jszf7,52,39.0
+job.batch "jorrit-stutterheim-348a87caclientone32" deleted
+trigger: {"request_id":"32931fe3-8f67-4121-9348-c9b11cf715e7","status":"pending"}
+33,jorrit-stutterheim-348a87caclientone33-r68nh,51,39.0
+job.batch "jorrit-stutterheim-348a87caclientone33" deleted
+trigger: {"request_id":"173787e6-fefd-465e-adc2-8ba1efe97ceb","status":"pending"}
+34,jorrit-stutterheim-348a87caclientone34-nsqnx,51,39.0
+job.batch "jorrit-stutterheim-348a87caclientone34" deleted
+trigger: {"request_id":"268730cd-5a81-4451-8210-d8d6e4ee72ae","status":"pending"}
+35,jorrit-stutterheim-348a87caclientone35-q2d5q,51,39.0
+job.batch "jorrit-stutterheim-348a87caclientone35" deleted
+trigger: {"request_id":"c8e10b9b-b888-4805-bdf1-155ddc6fc52b","status":"pending"}
+36,jorrit-stutterheim-348a87caclientone36-k4bxx,52,39.0
+job.batch "jorrit-stutterheim-348a87caclientone36" deleted
+trigger: {"request_id":"5c4d2338-7e79-4edf-ace3-3f7793675315","status":"pending"}
+37,jorrit-stutterheim-348a87caclientone37-7f8g6,52,39.0
+job.batch "jorrit-stutterheim-348a87caclientone37" deleted
+trigger: {"request_id":"6b720ae4-859e-4797-9df4-f8b9cbafa51b","status":"pending"}
+38,jorrit-stutterheim-348a87caclientone38-rgknj,51,39.0
+job.batch "jorrit-stutterheim-348a87caclientone38" deleted
+trigger: {"request_id":"0339c2cf-7c23-4366-aef7-15ccde5837aa","status":"pending"}
+39,jorrit-stutterheim-348a87caclientone39-znx4k,51,39.0
+job.batch "jorrit-stutterheim-348a87caclientone39" deleted
+trigger: {"request_id":"49b0392c-a3fd-42de-94c6-2cd696604443","status":"pending"}
+40,jorrit-stutterheim-348a87caclientone40-gkfjw,51,39.0
+job.batch "jorrit-stutterheim-348a87caclientone40" deleted
+trigger: {"request_id":"2520a238-0a51-40eb-9a8a-68c37a9b0c28","status":"pending"}
+41,jorrit-stutterheim-348a87caclientone41-6f8sl,52,39.0
+job.batch "jorrit-stutterheim-348a87caclientone41" deleted
+trigger: {"request_id":"25ed12a8-8696-475d-b940-7c6bc03ec959","status":"pending"}
+42,jorrit-stutterheim-348a87caclientone42-258wf,51,39.0
+job.batch "jorrit-stutterheim-348a87caclientone42" deleted
+trigger: {"request_id":"947a38ee-988a-4bb6-87ef-535ad8de8004","status":"pending"}
+43,jorrit-stutterheim-348a87caclientone43-6cqfz,51,39.0
+job.batch "jorrit-stutterheim-348a87caclientone43" deleted
+trigger: {"request_id":"9e94ac1c-ee03-4a1b-b666-e18bd812a7a4","status":"pending"}
+44,jorrit-stutterheim-348a87caclientone44-xct5j,51,39.0
+job.batch "jorrit-stutterheim-348a87caclientone44" deleted
+trigger: {"request_id":"709bb776-f723-47fa-a17b-10bfd1ff9c65","status":"pending"}
+45,jorrit-stutterheim-348a87caclientone45-2ws5g,52,39.0
+job.batch "jorrit-stutterheim-348a87caclientone45" deleted
+trigger: {"request_id":"277c76a8-e27f-4339-8ae8-e910bf65aa82","status":"pending"}
+46,jorrit-stutterheim-348a87caclientone46-x7n46,52,39.0
+job.batch "jorrit-stutterheim-348a87caclientone46" deleted
+trigger: {"request_id":"39b65d9a-2639-4346-9463-70b822256f7b","status":"pending"}
+47,jorrit-stutterheim-348a87caclientone47-vks8g,51,39.0
+job.batch "jorrit-stutterheim-348a87caclientone47" deleted
+trigger: {"request_id":"062dd683-a98c-44a7-b65e-0861dab5d865","status":"pending"}
+48,jorrit-stutterheim-348a87caclientone48-tbwdx,51,39.0
+job.batch "jorrit-stutterheim-348a87caclientone48" deleted
+trigger: {"request_id":"97761368-8ee8-45dc-8c2d-6d9e71b00f11","status":"pending"}
+49,jorrit-stutterheim-348a87caclientone49-tlkbv,52,39.0
+job.batch "jorrit-stutterheim-348a87caclientone49" deleted
+trigger: {"request_id":"ba59b51e-1b7e-43d0-876b-499921a86035","status":"pending"}
+50,jorrit-stutterheim-348a87caclientone50-fbrjm,52,39.0
+
+=== MS degrade evidence (last run)
+OK: MS degraded to no-gateway mode
+    2026-08-22 13:04:33,866 - main.py - gateway_lifecycle.py:45 - WARNING - No policy gateway reachable, continuing without one: Could not connect to gateway localhost:50050 after 8 tries
+
+request completion (trigger accepted -> pod Succeeded), ungoverned recompute:
+n=50  min=50.0 s  p50=51.0 s  p90=52.0 s  max=52.0 s  mean=51.2 s
+minus the fruitless gateway dial window (50/50 runs with a measured dial span):
+n=50  min=11.0 s  p50=12.0 s  p90=13.0 s  max=13.0 s  mean=12.2 s
+note: the MS image dials its gateway before degrading (exponential timeouts, ~40s total); the raw wall time includes that integration artifact, the adjusted series removes it
+note: the flip is ephemeral; the next reset restores requiresGateway
