@@ -16,10 +16,16 @@ set -u
 #   f  store-only chain roundtrip (config e with GATEWAY_STORE_ONLY on the
 #      gateways: identity, decisions, and audit are skipped, only the PVC
 #      I/O remains — the governed-minus-ungoverned delta prices governance)
+#   g  inert gateway (container present and fully booted via GATEWAY_INERT
+#      on the steward agents, but its listener never binds: the MSs degrade
+#      exactly as in config a — isolates the container's presence cost from
+#      its interaction cost; needs images built with the GATEWAY_INERT flag)
 #
 # Configs d, e, and f belong to their own experiment: they tag failures E7
 # and default their artifacts to results/e7-pvc-roundtrip, so a forgotten
-# E3_RESULTS_DIR override can never touch the frozen campaign tree.
+# E3_RESULTS_DIR override can never touch the frozen campaign tree. Config g
+# is a diagnostic probe and defaults to results/e3-inert-probe for the same
+# reason — it can never land in a counted tree by accident.
 #
 # Per-round latency comes from the api-gateway's own round markers ("Running
 # VFL training round N" to "Intermediate accuracy achieved ... for round N"),
@@ -38,7 +44,7 @@ set -u
 # canonical microservices config on every boot, so any reset restores
 # requiresGateway:true).
 #
-# Usage: capture_e3_overhead.sh <a|b|c|d|e|f> [cycles]   (cycles default CAMPAIGN_N)
+# Usage: capture_e3_overhead.sh <a|b|c|d|e|f|g> [cycles]   (cycles default CAMPAIGN_N)
 
 EXP=E3
 root="$(cd "$(dirname "$0")/.." && pwd)"
@@ -54,7 +60,8 @@ case "$CONFIG" in
 	d) subdir="config-d-roundtrip"; EXP=E7; results_dir="${E3_RESULTS_DIR:-$root/results/e7-pvc-roundtrip}" ;;
 	e) subdir="config-e-chain-roundtrip"; EXP=E7; results_dir="${E3_RESULTS_DIR:-$root/results/e7-pvc-roundtrip}" ;;
 	f) subdir="config-f-store-only"; EXP=E7; results_dir="${E3_RESULTS_DIR:-$root/results/e7-pvc-roundtrip}" ;;
-	*) echo "usage: $0 <a|b|c|d|e|f> [cycles]" >&2; exit 2 ;;
+	g) subdir="config-g-inert"; results_dir="${E3_RESULTS_DIR:-$root/results/e3-inert-probe}" ;;
+	*) echo "usage: $0 <a|b|c|d|e|f|g> [cycles]" >&2; exit 2 ;;
 esac
 export EXP
 
@@ -69,11 +76,12 @@ INSPECTOR=e3-inspector
 
 PIDS=()
 cleanup() {
-	# A failed b, d, e, or f run must not leave its env flags armed for a later config.
+	# A failed b, d, e, f, or g run must not leave its env flags armed for a later config.
 	[ "$CONFIG" = b ] && disable_passthrough
 	[ "$CONFIG" = d ] && disable_roundtrip
 	[ "$CONFIG" = e ] && { disable_roundtrip; disable_roundtrip_client; }
 	[ "$CONFIG" = f ] && { disable_roundtrip; disable_roundtrip_client; disable_store_only; }
+	[ "$CONFIG" = g ] && disable_inert
 	for p in "${PIDS[@]}"; do kill "$p" 2>/dev/null; done
 }
 trap cleanup EXIT
@@ -159,6 +167,25 @@ disable_store_only() {
 	local ns
 	for ns in "${STEWARD_NS[@]}"; do
 		kubectl set env "deployment/${ns}" -n "$ns" GATEWAY_STORE_ONLY- >/dev/null 2>&1
+	done
+}
+
+# Inert mode is armed like pass-through: an env var on the steward agents,
+# mirrored into every gateway container they deploy. Same rule: arm BEFORE
+# the reset so the agent rollout is absorbed by the settle window.
+enable_inert() {
+	local ns
+	for ns in "${STEWARD_NS[@]}"; do
+		kubectl set env "deployment/${ns}" -n "$ns" GATEWAY_INERT=true >/dev/null \
+			|| fail "could not set GATEWAY_INERT on $ns"
+	done
+	echo "[inert] GATEWAY_INERT=true on all four steward agents"
+}
+
+disable_inert() {
+	local ns
+	for ns in "${STEWARD_NS[@]}"; do
+		kubectl set env "deployment/${ns}" -n "$ns" GATEWAY_INERT- >/dev/null 2>&1
 	done
 }
 
@@ -905,6 +932,83 @@ do_config_f() {
 	disable_roundtrip_client
 	disable_store_only
 	echo "[store-only] all three variant env vars removed from the steward agents"
+}
+
+do_config_g() {
+	step "arm inert gateway, then reset + canonical seed + clean slate"
+	enable_inert
+	reset_and_seed
+	delete_state_pvcs
+
+	step "trigger the chain (cycles=${CYCLES}) with an inert gateway"
+	local rid
+	rid=$(trigger "$CYCLES") || exit 1
+
+	config_evidence with-gateway
+
+	step "wait for training to finish"
+	local status
+	status=$(wait_done "$rid") || exit 1
+	r2_series "$status"
+
+	full_logs with-gateway
+
+	step "inert evidence: banner on all four gateways, degrade like config a, zero interaction"
+	must_grep "server MS degraded to no-gateway mode" "$SERVER_MS_LOG" \
+		-F "No policy gateway reachable, continuing without one"
+	local ns v ms_log gw_log
+	for ns in "${STEWARD_NS[@]}"; do
+		if [ "$ns" = server ]; then
+			ms_log="$SERVER_MS_LOG"
+			gw_log="$SERVER_GW_LOG"
+		else
+			v="CLIENT_MS_LOG_${ns}"; ms_log="${!v}"
+			v="CLIENT_GW_LOG_${ns}"; gw_log="${!v}"
+		fi
+		[ -n "$ms_log" ] || fail "no retained MS log for $ns"
+		[ -n "$gw_log" ] || fail "no retained gateway log for $ns"
+		must_grep "inert banner on the $ns gateway" "$gw_log" \
+			-F "Inert mode: gRPC listener not bound, serving nothing"
+		must_not_grep "listener never bound on the $ns gateway" "$gw_log" -F "Serving on"
+		must_not_grep "no MS-gateway connection on $ns" "$ms_log" -F "Successfully connected to gateway"
+		must_not_grep "no checkpoint write on $ns" "$ms_log" -F "Checkpoint write allowed"
+		must_not_grep "no write audit records on the $ns gateway" "$gw_log" -F '"op":"write"'
+		must_not_grep "no read audit records on the $ns gateway" "$gw_log" -F '"op":"read"'
+	done
+	echo "OK: all four gateways inert, no MS interaction anywhere"
+
+	# Same proof as config a: the dial-retry must be absorbed inside round 0,
+	# so steady-state rounds never contain it.
+	local degrade_ts round0_close_ts
+	degrade_ts=$(echo "$SERVER_MS_LOG" | grep -F "No policy gateway reachable" | head -1 | awk '{print $1}')
+	round0_close_ts=$(echo "$GW_LOG" | grep -F "Intermediate accuracy achieved" \
+		| grep -F "for round 0" | head -1 | awk '{print $1}')
+	[ -n "$degrade_ts" ] || fail "no timestamped degrade line in the server MS log"
+	[ -n "$round0_close_ts" ] || fail "no round 0 close marker in the api-gateway log"
+	python3 -c "
+import re, sys
+from datetime import datetime
+def p(raw):
+    raw = re.sub(r'(\.\d{6})\d*', r'\1', raw).replace('Z', '+00:00')
+    return datetime.fromisoformat(raw)
+sys.exit(0 if p(sys.argv[1]) < p(sys.argv[2]) else 1)" "$degrade_ts" "$round0_close_ts" \
+		&& echo "OK: dial-retry degrade ($degrade_ts) absorbed inside round 0 (closed $round0_close_ts)" \
+		|| fail "the MS degraded after round 0 closed; steady-state rounds may contain the dial-retry"
+
+	# Presence-cost mechanism evidence: cumulative CPU of each inert gateway
+	# container over the run. Non-fatal — a missing snapshot never voids the run.
+	step "inert gateway cumulative CPU (crictl stats, per steward)"
+	docker exec kind-control-plane sh -c \
+		'crictl ps --name policy-checkpoint-gateway; for id in $(crictl ps --name policy-checkpoint-gateway -q); do crictl stats -o json "$id"; done' \
+		|| echo "note: crictl stats unavailable; CPU evidence missing from this artifact"
+
+	measure_rounds
+	payload_sizes_server
+	must_grep "no state files persisted with an inert gateway" "$PAYLOAD_LISTING" -F "state files: 0"
+
+	step "disarm inert gateway"
+	disable_inert
+	echo "[inert] GATEWAY_INERT removed from all four steward agents"
 }
 
 run_capture "$subdir" overhead-run "scripts/capture_e3_overhead.sh ${CONFIG} ${CYCLES}" "do_config_${CONFIG}" \

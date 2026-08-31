@@ -1,0 +1,9 @@
+`e3-replication-frozen/config-a-no-gateway/20260827-154259_overhead-run.txt | 20260827-154259 | scripts/capture_e3_overhead.sh a 50 | 44bd2bf | E3 config a (no-gateway): per-round latency + r2 + full logs, cycles=50`
+`e3-replication-frozen/config-b-passthrough/20260827-154507_overhead-run.txt | 20260827-154507 | scripts/capture_e3_overhead.sh b 50 | 44bd2bf | E3 config b (passthrough): per-round latency + r2 + full logs, cycles=50`
+`e3-replication-frozen/config-c-enforced/20260827-154720_overhead-run.txt | 20260827-154720 | scripts/capture_e3_overhead.sh c 50 | 44bd2bf | E3 config c (enforced): per-round latency + r2 + full logs, cycles=50`
+`e3-replication-frozen/config-a-no-gateway/20260827-154932_overhead-run.txt | 20260827-154932 | scripts/capture_e3_overhead.sh a 50 | 44bd2bf | E3 config a (no-gateway): per-round latency + r2 + full logs, cycles=50`
+`e3-replication-frozen/config-b-passthrough/20260827-155139_overhead-run.txt | 20260827-155139 | scripts/capture_e3_overhead.sh b 50 | 44bd2bf | E3 config b (passthrough): per-round latency + r2 + full logs, cycles=50`
+`e3-replication-frozen/config-c-enforced/20260827-155351_overhead-run.txt | 20260827-155351 | scripts/capture_e3_overhead.sh c 50 | 44bd2bf | E3 config c (enforced): per-round latency + r2 + full logs, cycles=50`
+`e3-replication-frozen/config-a-no-gateway/20260827-155608_overhead-run.txt | 20260827-155608 | scripts/capture_e3_overhead.sh a 50 | 44bd2bf | E3 config a (no-gateway): per-round latency + r2 + full logs, cycles=50`
+`e3-replication-frozen/config-b-passthrough/20260827-155815_overhead-run.txt | 20260827-155815 | scripts/capture_e3_overhead.sh b 50 | 44bd2bf | E3 config b (passthrough): per-round latency + r2 + full logs, cycles=50`
+`e3-replication-frozen/config-c-enforced/20260827-160033_overhead-run.txt | 20260827-160033 | scripts/capture_e3_overhead.sh c 50 | 44bd2bf | E3 config c (enforced): per-round latency + r2 + full logs, cycles=50`

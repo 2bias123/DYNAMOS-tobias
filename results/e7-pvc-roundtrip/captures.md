@@ -6,3 +6,7 @@
 `e7-pvc-roundtrip/config-e-chain-roundtrip/20260825-101620_overhead-run.txt | 20260825-101620 | scripts/capture_e3_overhead.sh e 50 | bcd3a12 | E7 config e: ABORTED seconds in (operator killed the launching shell, which had a wrong timeout); flags disarmed, rerun follows`
 `e7-pvc-roundtrip/config-e-chain-roundtrip/20260825-101731_overhead-run.txt | 20260825-101731 | scripts/capture_e3_overhead.sh e 50 | 6291c3e | E7 config e (chain-roundtrip): per-round latency + r2 + full logs, cycles=50`
 `e7-pvc-roundtrip/config-c-enforced/20260825-102044_overhead-run.txt | 20260825-102044 | scripts/capture_e3_overhead.sh c 50 | 2a4ea45 | E3 config c (enforced): per-round latency + r2 + full logs, cycles=50`
+`e7-pvc-roundtrip/config-c-enforced/20260825-114321_overhead-run.txt | 20260825-114321 | scripts/capture_e3_overhead.sh c 50 | bce372c | E3 config c (enforced): per-round latency + r2 + full logs, cycles=50`
+`e7-pvc-roundtrip/config-e-chain-roundtrip/20260825-114546_overhead-run.txt | 20260825-114546 | scripts/capture_e3_overhead.sh e 50 | f959262 | E7 config e (chain-roundtrip): per-round latency + r2 + full logs, cycles=50`
+`e7-pvc-roundtrip/config-f-store-only/20260825-114855_overhead-run.txt | 20260825-114855 | scripts/capture_e3_overhead.sh f 50 | 6edcc1b | E7 config f (store-only): per-round latency + r2 + full logs, cycles=50`
+`e7-pvc-roundtrip/config-c-enforced/20260825-115214_overhead-run.txt | 20260825-115214 | scripts/capture_e3_overhead.sh c 50 | 813ef1b | E3 config c (enforced): per-round latency + r2 + full logs, cycles=50`

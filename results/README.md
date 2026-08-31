@@ -90,6 +90,11 @@ there and sync forward, not here.
     also rehydrate per round (`capture_e3_overhead.sh e`), holding state only
     across the train/gradient RPC pair; per-client governance ledgers,
     fidelity pairs, and leg timings on top of config d's server set.
+  - `config-f-store-only/` — config e with the gateways in store-only mode
+    (`capture_e3_overhead.sh f`): identity, decisions, and audit skipped,
+    only the PVC I/O remains. The e−f delta prices the governance envelope;
+    asserts invert to zero decision-audit records and zero-valued
+    decide/audit span fields.
   - `env/` — the session's environment snapshots.
 
 ## Not in this folder
