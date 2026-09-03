@@ -1,0 +1,109 @@
+$ date
+Thu Aug 27 05:54:31 PM CEST 2026
+
+$ git -C /home/onebias/School/thesis/DYNAMOS-tobias rev-parse --abbrev-ref HEAD
+pvc-roundtrip-overhead
+
+$ git -C /home/onebias/School/thesis/DYNAMOS-tobias rev-parse HEAD
+7b53fcfb74867f6c8c692a4495c3dffd922efb0e
+
+$ git -C /home/onebias/School/thesis/DYNAMOS-tobias status --short
+ M scripts/capture_e3_overhead.sh
+ M scripts/run_e3_replication.sh
+?? results/e3-inert-probe/
+
+$ go version
+go version go1.23.8 linux/amd64
+
+$ kind version
+kind v0.24.0 go1.23.8 linux/amd64
+
+$ kubectl version --client
+Client Version: v1.31.2
+Kustomize Version: v5.4.2
+
+$ kubectl get nodes -o wide
+NAME                 STATUS   ROLES           AGE   VERSION   INTERNAL-IP   EXTERNAL-IP   OS-IMAGE                         KERNEL-VERSION   CONTAINER-RUNTIME
+kind-control-plane   Ready    control-plane   93d   v1.31.0   172.18.0.2    <none>        Debian GNU/Linux 12 (bookworm)   6.6.94           containerd://1.7.18
+
+$ kubectl get pods -A
+NAMESPACE            NAME                                                 READY   STATUS      RESTARTS        AGE
+api-gateway          api-gateway-74f9d9599b-2s6gg                         3/3     Running     0               8m23s
+clientone            clientone-54d78f5fd8-fvfjz                           3/3     Running     0               6m23s
+clientone            jake-jongejans-06867b88clientone1-j4725              1/6     NotReady    0               7m18s
+clientthree          clientthree-95fc99d96-j5fzw                          3/3     Running     0               6m22s
+clientthree          jake-jongejans-06867b88clientthree1-9m47p            1/6     NotReady    0               7m18s
+clienttwo            clienttwo-f464c6994-zrjvm                            3/3     Running     0               6m23s
+clienttwo            jake-jongejans-06867b88clienttwo1-f7jnh              1/6     NotReady    0               7m18s
+core                 debug                                                2/2     Running     620 (26m ago)   80d
+core                 etcd-0                                               2/2     Running     8 (8h ago)      3d22h
+core                 etcd-1                                               2/2     Running     8 (8h ago)      3d22h
+core                 etcd-2                                               2/2     Running     8 (8h ago)      3d22h
+core                 grafana-664bc9d4f7-sxc9d                             2/2     Running     168 (8h ago)    80d
+core                 loki-85444789f-f28qv                                 2/2     Running     168 (8h ago)    80d
+core                 promtail-8kxmg                                       2/2     Running     168 (8h ago)    80d
+core                 rabbitmq-54d6d88cc9-4s82l                            2/2     Running     8 (8h ago)      3d22h
+default              prometheus-alertmanager-0                            1/1     Running     84 (8h ago)     80d
+default              prometheus-kube-state-metrics-6b6b5f8c5c-gkvcc       1/1     Running     136 (8h ago)    80d
+default              prometheus-prometheus-node-exporter-5mw8v            1/1     Running     84 (8h ago)     80d
+default              prometheus-prometheus-pushgateway-79764966fb-q2clb   1/1     Running     84 (8h ago)     80d
+default              prometheus-server-659f5f956b-m6m8w                   2/2     Running     168 (8h ago)    80d
+ingress              nginx-nginx-ingress-controller-58bc7cddcc-5t5ph      1/1     Running     140 (8h ago)    80d
+kube-system          coredns-6f6b679f8f-dr2lp                             1/1     Running     105 (8h ago)    93d
+kube-system          coredns-6f6b679f8f-jbnwf                             1/1     Running     105 (8h ago)    93d
+kube-system          etcd-kind-control-plane                              1/1     Running     105 (8h ago)    93d
+kube-system          kindnet-m9vxf                                        1/1     Running     105 (8h ago)    93d
+kube-system          kube-apiserver-kind-control-plane                    1/1     Running     105 (8h ago)    93d
+kube-system          kube-controller-manager-kind-control-plane           1/1     Running     105 (8h ago)    93d
+kube-system          kube-proxy-2nfth                                     1/1     Running     106 (8h ago)    93d
+kube-system          kube-scheduler-kind-control-plane                    1/1     Running     105 (8h ago)    93d
+linkerd-jaeger       collector-8459487b75-zrpvc                           2/2     Running     209 (8h ago)    93d
+linkerd-jaeger       jaeger-77d4954795-52cw4                              2/2     Running     209 (8h ago)    93d
+linkerd-jaeger       jaeger-injector-7cb554bc64-s7tdr                     2/2     Running     211 (8h ago)    93d
+linkerd              linkerd-destination-6f6d799765-7r84n                 4/4     Running     16 (8h ago)     4d2h
+linkerd              linkerd-identity-566485f4b4-g7khf                    2/2     Running     9 (8h ago)      4d2h
+linkerd              linkerd-proxy-injector-56699b49d7-cfhl4              2/2     Running     8 (8h ago)      4d2h
+local-path-storage   local-path-provisioner-57c5987fd4-psc95              1/1     Running     176 (8h ago)    93d
+orchestrator         init-etcd-pvc-hs7cf                                  0/1     Completed   0               80d
+orchestrator         orchestrator-7568c4469-zrtc2                         3/3     Running     0               8m23s
+orchestrator         policy-enforcer-6cfdd7df7-9xzhx                      3/3     Running     0               8m23s
+server               server-6b44f89854-85vng                              3/3     Running     0               6m23s
+surf                 surf-7f9c7dcfcf-g2vdx                                3/3     Running     16 (8h ago)     3d22h
+uva                  uva-58b696fc55-fztcb                                 3/3     Running     16 (8h ago)     3d22h
+vu                   vu-787768574c-p55b9                                  3/3     Running     16 (8h ago)     3d22h
+
+$ fork-image provenance (containers on dynamos1/ or tamjiyan/ images)
+OK     api-gateway/api-gateway-74f9d9599b-2s6gg api-gateway docker.io/dynamos1/api-gateway:main -> docker.io/library/import-2026-08-05@sha256:d691b798ed4a3768c4bfea89fa445c87a2b0898e0ad5293496e26143ec3f9c16
+OK     api-gateway/api-gateway-74f9d9599b-2s6gg sidecar docker.io/dynamos1/sidecar:main -> docker.io/library/import-2026-07-10@sha256:ff3576e1ae17b8e670fe473baf965bbef30202045c62fc73acb4ad00204fdabd
+OK     clientone/clientone-54d78f5fd8-fvfjz clientone docker.io/dynamos1/agent:e3-inert-probe -> docker.io/library/import-2026-08-27@sha256:a403ee9c4704755431ccd889be37a7163b32aacb64132d6f9a4365c30a70bd73
+OK     clientone/clientone-54d78f5fd8-fvfjz sidecar docker.io/dynamos1/sidecar:main -> docker.io/library/import-2026-07-10@sha256:ff3576e1ae17b8e670fe473baf965bbef30202045c62fc73acb4ad00204fdabd
+OK     clientone/jake-jongejans-06867b88clientone1-j4725 anonymize-test docker.io/tamjiyan/anonymize-test:latest -> docker.io/library/import-2026-07-04@sha256:73a8f2e6dc24660ce531a707a7c3bebe39345691d330b560ccc65f870546fc41
+OK     clientone/jake-jongejans-06867b88clientone1-j4725 differential-p-test docker.io/tamjiyan/differential-p-test:latest -> docker.io/library/import-2026-07-04@sha256:c45dbef007ad09add26ffa2e664c9f86054602bb35122a3f4a469c9fb5833091
+OK     clientone/jake-jongejans-06867b88clientone1-j4725 policy-checkpoint-gateway docker.io/tamjiyan/policy-checkpoint-gateway:e3-inert-probe -> docker.io/library/import-2026-08-27@sha256:38600fe18fac13a13617d64190dd01eb9bdfec9a183fb28c3a2c984bada7c25c
+OK     clientone/jake-jongejans-06867b88clientone1-j4725 sidecar docker.io/tamjiyan/sidecar:latest -> docker.io/library/import-2026-07-04@sha256:d3f3ce1f15eb73d5eab6ea5785cd23edc5b83e88671b0513743755cb604b0cab
+OK     clientone/jake-jongejans-06867b88clientone1-j4725 vfl-train-demo docker.io/tamjiyan/vfl-train-demo:latest -> docker.io/library/import-2026-08-21@sha256:db159c7d47800e85dcfdfb70eeaff7fd6e7cf4aef1ba0e73f2a226b4ad38bef4
+OK     clientone/jake-jongejans-06867b88clientone1-j4725 vfl-train-model-demo docker.io/tamjiyan/vfl-train-model-demo:latest -> docker.io/library/import-2026-08-21@sha256:2bda6cf0b133c78073dd213555c1db46e66c13417d3d90336f0dab566ab2f9cc
+OK     clientthree/clientthree-95fc99d96-j5fzw clientthree docker.io/dynamos1/agent:e3-inert-probe -> docker.io/library/import-2026-08-27@sha256:a403ee9c4704755431ccd889be37a7163b32aacb64132d6f9a4365c30a70bd73
+OK     clientthree/clientthree-95fc99d96-j5fzw sidecar docker.io/dynamos1/sidecar:main -> docker.io/library/import-2026-07-10@sha256:ff3576e1ae17b8e670fe473baf965bbef30202045c62fc73acb4ad00204fdabd
+OK     clientthree/jake-jongejans-06867b88clientthree1-9m47p anonymize-test docker.io/tamjiyan/anonymize-test:latest -> docker.io/library/import-2026-07-04@sha256:73a8f2e6dc24660ce531a707a7c3bebe39345691d330b560ccc65f870546fc41
+OK     clientthree/jake-jongejans-06867b88clientthree1-9m47p differential-p-test docker.io/tamjiyan/differential-p-test:latest -> docker.io/library/import-2026-07-04@sha256:c45dbef007ad09add26ffa2e664c9f86054602bb35122a3f4a469c9fb5833091
+OK     clientthree/jake-jongejans-06867b88clientthree1-9m47p policy-checkpoint-gateway docker.io/tamjiyan/policy-checkpoint-gateway:e3-inert-probe -> docker.io/library/import-2026-08-27@sha256:38600fe18fac13a13617d64190dd01eb9bdfec9a183fb28c3a2c984bada7c25c
+OK     clientthree/jake-jongejans-06867b88clientthree1-9m47p sidecar docker.io/tamjiyan/sidecar:latest -> docker.io/library/import-2026-07-04@sha256:d3f3ce1f15eb73d5eab6ea5785cd23edc5b83e88671b0513743755cb604b0cab
+OK     clientthree/jake-jongejans-06867b88clientthree1-9m47p vfl-train-demo docker.io/tamjiyan/vfl-train-demo:latest -> docker.io/library/import-2026-08-21@sha256:db159c7d47800e85dcfdfb70eeaff7fd6e7cf4aef1ba0e73f2a226b4ad38bef4
+OK     clientthree/jake-jongejans-06867b88clientthree1-9m47p vfl-train-model-demo docker.io/tamjiyan/vfl-train-model-demo:latest -> docker.io/library/import-2026-08-21@sha256:2bda6cf0b133c78073dd213555c1db46e66c13417d3d90336f0dab566ab2f9cc
+OK     clienttwo/clienttwo-f464c6994-zrjvm clienttwo docker.io/dynamos1/agent:e3-inert-probe -> docker.io/library/import-2026-08-27@sha256:a403ee9c4704755431ccd889be37a7163b32aacb64132d6f9a4365c30a70bd73
+OK     clienttwo/clienttwo-f464c6994-zrjvm sidecar docker.io/dynamos1/sidecar:main -> docker.io/library/import-2026-07-10@sha256:ff3576e1ae17b8e670fe473baf965bbef30202045c62fc73acb4ad00204fdabd
+OK     clienttwo/jake-jongejans-06867b88clienttwo1-f7jnh anonymize-test docker.io/tamjiyan/anonymize-test:latest -> docker.io/library/import-2026-07-04@sha256:73a8f2e6dc24660ce531a707a7c3bebe39345691d330b560ccc65f870546fc41
+OK     clienttwo/jake-jongejans-06867b88clienttwo1-f7jnh differential-p-test docker.io/tamjiyan/differential-p-test:latest -> docker.io/library/import-2026-07-04@sha256:c45dbef007ad09add26ffa2e664c9f86054602bb35122a3f4a469c9fb5833091
+OK     clienttwo/jake-jongejans-06867b88clienttwo1-f7jnh policy-checkpoint-gateway docker.io/tamjiyan/policy-checkpoint-gateway:e3-inert-probe -> docker.io/library/import-2026-08-27@sha256:38600fe18fac13a13617d64190dd01eb9bdfec9a183fb28c3a2c984bada7c25c
+OK     clienttwo/jake-jongejans-06867b88clienttwo1-f7jnh sidecar docker.io/tamjiyan/sidecar:latest -> docker.io/library/import-2026-07-04@sha256:d3f3ce1f15eb73d5eab6ea5785cd23edc5b83e88671b0513743755cb604b0cab
+OK     clienttwo/jake-jongejans-06867b88clienttwo1-f7jnh vfl-train-demo docker.io/tamjiyan/vfl-train-demo:latest -> docker.io/library/import-2026-08-21@sha256:db159c7d47800e85dcfdfb70eeaff7fd6e7cf4aef1ba0e73f2a226b4ad38bef4
+OK     clienttwo/jake-jongejans-06867b88clienttwo1-f7jnh vfl-train-model-demo docker.io/tamjiyan/vfl-train-model-demo:latest -> docker.io/library/import-2026-08-21@sha256:2bda6cf0b133c78073dd213555c1db46e66c13417d3d90336f0dab566ab2f9cc
+OK     orchestrator/orchestrator-7568c4469-zrtc2 orchestrator docker.io/dynamos1/orchestrator:main -> docker.io/library/import-2026-07-17@sha256:8d52eb087d57aa5cc46342d5089d50507a8b3f38c7f18f1b7ddb27a001fd6232
+OK     orchestrator/orchestrator-7568c4469-zrtc2 sidecar docker.io/dynamos1/sidecar:main -> docker.io/library/import-2026-07-10@sha256:ff3576e1ae17b8e670fe473baf965bbef30202045c62fc73acb4ad00204fdabd
+OK     orchestrator/policy-enforcer-6cfdd7df7-9xzhx policy-enforcer docker.io/dynamos1/policy-enforcer:main -> docker.io/library/import-2026-08-02@sha256:a93e0d39dfe2e28e9fbeab446df434e54430d780240a45f850ec2e8581650b0c
+OK     orchestrator/policy-enforcer-6cfdd7df7-9xzhx sidecar docker.io/dynamos1/sidecar:main -> docker.io/library/import-2026-07-10@sha256:ff3576e1ae17b8e670fe473baf965bbef30202045c62fc73acb4ad00204fdabd
+OK     server/server-6b44f89854-85vng server docker.io/dynamos1/agent:e3-inert-probe -> docker.io/library/import-2026-08-27@sha256:a403ee9c4704755431ccd889be37a7163b32aacb64132d6f9a4365c30a70bd73
+OK     server/server-6b44f89854-85vng sidecar docker.io/dynamos1/sidecar:main -> docker.io/library/import-2026-07-10@sha256:ff3576e1ae17b8e670fe473baf965bbef30202045c62fc73acb4ad00204fdabd
+image check: all fork images on the VFL path run kind-import digests
+

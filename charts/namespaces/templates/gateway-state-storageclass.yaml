@@ -1,0 +1,12 @@
+# Dedicated class for the agent's per-round state PVCs
+# (state-{steward}-{userhash}-{requesttype}). Kept separate from
+# "standard" so the static hostPath PVs on that class can never bind a
+# state claim; the backing path per environment is provisioner config.
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: gateway-state
+provisioner: rancher.io/local-path
+volumeBindingMode: WaitForFirstConsumer
+reclaimPolicy: Delete
+allowVolumeExpansion: false

@@ -1,0 +1,9 @@
+`e3-inert-probe/config-a-no-gateway/20260827-175432_overhead-run.txt | 20260827-175432 | scripts/capture_e3_overhead.sh a 50 | 7b53fcf | E3 config a (no-gateway): per-round latency + r2 + full logs, cycles=50`
+`e3-inert-probe/config-g-inert/20260827-175639_overhead-run.txt | 20260827-175639 | scripts/capture_e3_overhead.sh g 50 | 7b53fcf | E3 config g (inert): per-round latency + r2 + full logs, cycles=50`
+`e3-inert-probe/config-b-passthrough/20260827-175929_overhead-run.txt | 20260827-175929 | scripts/capture_e3_overhead.sh b 50 | 7b53fcf | E3 config b (passthrough): per-round latency + r2 + full logs, cycles=50`
+`e3-inert-probe/config-a-no-gateway/20260827-180139_overhead-run.txt | 20260827-180139 | scripts/capture_e3_overhead.sh a 50 | 7b53fcf | E3 config a (no-gateway): per-round latency + r2 + full logs, cycles=50`
+`e3-inert-probe/config-g-inert/20260827-180345_overhead-run.txt | 20260827-180345 | scripts/capture_e3_overhead.sh g 50 | 7b53fcf | E3 config g (inert): per-round latency + r2 + full logs, cycles=50`
+`e3-inert-probe/config-b-passthrough/20260827-180631_overhead-run.txt | 20260827-180631 | scripts/capture_e3_overhead.sh b 50 | 7b53fcf | E3 config b (passthrough): per-round latency + r2 + full logs, cycles=50`
+`e3-inert-probe/config-a-no-gateway/20260827-180838_overhead-run.txt | 20260827-180838 | scripts/capture_e3_overhead.sh a 50 | 7b53fcf | E3 config a (no-gateway): per-round latency + r2 + full logs, cycles=50`
+`e3-inert-probe/config-g-inert/20260827-181052_overhead-run.txt | 20260827-181052 | scripts/capture_e3_overhead.sh g 50 | 7b53fcf | E3 config g (inert): per-round latency + r2 + full logs, cycles=50`
+`e3-inert-probe/config-b-passthrough/20260827-181342_overhead-run.txt | 20260827-181342 | scripts/capture_e3_overhead.sh b 50 | 7b53fcf | E3 config b (passthrough): per-round latency + r2 + full logs, cycles=50`

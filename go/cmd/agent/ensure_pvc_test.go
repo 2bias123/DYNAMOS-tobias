@@ -100,7 +100,7 @@ func TestEnsureStatePVC(t *testing.T) {
 
 		created, ok := f.pvcs[name]
 		assert.Assert(t, ok)
-		assert.Equal(t, *created.Spec.StorageClassName, "standard")
+		assert.Equal(t, *created.Spec.StorageClassName, "gateway-state")
 		assert.Equal(t, len(created.Spec.AccessModes), 1)
 		assert.Equal(t, created.Spec.AccessModes[0], v1.ReadWriteOnce)
 		storage := created.Spec.Resources.Requests[v1.ResourceStorage]

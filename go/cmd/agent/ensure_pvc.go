@@ -13,7 +13,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-const stateStorageClass = "standard"
+const stateStorageClass = "gateway-state"
 
 // pvcClient is the slice of the namespaced PVC API ensureStatePVC needs;
 // satisfied by clientSet.CoreV1().PersistentVolumeClaims(namespace).
@@ -37,8 +37,8 @@ func statePVCName(steward, user, requestType string) string {
 }
 
 // ensureStatePVC gets or creates the identity-tuple PVC. A Pending PVC is
-// normal here: the standard StorageClass binds on WaitForFirstConsumer, so
-// the claim stays Pending until the gateway pod schedules.
+// normal here: the gateway-state StorageClass binds on WaitForFirstConsumer,
+// so the claim stays Pending until the gateway pod schedules.
 func ensureStatePVC(ctx context.Context, pvcs pvcClient, name string) error {
 	_, err := pvcs.Get(ctx, name, metav1.GetOptions{})
 	if err == nil {
