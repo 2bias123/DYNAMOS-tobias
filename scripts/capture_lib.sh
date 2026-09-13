@@ -16,6 +16,64 @@
 # it so every experiment reports distributions at the same n.
 CAMPAIGN_N="${CAMPAIGN_N:-50}"
 
+# HTTP transport to the orchestrator and api-gateway services.
+#   portforward (default) — localhost port-forwards, the kind path.
+#   nodeport — patch the service to NodePort and curl a node IP directly;
+#   the FABRIC path (kubectl port-forward is broken on the testbed VMs).
+# PF_SETTLE is the post-port-forward settle; nodeport needs none.
+E3_TRANSPORT="${E3_TRANSPORT:-portforward}"
+PF_SETTLE="${PF_SETTLE:-3}"
+export E3_TRANSPORT PF_SETTLE
+
+cluster_node_ip() {
+	if [ -n "${E3_NODE_IP:-}" ]; then
+		echo "$E3_NODE_IP"
+		return 0
+	fi
+	kubectl get nodes -o jsonpath='{.items[0].status.addresses[?(@.type=="InternalIP")].address}'
+}
+
+# Ensure $1/$2 (ns/svc) is reachable without a port-forward; echo its base
+# URL. Patches the service to NodePort on first use (idempotent; a rollout
+# restart never resets the service type).
+nodeport_base() { # $1 ns, $2 svc
+	local ns="$1" svc="$2" ip port
+	if [ "$(kubectl -n "$ns" get svc "$svc" -o jsonpath='{.spec.type}')" != "NodePort" ]; then
+		kubectl -n "$ns" patch svc "$svc" -p '{"spec":{"type":"NodePort"}}' >/dev/null \
+			|| { echo "cannot patch $ns/$svc to NodePort" >&2; return 1; }
+	fi
+	port=$(kubectl -n "$ns" get svc "$svc" -o jsonpath='{.spec.ports[0].nodePort}')
+	ip=$(cluster_node_ip)
+	[ -n "$port" ] && [ -n "$ip" ] || { echo "cannot resolve NodePort endpoint for $ns/$svc" >&2; return 1; }
+	echo "http://${ip}:${port}"
+}
+
+# Set ORCH_BASE / API_BASE for the configured transport, starting a
+# port-forward only in portforward mode.
+ensure_orch_base() {
+	if [ "$E3_TRANSPORT" = "nodeport" ]; then
+		ORCH_BASE=$(nodeport_base orchestrator orchestrator) || fail "orchestrator NodePort endpoint"
+	else
+		pkill -f "port-forward.*${ORCHPORT}:8080" 2>/dev/null
+		kubectl port-forward -n orchestrator svc/orchestrator "${ORCHPORT}:8080" >/dev/null 2>&1 &
+		PIDS+=($!)
+		sleep "$PF_SETTLE"
+		ORCH_BASE="http://localhost:${ORCHPORT}"
+	fi
+}
+
+ensure_api_base() {
+	if [ "$E3_TRANSPORT" = "nodeport" ]; then
+		API_BASE=$(nodeport_base api-gateway api-gateway) || fail "api-gateway NodePort endpoint"
+	else
+		pkill -f "port-forward.*${APIPORT}:8080" 2>/dev/null
+		kubectl port-forward -n api-gateway svc/api-gateway "${APIPORT}:8080" >/dev/null 2>&1 &
+		PIDS+=($!)
+		sleep "$PF_SETTLE"
+		API_BASE="http://localhost:${APIPORT}"
+	fi
+}
+
 step() { echo; echo "=== $*"; }
 fail() { echo "${EXP} FAIL: $*" >&2; exit 1; }
 
@@ -79,7 +137,7 @@ reset_cluster() {
 # rollout, clear any stale forward, then retry.
 reset_and_seed() {
 	reset_cluster
-	pkill -f "port-forward.*${ORCHPORT}:8080" 2>/dev/null
+	[ "$E3_TRANSPORT" = "portforward" ] && pkill -f "port-forward.*${ORCHPORT}:8080" 2>/dev/null
 	kubectl -n orchestrator rollout status deploy/orchestrator --timeout=90s >/dev/null 2>&1
 	local i
 	for i in 1 2 3 4; do
@@ -95,10 +153,7 @@ reset_and_seed() {
 # stateDirectives dict (variable `sd`) before the PUT; empty seeds canonical.
 seed_agreements() {
 	local transform="${1:-}"
-	pkill -f "port-forward.*${ORCHPORT}:8080" 2>/dev/null
-	kubectl port-forward -n orchestrator svc/orchestrator "${ORCHPORT}:8080" >/dev/null 2>&1 &
-	PIDS+=($!)
-	sleep 3
+	ensure_orch_base
 	local s f code tmp
 	for s in "${STEWARD_NS[@]}"; do
 		f="$root/configuration/etcd_launch_files/state_aware_${s}.json"
@@ -112,7 +167,7 @@ for rel in a['relations'].values():
         continue
     ${transform:-pass}
 print(json.dumps(a))" > "$tmp" || fail "variant transform failed for $s"
-		code=$(curl -s -o /dev/null -w '%{http_code}' -X PUT "http://localhost:${ORCHPORT}/api/v1/policyEnforcer" \
+		code=$(curl -s -o /dev/null -w '%{http_code}' -X PUT "${ORCH_BASE}/api/v1/policyEnforcer" \
 			-H 'Content-Type: application/json' --data-binary @"$tmp")
 		rm -f "$tmp"
 		[ "$code" = "200" ] || fail "seed PUT for $s returned http $code"
@@ -136,12 +191,9 @@ print(a['relations']['${USER_NAME}']['stateDirectives']['$1'])")
 }
 
 trigger() { # $1 = cycles; echoes request_id (logs go to stderr)
-	pkill -f "port-forward.*${APIPORT}:8080" 2>/dev/null
-	kubectl port-forward -n api-gateway svc/api-gateway "${APIPORT}:8080" >/dev/null 2>&1 &
-	PIDS+=($!)
-	sleep 3
+	ensure_api_base
 	local resp
-	resp=$(curl -s -X POST "http://localhost:${APIPORT}/api/v1/requestApproval" \
+	resp=$(curl -s -X POST "${API_BASE}/api/v1/requestApproval" \
 		-H 'Content-Type: application/json' -d '{
   "type": "vflTrainModelRequest",
   "user": { "id": "1234", "userName": "'"${USER_NAME}"'" },
@@ -156,10 +208,11 @@ trigger() { # $1 = cycles; echoes request_id (logs go to stderr)
 }
 
 wait_done() { # $1 = request_id, $2 = max polls (5s each, default POLL_MAX); prints final status JSON
+	[ -n "${API_BASE:-}" ] || ensure_api_base
 	local max="${2:-$POLL_MAX}" i out st
 	for i in $(seq 1 "$max"); do
 		sleep 5
-		out=$(curl -s "http://localhost:${APIPORT}/api/v1/getTrainingStatus?id=$1")
+		out=$(curl -s "${API_BASE}/api/v1/getTrainingStatus?id=$1")
 		st=$(echo "$out" | python3 -c "import sys, json; print(json.load(sys.stdin).get('status', ''))" 2>/dev/null)
 		echo "poll $i: ${st:-no-response}" >&2
 		if [ "$st" = "done" ]; then

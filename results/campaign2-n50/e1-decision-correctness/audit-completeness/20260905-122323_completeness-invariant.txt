@@ -1,0 +1,40 @@
+$ date
+Sat Sep  5 12:23:23 PM CEST 2026
+
+$ git rev-parse HEAD
+51308f7fb2f1f259f218341a1699d21a43c9b530
+
+$ git status --short
+?? results/campaign2-n50/
+?? results/e3-frozen-30triplets/captures.md
+?? results/e3-frozen-30triplets/config-a-no-gateway/
+?? results/e3-frozen-30triplets/config-b-passthrough/
+?? results/e3-frozen-30triplets/config-c-enforced/
+?? results/e3-frozen-30triplets/env/20260904-181403_env-snapshot.txt
+?? results/e3-frozen-30triplets/env/20260904-181403_images.txt
+
+$ kubectl config current-context
+kind-kind
+
+
+=== steward server
+[server] state PVC: state-server-ad751c18-vfltrainmodelrequest
+state files: 2  audit lines: 530  allow-writes: 2
+COMPLETENESS PASS: every state file has an ALLOW audit line
+
+=== steward clientone
+[clientone] state PVC: state-clientone-ad751c18-vfltrainmodelrequest
+state files: 1  audit lines: 526  allow-writes: 1
+COMPLETENESS PASS: every state file has an ALLOW audit line
+
+=== steward clienttwo
+[clienttwo] state PVC: state-clienttwo-ad751c18-vfltrainmodelrequest
+state files: 1  audit lines: 526  allow-writes: 1
+COMPLETENESS PASS: every state file has an ALLOW audit line
+
+=== steward clientthree
+[clientthree] state PVC: state-clientthree-ad751c18-vfltrainmodelrequest
+state files: 1  audit lines: 526  allow-writes: 1
+COMPLETENESS PASS: every state file has an ALLOW audit line
+
+OK: completeness PASS on all 4 steward PVCs

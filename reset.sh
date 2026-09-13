@@ -26,6 +26,7 @@ REQUEST_PATH=(
 	"clientthree/clientthree"
 )
 SETTLE_SECONDS="${SETTLE_SECONDS:-45}"
+ROLLOUT_TIMEOUT="${ROLLOUT_TIMEOUT:-120s}"
 
 # Refuse to run if the required recovery patches aren't in the tree.
 "$script_dir/scripts/preflight_patches.sh"
@@ -49,7 +50,7 @@ done
 for entry in "${REQUEST_PATH[@]}"; do
 	ns="${entry%%/*}"
 	deploy="${entry##*/}"
-	kubectl -n "$ns" rollout status "deployment/$deploy" --timeout=120s
+	kubectl -n "$ns" rollout status "deployment/$deploy" --timeout="$ROLLOUT_TIMEOUT"
 done
 
 echo "[reset] settling ${SETTLE_SECONDS}s for AMQP topology to converge"

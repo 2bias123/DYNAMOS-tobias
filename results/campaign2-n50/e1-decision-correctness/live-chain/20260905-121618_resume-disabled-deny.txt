@@ -1,0 +1,601 @@
+$ date
+Sat Sep  5 12:16:18 PM CEST 2026
+
+$ git rev-parse HEAD
+51308f7fb2f1f259f218341a1699d21a43c9b530
+
+$ git status --short
+?? results/campaign2-n50/
+?? results/e3-frozen-30triplets/captures.md
+?? results/e3-frozen-30triplets/config-a-no-gateway/
+?? results/e3-frozen-30triplets/config-b-passthrough/
+?? results/e3-frozen-30triplets/config-c-enforced/
+?? results/e3-frozen-30triplets/env/20260904-181403_env-snapshot.txt
+?? results/e3-frozen-30triplets/env/20260904-181403_images.txt
+
+$ kubectl config current-context
+kind-kind
+
+
+=== reset + seed variant resumeAllowed=false
+PREFLIGHT OK: B14, B15 applied
+[reset] deleting stale Jobs in steward namespaces
+job.batch "jake-jongejans-b7284d14server1" deleted
+job.batch "jake-jongejans-b7284d14clientone1" deleted
+job.batch "jake-jongejans-b7284d14clienttwo1" deleted
+job.batch "jake-jongejans-b7284d14clientthree1" deleted
+[reset] clearing /agents/jobs/ etcd keys
+[reset] coordinated rollout of request path
+deployment.apps/api-gateway restarted
+deployment.apps/policy-enforcer restarted
+deployment.apps/orchestrator restarted
+deployment.apps/server restarted
+deployment.apps/clientone restarted
+deployment.apps/clienttwo restarted
+deployment.apps/clientthree restarted
+Waiting for deployment "api-gateway" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "api-gateway" rollout to finish: 1 old replicas are pending termination...
+deployment "api-gateway" successfully rolled out
+Waiting for deployment "policy-enforcer" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "policy-enforcer" rollout to finish: 1 old replicas are pending termination...
+deployment "policy-enforcer" successfully rolled out
+deployment "orchestrator" successfully rolled out
+deployment "server" successfully rolled out
+deployment "clientone" successfully rolled out
+deployment "clienttwo" successfully rolled out
+deployment "clientthree" successfully rolled out
+[reset] settling 45s for AMQP topology to converge
+[reset] OK
+[seed] server: OK (variant: sd['resumeAllowed'] = False)
+[seed] clientone: OK (variant: sd['resumeAllowed'] = False)
+[seed] clienttwo: OK (variant: sd['resumeAllowed'] = False)
+[seed] clientthree: OK (variant: sd['resumeAllowed'] = False)
+[seed] verified in etcd for all stewards: resumeAllowed=False
+
+=== run: cycles=50; startup read must DENY 'resume disabled', writes still ALLOW
+trigger: {"request_id":"725ec888-52f2-420c-9958-1b5e50af2df0","status":"pending"}
+poll 1: pending
+poll 2: pending
+poll 3: pending
+poll 4: pending
+poll 5: pending
+poll 6: pending
+poll 7: pending
+poll 8: done
+{
+    "metadata": {
+        "policy_reintroduction": -1,
+        "policy_removal": -1,
+        "total_rounds": 50,
+        "training_backtrack": 0
+    },
+    "request_id": "725ec888-52f2-420c-9958-1b5e50af2df0",
+    "results": [
+        {
+            "accuracy": -2.1119015216827393,
+            "clients": 3,
+            "timestamp": "2026-09-05T10:17:25Z",
+            "train_round": 0
+        },
+        {
+            "accuracy": -2.1099298000335693,
+            "clients": 3,
+            "timestamp": "2026-09-05T10:17:26Z",
+            "train_round": 1
+        },
+        {
+            "accuracy": -2.099273204803467,
+            "clients": 3,
+            "timestamp": "2026-09-05T10:17:27Z",
+            "train_round": 2
+        },
+        {
+            "accuracy": -2.067572832107544,
+            "clients": 3,
+            "timestamp": "2026-09-05T10:17:27Z",
+            "train_round": 3
+        },
+        {
+            "accuracy": -1.994020938873291,
+            "clients": 3,
+            "timestamp": "2026-09-05T10:17:28Z",
+            "train_round": 4
+        },
+        {
+            "accuracy": -1.8500776290893555,
+            "clients": 3,
+            "timestamp": "2026-09-05T10:17:28Z",
+            "train_round": 5
+        },
+        {
+            "accuracy": -1.6018362045288086,
+            "clients": 3,
+            "timestamp": "2026-09-05T10:17:29Z",
+            "train_round": 6
+        },
+        {
+            "accuracy": -1.221557855606079,
+            "clients": 3,
+            "timestamp": "2026-09-05T10:17:29Z",
+            "train_round": 7
+        },
+        {
+            "accuracy": -0.7049739360809326,
+            "clients": 3,
+            "timestamp": "2026-09-05T10:17:30Z",
+            "train_round": 8
+        },
+        {
+            "accuracy": -0.13543760776519775,
+            "clients": 3,
+            "timestamp": "2026-09-05T10:17:30Z",
+            "train_round": 9
+        },
+        {
+            "accuracy": 0.2400560975074768,
+            "clients": 3,
+            "timestamp": "2026-09-05T10:17:31Z",
+            "train_round": 10
+        },
+        {
+            "accuracy": 0.06391268968582153,
+            "clients": 3,
+            "timestamp": "2026-09-05T10:17:32Z",
+            "train_round": 11
+        },
+        {
+            "accuracy": -0.11198043823242188,
+            "clients": 3,
+            "timestamp": "2026-09-05T10:17:32Z",
+            "train_round": 12
+        },
+        {
+            "accuracy": 0.08771640062332153,
+            "clients": 3,
+            "timestamp": "2026-09-05T10:17:33Z",
+            "train_round": 13
+        },
+        {
+            "accuracy": 0.36427462100982666,
+            "clients": 3,
+            "timestamp": "2026-09-05T10:17:33Z",
+            "train_round": 14
+        },
+        {
+            "accuracy": 0.497381329536438,
+            "clients": 3,
+            "timestamp": "2026-09-05T10:17:34Z",
+            "train_round": 15
+        },
+        {
+            "accuracy": 0.4607870578765869,
+            "clients": 3,
+            "timestamp": "2026-09-05T10:17:34Z",
+            "train_round": 16
+        },
+        {
+            "accuracy": 0.39047813415527344,
+            "clients": 3,
+            "timestamp": "2026-09-05T10:17:35Z",
+            "train_round": 17
+        },
+        {
+            "accuracy": 0.32978272438049316,
+            "clients": 3,
+            "timestamp": "2026-09-05T10:17:36Z",
+            "train_round": 18
+        },
+        {
+            "accuracy": 0.33184969425201416,
+            "clients": 3,
+            "timestamp": "2026-09-05T10:17:36Z",
+            "train_round": 19
+        },
+        {
+            "accuracy": 0.38806867599487305,
+            "clients": 3,
+            "timestamp": "2026-09-05T10:17:37Z",
+            "train_round": 20
+        },
+        {
+            "accuracy": 0.4703652262687683,
+            "clients": 3,
+            "timestamp": "2026-09-05T10:17:37Z",
+            "train_round": 21
+        },
+        {
+            "accuracy": 0.539726972579956,
+            "clients": 3,
+            "timestamp": "2026-09-05T10:17:38Z",
+            "train_round": 22
+        },
+        {
+            "accuracy": 0.5713263154029846,
+            "clients": 3,
+            "timestamp": "2026-09-05T10:17:38Z",
+            "train_round": 23
+        },
+        {
+            "accuracy": 0.5472698211669922,
+            "clients": 3,
+            "timestamp": "2026-09-05T10:17:39Z",
+            "train_round": 24
+        },
+        {
+            "accuracy": 0.5102401971817017,
+            "clients": 3,
+            "timestamp": "2026-09-05T10:17:39Z",
+            "train_round": 25
+        },
+        {
+            "accuracy": 0.49743592739105225,
+            "clients": 3,
+            "timestamp": "2026-09-05T10:17:40Z",
+            "train_round": 26
+        },
+        {
+            "accuracy": 0.5491477847099304,
+            "clients": 3,
+            "timestamp": "2026-09-05T10:17:40Z",
+            "train_round": 27
+        },
+        {
+            "accuracy": 0.5935004949569702,
+            "clients": 3,
+            "timestamp": "2026-09-05T10:17:41Z",
+            "train_round": 28
+        },
+        {
+            "accuracy": 0.6282415390014648,
+            "clients": 3,
+            "timestamp": "2026-09-05T10:17:41Z",
+            "train_round": 29
+        },
+        {
+            "accuracy": 0.6197926998138428,
+            "clients": 3,
+            "timestamp": "2026-09-05T10:17:42Z",
+            "train_round": 30
+        },
+        {
+            "accuracy": 0.5989049673080444,
+            "clients": 3,
+            "timestamp": "2026-09-05T10:17:42Z",
+            "train_round": 31
+        },
+        {
+            "accuracy": 0.5889431238174438,
+            "clients": 3,
+            "timestamp": "2026-09-05T10:17:43Z",
+            "train_round": 32
+        },
+        {
+            "accuracy": 0.5930992364883423,
+            "clients": 3,
+            "timestamp": "2026-09-05T10:17:43Z",
+            "train_round": 33
+        },
+        {
+            "accuracy": 0.6129176616668701,
+            "clients": 3,
+            "timestamp": "2026-09-05T10:17:44Z",
+            "train_round": 34
+        },
+        {
+            "accuracy": 0.6279172897338867,
+            "clients": 3,
+            "timestamp": "2026-09-05T10:17:44Z",
+            "train_round": 35
+        },
+        {
+            "accuracy": 0.6427819728851318,
+            "clients": 3,
+            "timestamp": "2026-09-05T10:17:45Z",
+            "train_round": 36
+        },
+        {
+            "accuracy": 0.6383086442947388,
+            "clients": 3,
+            "timestamp": "2026-09-05T10:17:45Z",
+            "train_round": 37
+        },
+        {
+            "accuracy": 0.6324862241744995,
+            "clients": 3,
+            "timestamp": "2026-09-05T10:17:46Z",
+            "train_round": 38
+        },
+        {
+            "accuracy": 0.6352691650390625,
+            "clients": 3,
+            "timestamp": "2026-09-05T10:17:46Z",
+            "train_round": 39
+        },
+        {
+            "accuracy": 0.6360974311828613,
+            "clients": 3,
+            "timestamp": "2026-09-05T10:17:47Z",
+            "train_round": 40
+        },
+        {
+            "accuracy": 0.6638934016227722,
+            "clients": 3,
+            "timestamp": "2026-09-05T10:17:47Z",
+            "train_round": 41
+        },
+        {
+            "accuracy": 0.6693620681762695,
+            "clients": 3,
+            "timestamp": "2026-09-05T10:17:48Z",
+            "train_round": 42
+        },
+        {
+            "accuracy": 0.6652570962905884,
+            "clients": 3,
+            "timestamp": "2026-09-05T10:17:48Z",
+            "train_round": 43
+        },
+        {
+            "accuracy": 0.6696213483810425,
+            "clients": 3,
+            "timestamp": "2026-09-05T10:17:49Z",
+            "train_round": 44
+        },
+        {
+            "accuracy": 0.6572669148445129,
+            "clients": 3,
+            "timestamp": "2026-09-05T10:17:49Z",
+            "train_round": 45
+        },
+        {
+            "accuracy": 0.6637743711471558,
+            "clients": 3,
+            "timestamp": "2026-09-05T10:17:50Z",
+            "train_round": 46
+        },
+        {
+            "accuracy": 0.6693111062049866,
+            "clients": 3,
+            "timestamp": "2026-09-05T10:17:51Z",
+            "train_round": 47
+        },
+        {
+            "accuracy": 0.6739547252655029,
+            "clients": 3,
+            "timestamp": "2026-09-05T10:17:51Z",
+            "train_round": 48
+        },
+        {
+            "accuracy": 0.6752510666847229,
+            "clients": 3,
+            "timestamp": "2026-09-05T10:17:52Z",
+            "train_round": 49
+        }
+    ],
+    "status": "done"
+}
+
+--- server gateway audit ---
+1.7886034388448164e+09	[34mINFO[0m	/app/cmd/policy-checkpoint-gateway/main.go:142	Serving on 50050
+1.788603438855035e+09	[34mINFO[0m	/app/cmd/policy-checkpoint-gateway/watch.go:56	Agreement loaded 55cbe49675089cec5497558960c69f09c05543ff42338f35daf2a073f19a9981
+{"op":"subscribe","reason":"subscription established","identity":{"steward":"SERVER","user":"jake.jongejans@student.uva.nl","requestType":"vflTrainModelRequest","jobId":"jake-jongejans-2e581d30server1","localJobName":"jake-jongejans-2e581d30server1"},"agreementHash":"55cbe49675089cec5497558960c69f09c05543ff42338f35daf2a073f19a9981","policySource":"cached"}
+{"op":"subscribe","reason":"subscription established","identity":{"steward":"SERVER","user":"jake.jongejans@student.uva.nl","requestType":"vflTrainModelRequest","jobId":"jake-jongejans-2e581d30server1","localJobName":"jake-jongejans-2e581d30server1"},"agreementHash":"55cbe49675089cec5497558960c69f09c05543ff42338f35daf2a073f19a9981","policySource":"cached"}
+{"op":"read","decision":"DENY","reason":"resume disabled","identity":{"steward":"SERVER","user":"jake.jongejans@student.uva.nl","requestType":"vflTrainModelRequest","jobId":"jake-jongejans-2e581d30server1","localJobName":"jake-jongejans-2e581d30server1"},"stateClass":"vfl_server_model","stateKey":"latest","agreementHash":"55cbe49675089cec5497558960c69f09c05543ff42338f35daf2a073f19a9981","policySource":"cached","cacheAgeMs":2909,"relationId":"GUID-state-aware","directives":{"allowed":true,"retentionSeconds":900,"resumeAllowed":false,"onRevocation":"purge"}}
+{"op":"write","decision":"ALLOW","identity":{"steward":"SERVER","user":"jake.jongejans@student.uva.nl","requestType":"vflTrainModelRequest","jobId":"jake-jongejans-2e581d30server1","localJobName":"jake-jongejans-2e581d30server1"},"stateClass":"vfl_server_model","stateKey":"latest","writtenUnixSeconds":1788603444,"agreementHash":"55cbe49675089cec5497558960c69f09c05543ff42338f35daf2a073f19a9981","policySource":"cached","cacheAgeMs":5868,"relationId":"GUID-state-aware","directives":{"allowed":true,"retentionSeconds":900,"resumeAllowed":false,"onRevocation":"purge"}}
+1.7886034447246468e+09	[34mINFO[0m	/app/cmd/policy-checkpoint-gateway/handlers.go:218	Write timing	{"decideMicros": 1, "auditMicros": 896, "persistMicros": 222, "totalMicros": 1125}
+{"op":"write","decision":"ALLOW","identity":{"steward":"SERVER","user":"jake.jongejans@student.uva.nl","requestType":"vflTrainModelRequest","jobId":"jake-jongejans-2e581d30server1","localJobName":"jake-jongejans-2e581d30server1"},"stateClass":"vfl_server_model","stateKey":"latest","writtenUnixSeconds":1788603446,"agreementHash":"55cbe49675089cec5497558960c69f09c05543ff42338f35daf2a073f19a9981","policySource":"cached","cacheAgeMs":7486,"relationId":"GUID-state-aware","directives":{"allowed":true,"retentionSeconds":900,"resumeAllowed":false,"onRevocation":"purge"}}
+1.7886034463427815e+09	[34mINFO[0m	/app/cmd/policy-checkpoint-gateway/handlers.go:218	Write timing	{"decideMicros": 2, "auditMicros": 810, "persistMicros": 238, "totalMicros": 1059}
+{"op":"write","decision":"ALLOW","identity":{"steward":"SERVER","user":"jake.jongejans@student.uva.nl","requestType":"vflTrainModelRequest","jobId":"jake-jongejans-2e581d30server1","localJobName":"jake-jongejans-2e581d30server1"},"stateClass":"vfl_server_model","stateKey":"latest","writtenUnixSeconds":1788603446,"agreementHash":"55cbe49675089cec5497558960c69f09c05543ff42338f35daf2a073f19a9981","policySource":"cached","cacheAgeMs":8071,"relationId":"GUID-state-aware","directives":{"allowed":true,"retentionSeconds":900,"resumeAllowed":false,"onRevocation":"purge"}}
+1.7886034469271517e+09	[34mINFO[0m	/app/cmd/policy-checkpoint-gateway/handlers.go:218	Write timing	{"decideMicros": 2, "auditMicros": 598, "persistMicros": 184, "totalMicros": 793}
+{"op":"write","decision":"ALLOW","identity":{"steward":"SERVER","user":"jake.jongejans@student.uva.nl","requestType":"vflTrainModelRequest","jobId":"jake-jongejans-2e581d30server1","localJobName":"jake-jongejans-2e581d30server1"},"stateClass":"vfl_server_model","stateKey":"latest","writtenUnixSeconds":1788603447,"agreementHash":"55cbe49675089cec5497558960c69f09c05543ff42338f35daf2a073f19a9981","policySource":"cached","cacheAgeMs":8621,"relationId":"GUID-state-aware","directives":{"allowed":true,"retentionSeconds":900,"resumeAllowed":false,"onRevocation":"purge"}}
+1.7886034474776125e+09	[34mINFO[0m	/app/cmd/policy-checkpoint-gateway/handlers.go:218	Write timing	{"decideMicros": 2, "auditMicros": 798, "persistMicros": 203, "totalMicros": 1011}
+{"op":"write","decision":"ALLOW","identity":{"steward":"SERVER","user":"jake.jongejans@student.uva.nl","requestType":"vflTrainModelRequest","jobId":"jake-jongejans-2e581d30server1","localJobName":"jake-jongejans-2e581d30server1"},"stateClass":"vfl_server_model","stateKey":"latest","writtenUnixSeconds":1788603448,"agreementHash":"55cbe49675089cec5497558960c69f09c05543ff42338f35daf2a073f19a9981","policySource":"cached","cacheAgeMs":9212,"relationId":"GUID-state-aware","directives":{"allowed":true,"retentionSeconds":900,"resumeAllowed":false,"onRevocation":"purge"}}
+1.7886034480686445e+09	[34mINFO[0m	/app/cmd/policy-checkpoint-gateway/handlers.go:218	Write timing	{"decideMicros": 2, "auditMicros": 611, "persistMicros": 205, "totalMicros": 825}
+{"op":"write","decision":"ALLOW","identity":{"steward":"SERVER","user":"jake.jongejans@student.uva.nl","requestType":"vflTrainModelRequest","jobId":"jake-jongejans-2e581d30server1","localJobName":"jake-jongejans-2e581d30server1"},"stateClass":"vfl_server_model","stateKey":"latest","writtenUnixSeconds":1788603448,"agreementHash":"55cbe49675089cec5497558960c69f09c05543ff42338f35daf2a073f19a9981","policySource":"cached","cacheAgeMs":9750,"relationId":"GUID-state-aware","directives":{"allowed":true,"retentionSeconds":900,"resumeAllowed":false,"onRevocation":"purge"}}
+1.7886034486069605e+09	[34mINFO[0m	/app/cmd/policy-checkpoint-gateway/handlers.go:218	Write timing	{"decideMicros": 2, "auditMicros": 776, "persistMicros": 216, "totalMicros": 1001}
+{"op":"write","decision":"ALLOW","identity":{"steward":"SERVER","user":"jake.jongejans@student.uva.nl","requestType":"vflTrainModelRequest","jobId":"jake-jongejans-2e581d30server1","localJobName":"jake-jongejans-2e581d30server1"},"stateClass":"vfl_server_model","stateKey":"latest","writtenUnixSeconds":1788603449,"agreementHash":"55cbe49675089cec5497558960c69f09c05543ff42338f35daf2a073f19a9981","policySource":"cached","cacheAgeMs":10281,"relationId":"GUID-state-aware","directives":{"allowed":true,"retentionSeconds":900,"resumeAllowed":false,"onRevocation":"purge"}}
+1.788603449137382e+09	[34mINFO[0m	/app/cmd/policy-checkpoint-gateway/handlers.go:218	Write timing	{"decideMicros": 2, "auditMicros": 657, "persistMicros": 203, "totalMicros": 869}
+{"op":"write","decision":"ALLOW","identity":{"steward":"SERVER","user":"jake.jongejans@student.uva.nl","requestType":"vflTrainModelRequest","jobId":"jake-jongejans-2e581d30server1","localJobName":"jake-jongejans-2e581d30server1"},"stateClass":"vfl_server_model","stateKey":"latest","writtenUnixSeconds":1788603449,"agreementHash":"55cbe49675089cec5497558960c69f09c05543ff42338f35daf2a073f19a9981","policySource":"cached","cacheAgeMs":10784,"relationId":"GUID-state-aware","directives":{"allowed":true,"retentionSeconds":900,"resumeAllowed":false,"onRevocation":"purge"}}
+1.7886034496409466e+09	[34mINFO[0m	/app/cmd/policy-checkpoint-gateway/handlers.go:218	Write timing	{"decideMicros": 2, "auditMicros": 1075, "persistMicros": 192, "totalMicros": 1277}
+{"op":"write","decision":"ALLOW","identity":{"steward":"SERVER","user":"jake.jongejans@student.uva.nl","requestType":"vflTrainModelRequest","jobId":"jake-jongejans-2e581d30server1","localJobName":"jake-jongejans-2e581d30server1"},"stateClass":"vfl_server_model","stateKey":"latest","writtenUnixSeconds":1788603450,"agreementHash":"55cbe49675089cec5497558960c69f09c05543ff42338f35daf2a073f19a9981","policySource":"cached","cacheAgeMs":11345,"relationId":"GUID-state-aware","directives":{"allowed":true,"retentionSeconds":900,"resumeAllowed":false,"onRevocation":"purge"}}
+1.7886034502015436e+09	[34mINFO[0m	/app/cmd/policy-checkpoint-gateway/handlers.go:218	Write timing	{"decideMicros": 2, "auditMicros": 746, "persistMicros": 203, "totalMicros": 958}
+{"op":"write","decision":"ALLOW","identity":{"steward":"SERVER","user":"jake.jongejans@student.uva.nl","requestType":"vflTrainModelRequest","jobId":"jake-jongejans-2e581d30server1","localJobName":"jake-jongejans-2e581d30server1"},"stateClass":"vfl_server_model","stateKey":"latest","writtenUnixSeconds":1788603450,"agreementHash":"55cbe49675089cec5497558960c69f09c05543ff42338f35daf2a073f19a9981","policySource":"cached","cacheAgeMs":11901,"relationId":"GUID-state-aware","directives":{"allowed":true,"retentionSeconds":900,"resumeAllowed":false,"onRevocation":"purge"}}
+1.7886034507571304e+09	[34mINFO[0m	/app/cmd/policy-checkpoint-gateway/handlers.go:218	Write timing	{"decideMicros": 2, "auditMicros": 675, "persistMicros": 201, "totalMicros": 885}
+{"op":"write","decision":"ALLOW","identity":{"steward":"SERVER","user":"jake.jongejans@student.uva.nl","requestType":"vflTrainModelRequest","jobId":"jake-jongejans-2e581d30server1","localJobName":"jake-jongejans-2e581d30server1"},"stateClass":"vfl_server_model","stateKey":"latest","writtenUnixSeconds":1788603451,"agreementHash":"55cbe49675089cec5497558960c69f09c05543ff42338f35daf2a073f19a9981","policySource":"cached","cacheAgeMs":12440,"relationId":"GUID-state-aware","directives":{"allowed":true,"retentionSeconds":900,"resumeAllowed":false,"onRevocation":"purge"}}
+1.7886034512961743e+09	[34mINFO[0m	/app/cmd/policy-checkpoint-gateway/handlers.go:218	Write timing	{"decideMicros": 2, "auditMicros": 684, "persistMicros": 252, "totalMicros": 946}
+{"op":"write","decision":"ALLOW","identity":{"steward":"SERVER","user":"jake.jongejans@student.uva.nl","requestType":"vflTrainModelRequest","jobId":"jake-jongejans-2e581d30server1","localJobName":"jake-jongejans-2e581d30server1"},"stateClass":"vfl_server_model","stateKey":"latest","writtenUnixSeconds":1788603451,"agreementHash":"55cbe49675089cec5497558960c69f09c05543ff42338f35daf2a073f19a9981","policySource":"cached","cacheAgeMs":12975,"relationId":"GUID-state-aware","directives":{"allowed":true,"retentionSeconds":900,"resumeAllowed":false,"onRevocation":"purge"}}
+1.7886034518315349e+09	[34mINFO[0m	/app/cmd/policy-checkpoint-gateway/handlers.go:218	Write timing	{"decideMicros": 2, "auditMicros": 805, "persistMicros": 258, "totalMicros": 1072}
+{"op":"write","decision":"ALLOW","identity":{"steward":"SERVER","user":"jake.jongejans@student.uva.nl","requestType":"vflTrainModelRequest","jobId":"jake-jongejans-2e581d30server1","localJobName":"jake-jongejans-2e581d30server1"},"stateClass":"vfl_server_model","stateKey":"latest","writtenUnixSeconds":1788603452,"agreementHash":"55cbe49675089cec5497558960c69f09c05543ff42338f35daf2a073f19a9981","policySource":"cached","cacheAgeMs":13499,"relationId":"GUID-state-aware","directives":{"allowed":true,"retentionSeconds":900,"resumeAllowed":false,"onRevocation":"purge"}}
+1.7886034523554604e+09	[34mINFO[0m	/app/cmd/policy-checkpoint-gateway/handlers.go:218	Write timing	{"decideMicros": 2, "auditMicros": 715, "persistMicros": 290, "totalMicros": 1015}
+{"op":"write","decision":"ALLOW","identity":{"steward":"SERVER","user":"jake.jongejans@student.uva.nl","requestType":"vflTrainModelRequest","jobId":"jake-jongejans-2e581d30server1","localJobName":"jake-jongejans-2e581d30server1"},"stateClass":"vfl_server_model","stateKey":"latest","writtenUnixSeconds":1788603452,"agreementHash":"55cbe49675089cec5497558960c69f09c05543ff42338f35daf2a073f19a9981","policySource":"cached","cacheAgeMs":14102,"relationId":"GUID-state-aware","directives":{"allowed":true,"retentionSeconds":900,"resumeAllowed":false,"onRevocation":"purge"}}
+1.788603452958331e+09	[34mINFO[0m	/app/cmd/policy-checkpoint-gateway/handlers.go:218	Write timing	{"decideMicros": 2, "auditMicros": 697, "persistMicros": 216, "totalMicros": 924}
+{"op":"write","decision":"ALLOW","identity":{"steward":"SERVER","user":"jake.jongejans@student.uva.nl","requestType":"vflTrainModelRequest","jobId":"jake-jongejans-2e581d30server1","localJobName":"jake-jongejans-2e581d30server1"},"stateClass":"vfl_server_model","stateKey":"latest","writtenUnixSeconds":1788603453,"agreementHash":"55cbe49675089cec5497558960c69f09c05543ff42338f35daf2a073f19a9981","policySource":"cached","cacheAgeMs":14648,"relationId":"GUID-state-aware","directives":{"allowed":true,"retentionSeconds":900,"resumeAllowed":false,"onRevocation":"purge"}}
+1.7886034535059285e+09	[34mINFO[0m	/app/cmd/policy-checkpoint-gateway/handlers.go:218	Write timing	{"decideMicros": 2, "auditMicros": 1776, "persistMicros": 204, "totalMicros": 1991}
+{"op":"write","decision":"ALLOW","identity":{"steward":"SERVER","user":"jake.jongejans@student.uva.nl","requestType":"vflTrainModelRequest","jobId":"jake-jongejans-2e581d30server1","localJobName":"jake-jongejans-2e581d30server1"},"stateClass":"vfl_server_model","stateKey":"latest","writtenUnixSeconds":1788603453,"agreementHash":"55cbe49675089cec5497558960c69f09c05543ff42338f35daf2a073f19a9981","policySource":"cached","cacheAgeMs":15133,"relationId":"GUID-state-aware","directives":{"allowed":true,"retentionSeconds":900,"resumeAllowed":false,"onRevocation":"purge"}}
+1.7886034539893277e+09	[34mINFO[0m	/app/cmd/policy-checkpoint-gateway/handlers.go:218	Write timing	{"decideMicros": 2, "auditMicros": 700, "persistMicros": 209, "totalMicros": 919}
+{"op":"write","decision":"ALLOW","identity":{"steward":"SERVER","user":"jake.jongejans@student.uva.nl","requestType":"vflTrainModelRequest","jobId":"jake-jongejans-2e581d30server1","localJobName":"jake-jongejans-2e581d30server1"},"stateClass":"vfl_server_model","stateKey":"latest","writtenUnixSeconds":1788603454,"agreementHash":"55cbe49675089cec5497558960c69f09c05543ff42338f35daf2a073f19a9981","policySource":"cached","cacheAgeMs":15708,"relationId":"GUID-state-aware","directives":{"allowed":true,"retentionSeconds":900,"resumeAllowed":false,"onRevocation":"purge"}}
+1.7886034545648751e+09	[34mINFO[0m	/app/cmd/policy-checkpoint-gateway/handlers.go:218	Write timing	{"decideMicros": 2, "auditMicros": 650, "persistMicros": 216, "totalMicros": 875}
+{"op":"write","decision":"ALLOW","identity":{"steward":"SERVER","user":"jake.jongejans@student.uva.nl","requestType":"vflTrainModelRequest","jobId":"jake-jongejans-2e581d30server1","localJobName":"jake-jongejans-2e581d30server1"},"stateClass":"vfl_server_model","stateKey":"latest","writtenUnixSeconds":1788603455,"agreementHash":"55cbe49675089cec5497558960c69f09c05543ff42338f35daf2a073f19a9981","policySource":"cached","cacheAgeMs":16203,"relationId":"GUID-state-aware","directives":{"allowed":true,"retentionSeconds":900,"resumeAllowed":false,"onRevocation":"purge"}}
+1.7886034550599284e+09	[34mINFO[0m	/app/cmd/policy-checkpoint-gateway/handlers.go:218	Write timing	{"decideMicros": 2, "auditMicros": 728, "persistMicros": 240, "totalMicros": 980}
+{"op":"write","decision":"ALLOW","identity":{"steward":"SERVER","user":"jake.jongejans@student.uva.nl","requestType":"vflTrainModelRequest","jobId":"jake-jongejans-2e581d30server1","localJobName":"jake-jongejans-2e581d30server1"},"stateClass":"vfl_server_model","stateKey":"latest","writtenUnixSeconds":1788603455,"agreementHash":"55cbe49675089cec5497558960c69f09c05543ff42338f35daf2a073f19a9981","policySource":"cached","cacheAgeMs":16891,"relationId":"GUID-state-aware","directives":{"allowed":true,"retentionSeconds":900,"resumeAllowed":false,"onRevocation":"purge"}}
+1.7886034557476091e+09	[34mINFO[0m	/app/cmd/policy-checkpoint-gateway/handlers.go:218	Write timing	{"decideMicros": 2, "auditMicros": 1088, "persistMicros": 228, "totalMicros": 1326}
+{"op":"write","decision":"ALLOW","identity":{"steward":"SERVER","user":"jake.jongejans@student.uva.nl","requestType":"vflTrainModelRequest","jobId":"jake-jongejans-2e581d30server1","localJobName":"jake-jongejans-2e581d30server1"},"stateClass":"vfl_server_model","stateKey":"latest","writtenUnixSeconds":1788603456,"agreementHash":"55cbe49675089cec5497558960c69f09c05543ff42338f35daf2a073f19a9981","policySource":"cached","cacheAgeMs":17487,"relationId":"GUID-state-aware","directives":{"allowed":true,"retentionSeconds":900,"resumeAllowed":false,"onRevocation":"purge"}}
+1.7886034563438892e+09	[34mINFO[0m	/app/cmd/policy-checkpoint-gateway/handlers.go:218	Write timing	{"decideMicros": 2, "auditMicros": 721, "persistMicros": 336, "totalMicros": 1067}
+{"op":"write","decision":"ALLOW","identity":{"steward":"SERVER","user":"jake.jongejans@student.uva.nl","requestType":"vflTrainModelRequest","jobId":"jake-jongejans-2e581d30server1","localJobName":"jake-jongejans-2e581d30server1"},"stateClass":"vfl_server_model","stateKey":"latest","writtenUnixSeconds":1788603456,"agreementHash":"55cbe49675089cec5497558960c69f09c05543ff42338f35daf2a073f19a9981","policySource":"cached","cacheAgeMs":17986,"relationId":"GUID-state-aware","directives":{"allowed":true,"retentionSeconds":900,"resumeAllowed":false,"onRevocation":"purge"}}
+1.7886034568421185e+09	[34mINFO[0m	/app/cmd/policy-checkpoint-gateway/handlers.go:218	Write timing	{"decideMicros": 2, "auditMicros": 701, "persistMicros": 230, "totalMicros": 941}
+{"op":"write","decision":"ALLOW","identity":{"steward":"SERVER","user":"jake.jongejans@student.uva.nl","requestType":"vflTrainModelRequest","jobId":"jake-jongejans-2e581d30server1","localJobName":"jake-jongejans-2e581d30server1"},"stateClass":"vfl_server_model","stateKey":"latest","writtenUnixSeconds":1788603457,"agreementHash":"55cbe49675089cec5497558960c69f09c05543ff42338f35daf2a073f19a9981","policySource":"cached","cacheAgeMs":18583,"relationId":"GUID-state-aware","directives":{"allowed":true,"retentionSeconds":900,"resumeAllowed":false,"onRevocation":"purge"}}
+1.7886034574390814e+09	[34mINFO[0m	/app/cmd/policy-checkpoint-gateway/handlers.go:218	Write timing	{"decideMicros": 2, "auditMicros": 786, "persistMicros": 225, "totalMicros": 1020}
+{"op":"write","decision":"ALLOW","identity":{"steward":"SERVER","user":"jake.jongejans@student.uva.nl","requestType":"vflTrainModelRequest","jobId":"jake-jongejans-2e581d30server1","localJobName":"jake-jongejans-2e581d30server1"},"stateClass":"vfl_server_model","stateKey":"latest","writtenUnixSeconds":1788603457,"agreementHash":"55cbe49675089cec5497558960c69f09c05543ff42338f35daf2a073f19a9981","policySource":"cached","cacheAgeMs":19089,"relationId":"GUID-state-aware","directives":{"allowed":true,"retentionSeconds":900,"resumeAllowed":false,"onRevocation":"purge"}}
+1.788603457945309e+09	[34mINFO[0m	/app/cmd/policy-checkpoint-gateway/handlers.go:218	Write timing	{"decideMicros": 2, "auditMicros": 634, "persistMicros": 204, "totalMicros": 847}
+{"op":"write","decision":"ALLOW","identity":{"steward":"SERVER","user":"jake.jongejans@student.uva.nl","requestType":"vflTrainModelRequest","jobId":"jake-jongejans-2e581d30server1","localJobName":"jake-jongejans-2e581d30server1"},"stateClass":"vfl_server_model","stateKey":"latest","writtenUnixSeconds":1788603458,"agreementHash":"55cbe49675089cec5497558960c69f09c05543ff42338f35daf2a073f19a9981","policySource":"cached","cacheAgeMs":19521,"relationId":"GUID-state-aware","directives":{"allowed":true,"retentionSeconds":900,"resumeAllowed":false,"onRevocation":"purge"}}
+1.7886034583773263e+09	[34mINFO[0m	/app/cmd/policy-checkpoint-gateway/handlers.go:218	Write timing	{"decideMicros": 2, "auditMicros": 652, "persistMicros": 313, "totalMicros": 975}
+{"op":"write","decision":"ALLOW","identity":{"steward":"SERVER","user":"jake.jongejans@student.uva.nl","requestType":"vflTrainModelRequest","jobId":"jake-jongejans-2e581d30server1","localJobName":"jake-jongejans-2e581d30server1"},"stateClass":"vfl_server_model","stateKey":"latest","writtenUnixSeconds":1788603458,"agreementHash":"55cbe49675089cec5497558960c69f09c05543ff42338f35daf2a073f19a9981","policySource":"cached","cacheAgeMs":20062,"relationId":"GUID-state-aware","directives":{"allowed":true,"retentionSeconds":900,"resumeAllowed":false,"onRevocation":"purge"}}
+1.7886034589184554e+09	[34mINFO[0m	/app/cmd/policy-checkpoint-gateway/handlers.go:218	Write timing	{"decideMicros": 1, "auditMicros": 730, "persistMicros": 226, "totalMicros": 965}
+{"op":"write","decision":"ALLOW","identity":{"steward":"SERVER","user":"jake.jongejans@student.uva.nl","requestType":"vflTrainModelRequest","jobId":"jake-jongejans-2e581d30server1","localJobName":"jake-jongejans-2e581d30server1"},"stateClass":"vfl_server_model","stateKey":"latest","writtenUnixSeconds":1788603459,"agreementHash":"55cbe49675089cec5497558960c69f09c05543ff42338f35daf2a073f19a9981","policySource":"cached","cacheAgeMs":20588,"relationId":"GUID-state-aware","directives":{"allowed":true,"retentionSeconds":900,"resumeAllowed":false,"onRevocation":"purge"}}
+1.7886034594443176e+09	[34mINFO[0m	/app/cmd/policy-checkpoint-gateway/handlers.go:218	Write timing	{"decideMicros": 2, "auditMicros": 865, "persistMicros": 290, "totalMicros": 1164}
+{"op":"write","decision":"ALLOW","identity":{"steward":"SERVER","user":"jake.jongejans@student.uva.nl","requestType":"vflTrainModelRequest","jobId":"jake-jongejans-2e581d30server1","localJobName":"jake-jongejans-2e581d30server1"},"stateClass":"vfl_server_model","stateKey":"latest","writtenUnixSeconds":1788603459,"agreementHash":"55cbe49675089cec5497558960c69f09c05543ff42338f35daf2a073f19a9981","policySource":"cached","cacheAgeMs":21053,"relationId":"GUID-state-aware","directives":{"allowed":true,"retentionSeconds":900,"resumeAllowed":false,"onRevocation":"purge"}}
+1.7886034599095824e+09	[34mINFO[0m	/app/cmd/policy-checkpoint-gateway/handlers.go:218	Write timing	{"decideMicros": 2, "auditMicros": 640, "persistMicros": 210, "totalMicros": 860}
+{"op":"write","decision":"ALLOW","identity":{"steward":"SERVER","user":"jake.jongejans@student.uva.nl","requestType":"vflTrainModelRequest","jobId":"jake-jongejans-2e581d30server1","localJobName":"jake-jongejans-2e581d30server1"},"stateClass":"vfl_server_model","stateKey":"latest","writtenUnixSeconds":1788603460,"agreementHash":"55cbe49675089cec5497558960c69f09c05543ff42338f35daf2a073f19a9981","policySource":"cached","cacheAgeMs":21560,"relationId":"GUID-state-aware","directives":{"allowed":true,"retentionSeconds":900,"resumeAllowed":false,"onRevocation":"purge"}}
+1.788603460416069e+09	[34mINFO[0m	/app/cmd/policy-checkpoint-gateway/handlers.go:218	Write timing	{"decideMicros": 2, "auditMicros": 672, "persistMicros": 201, "totalMicros": 882}
+{"op":"write","decision":"ALLOW","identity":{"steward":"SERVER","user":"jake.jongejans@student.uva.nl","requestType":"vflTrainModelRequest","jobId":"jake-jongejans-2e581d30server1","localJobName":"jake-jongejans-2e581d30server1"},"stateClass":"vfl_server_model","stateKey":"latest","writtenUnixSeconds":1788603460,"agreementHash":"55cbe49675089cec5497558960c69f09c05543ff42338f35daf2a073f19a9981","policySource":"cached","cacheAgeMs":22099,"relationId":"GUID-state-aware","directives":{"allowed":true,"retentionSeconds":900,"resumeAllowed":false,"onRevocation":"purge"}}
+1.788603460955711e+09	[34mINFO[0m	/app/cmd/policy-checkpoint-gateway/handlers.go:218	Write timing	{"decideMicros": 2, "auditMicros": 735, "persistMicros": 252, "totalMicros": 997}
+{"op":"write","decision":"ALLOW","identity":{"steward":"SERVER","user":"jake.jongejans@student.uva.nl","requestType":"vflTrainModelRequest","jobId":"jake-jongejans-2e581d30server1","localJobName":"jake-jongejans-2e581d30server1"},"stateClass":"vfl_server_model","stateKey":"latest","writtenUnixSeconds":1788603461,"agreementHash":"55cbe49675089cec5497558960c69f09c05543ff42338f35daf2a073f19a9981","policySource":"cached","cacheAgeMs":22621,"relationId":"GUID-state-aware","directives":{"allowed":true,"retentionSeconds":900,"resumeAllowed":false,"onRevocation":"purge"}}
+1.788603461477778e+09	[34mINFO[0m	/app/cmd/policy-checkpoint-gateway/handlers.go:218	Write timing	{"decideMicros": 2, "auditMicros": 728, "persistMicros": 194, "totalMicros": 931}
+{"op":"write","decision":"ALLOW","identity":{"steward":"SERVER","user":"jake.jongejans@student.uva.nl","requestType":"vflTrainModelRequest","jobId":"jake-jongejans-2e581d30server1","localJobName":"jake-jongejans-2e581d30server1"},"stateClass":"vfl_server_model","stateKey":"latest","writtenUnixSeconds":1788603461,"agreementHash":"55cbe49675089cec5497558960c69f09c05543ff42338f35daf2a073f19a9981","policySource":"cached","cacheAgeMs":23144,"relationId":"GUID-state-aware","directives":{"allowed":true,"retentionSeconds":900,"resumeAllowed":false,"onRevocation":"purge"}}
+1.7886034620006084e+09	[34mINFO[0m	/app/cmd/policy-checkpoint-gateway/handlers.go:218	Write timing	{"decideMicros": 2, "auditMicros": 719, "persistMicros": 205, "totalMicros": 934}
+{"op":"write","decision":"ALLOW","identity":{"steward":"SERVER","user":"jake.jongejans@student.uva.nl","requestType":"vflTrainModelRequest","jobId":"jake-jongejans-2e581d30server1","localJobName":"jake-jongejans-2e581d30server1"},"stateClass":"vfl_server_model","stateKey":"latest","writtenUnixSeconds":1788603462,"agreementHash":"55cbe49675089cec5497558960c69f09c05543ff42338f35daf2a073f19a9981","policySource":"cached","cacheAgeMs":23712,"relationId":"GUID-state-aware","directives":{"allowed":true,"retentionSeconds":900,"resumeAllowed":false,"onRevocation":"purge"}}
+1.7886034625711823e+09	[34mINFO[0m	/app/cmd/policy-checkpoint-gateway/handlers.go:218	Write timing	{"decideMicros": 2, "auditMicros": 3438, "persistMicros": 245, "totalMicros": 3692}
+{"op":"write","decision":"ALLOW","identity":{"steward":"SERVER","user":"jake.jongejans@student.uva.nl","requestType":"vflTrainModelRequest","jobId":"jake-jongejans-2e581d30server1","localJobName":"jake-jongejans-2e581d30server1"},"stateClass":"vfl_server_model","stateKey":"latest","writtenUnixSeconds":1788603463,"agreementHash":"55cbe49675089cec5497558960c69f09c05543ff42338f35daf2a073f19a9981","policySource":"cached","cacheAgeMs":24279,"relationId":"GUID-state-aware","directives":{"allowed":true,"retentionSeconds":900,"resumeAllowed":false,"onRevocation":"purge"}}
+1.7886034631352117e+09	[34mINFO[0m	/app/cmd/policy-checkpoint-gateway/handlers.go:218	Write timing	{"decideMicros": 1, "auditMicros": 619, "persistMicros": 212, "totalMicros": 840}
+{"op":"write","decision":"ALLOW","identity":{"steward":"SERVER","user":"jake.jongejans@student.uva.nl","requestType":"vflTrainModelRequest","jobId":"jake-jongejans-2e581d30server1","localJobName":"jake-jongejans-2e581d30server1"},"stateClass":"vfl_server_model","stateKey":"latest","writtenUnixSeconds":1788603463,"agreementHash":"55cbe49675089cec5497558960c69f09c05543ff42338f35daf2a073f19a9981","policySource":"cached","cacheAgeMs":24849,"relationId":"GUID-state-aware","directives":{"allowed":true,"retentionSeconds":900,"resumeAllowed":false,"onRevocation":"purge"}}
+1.7886034637057874e+09	[34mINFO[0m	/app/cmd/policy-checkpoint-gateway/handlers.go:218	Write timing	{"decideMicros": 2, "auditMicros": 727, "persistMicros": 249, "totalMicros": 987}
+{"op":"write","decision":"ALLOW","identity":{"steward":"SERVER","user":"jake.jongejans@student.uva.nl","requestType":"vflTrainModelRequest","jobId":"jake-jongejans-2e581d30server1","localJobName":"jake-jongejans-2e581d30server1"},"stateClass":"vfl_server_model","stateKey":"latest","writtenUnixSeconds":1788603464,"agreementHash":"55cbe49675089cec5497558960c69f09c05543ff42338f35daf2a073f19a9981","policySource":"cached","cacheAgeMs":25306,"relationId":"GUID-state-aware","directives":{"allowed":true,"retentionSeconds":900,"resumeAllowed":false,"onRevocation":"purge"}}
+1.7886034641652105e+09	[34mINFO[0m	/app/cmd/policy-checkpoint-gateway/handlers.go:218	Write timing	{"decideMicros": 2, "auditMicros": 3362, "persistMicros": 279, "totalMicros": 3651}
+{"op":"write","decision":"ALLOW","identity":{"steward":"SERVER","user":"jake.jongejans@student.uva.nl","requestType":"vflTrainModelRequest","jobId":"jake-jongejans-2e581d30server1","localJobName":"jake-jongejans-2e581d30server1"},"stateClass":"vfl_server_model","stateKey":"latest","writtenUnixSeconds":1788603464,"agreementHash":"55cbe49675089cec5497558960c69f09c05543ff42338f35daf2a073f19a9981","policySource":"cached","cacheAgeMs":25793,"relationId":"GUID-state-aware","directives":{"allowed":true,"retentionSeconds":900,"resumeAllowed":false,"onRevocation":"purge"}}
+1.7886034646505709e+09	[34mINFO[0m	/app/cmd/policy-checkpoint-gateway/handlers.go:218	Write timing	{"decideMicros": 2, "auditMicros": 672, "persistMicros": 939, "totalMicros": 1620}
+{"op":"write","decision":"ALLOW","identity":{"steward":"SERVER","user":"jake.jongejans@student.uva.nl","requestType":"vflTrainModelRequest","jobId":"jake-jongejans-2e581d30server1","localJobName":"jake-jongejans-2e581d30server1"},"stateClass":"vfl_server_model","stateKey":"latest","writtenUnixSeconds":1788603465,"agreementHash":"55cbe49675089cec5497558960c69f09c05543ff42338f35daf2a073f19a9981","policySource":"cached","cacheAgeMs":26227,"relationId":"GUID-state-aware","directives":{"allowed":true,"retentionSeconds":900,"resumeAllowed":false,"onRevocation":"purge"}}
+1.7886034650838292e+09	[34mINFO[0m	/app/cmd/policy-checkpoint-gateway/handlers.go:218	Write timing	{"decideMicros": 2, "auditMicros": 818, "persistMicros": 962, "totalMicros": 1789}
+{"op":"write","decision":"ALLOW","identity":{"steward":"SERVER","user":"jake.jongejans@student.uva.nl","requestType":"vflTrainModelRequest","jobId":"jake-jongejans-2e581d30server1","localJobName":"jake-jongejans-2e581d30server1"},"stateClass":"vfl_server_model","stateKey":"latest","writtenUnixSeconds":1788603465,"agreementHash":"55cbe49675089cec5497558960c69f09c05543ff42338f35daf2a073f19a9981","policySource":"cached","cacheAgeMs":26741,"relationId":"GUID-state-aware","directives":{"allowed":true,"retentionSeconds":900,"resumeAllowed":false,"onRevocation":"purge"}}
+1.7886034655971718e+09	[34mINFO[0m	/app/cmd/policy-checkpoint-gateway/handlers.go:218	Write timing	{"decideMicros": 2, "auditMicros": 729, "persistMicros": 205, "totalMicros": 942}
+{"op":"write","decision":"ALLOW","identity":{"steward":"SERVER","user":"jake.jongejans@student.uva.nl","requestType":"vflTrainModelRequest","jobId":"jake-jongejans-2e581d30server1","localJobName":"jake-jongejans-2e581d30server1"},"stateClass":"vfl_server_model","stateKey":"latest","writtenUnixSeconds":1788603466,"agreementHash":"55cbe49675089cec5497558960c69f09c05543ff42338f35daf2a073f19a9981","policySource":"cached","cacheAgeMs":27271,"relationId":"GUID-state-aware","directives":{"allowed":true,"retentionSeconds":900,"resumeAllowed":false,"onRevocation":"purge"}}
+1.7886034661280105e+09	[34mINFO[0m	/app/cmd/policy-checkpoint-gateway/handlers.go:218	Write timing	{"decideMicros": 2, "auditMicros": 675, "persistMicros": 448, "totalMicros": 1132}
+{"op":"write","decision":"ALLOW","identity":{"steward":"SERVER","user":"jake.jongejans@student.uva.nl","requestType":"vflTrainModelRequest","jobId":"jake-jongejans-2e581d30server1","localJobName":"jake-jongejans-2e581d30server1"},"stateClass":"vfl_server_model","stateKey":"latest","writtenUnixSeconds":1788603466,"agreementHash":"55cbe49675089cec5497558960c69f09c05543ff42338f35daf2a073f19a9981","policySource":"cached","cacheAgeMs":27790,"relationId":"GUID-state-aware","directives":{"allowed":true,"retentionSeconds":900,"resumeAllowed":false,"onRevocation":"purge"}}
+1.7886034666461291e+09	[34mINFO[0m	/app/cmd/policy-checkpoint-gateway/handlers.go:218	Write timing	{"decideMicros": 2, "auditMicros": 857, "persistMicros": 192, "totalMicros": 1058}
+{"op":"write","decision":"ALLOW","identity":{"steward":"SERVER","user":"jake.jongejans@student.uva.nl","requestType":"vflTrainModelRequest","jobId":"jake-jongejans-2e581d30server1","localJobName":"jake-jongejans-2e581d30server1"},"stateClass":"vfl_server_model","stateKey":"latest","writtenUnixSeconds":1788603467,"agreementHash":"55cbe49675089cec5497558960c69f09c05543ff42338f35daf2a073f19a9981","policySource":"cached","cacheAgeMs":28314,"relationId":"GUID-state-aware","directives":{"allowed":true,"retentionSeconds":900,"resumeAllowed":false,"onRevocation":"purge"}}
+1.7886034671700287e+09	[34mINFO[0m	/app/cmd/policy-checkpoint-gateway/handlers.go:218	Write timing	{"decideMicros": 2, "auditMicros": 637, "persistMicros": 216, "totalMicros": 862}
+{"op":"write","decision":"ALLOW","identity":{"steward":"SERVER","user":"jake.jongejans@student.uva.nl","requestType":"vflTrainModelRequest","jobId":"jake-jongejans-2e581d30server1","localJobName":"jake-jongejans-2e581d30server1"},"stateClass":"vfl_server_model","stateKey":"latest","writtenUnixSeconds":1788603467,"agreementHash":"55cbe49675089cec5497558960c69f09c05543ff42338f35daf2a073f19a9981","policySource":"cached","cacheAgeMs":28791,"relationId":"GUID-state-aware","directives":{"allowed":true,"retentionSeconds":900,"resumeAllowed":false,"onRevocation":"purge"}}
+1.7886034676470544e+09	[34mINFO[0m	/app/cmd/policy-checkpoint-gateway/handlers.go:218	Write timing	{"decideMicros": 2, "auditMicros": 782, "persistMicros": 212, "totalMicros": 1003}
+{"op":"write","decision":"ALLOW","identity":{"steward":"SERVER","user":"jake.jongejans@student.uva.nl","requestType":"vflTrainModelRequest","jobId":"jake-jongejans-2e581d30server1","localJobName":"jake-jongejans-2e581d30server1"},"stateClass":"vfl_server_model","stateKey":"latest","writtenUnixSeconds":1788603468,"agreementHash":"55cbe49675089cec5497558960c69f09c05543ff42338f35daf2a073f19a9981","policySource":"cached","cacheAgeMs":29342,"relationId":"GUID-state-aware","directives":{"allowed":true,"retentionSeconds":900,"resumeAllowed":false,"onRevocation":"purge"}}
+1.788603468198805e+09	[34mINFO[0m	/app/cmd/policy-checkpoint-gateway/handlers.go:218	Write timing	{"decideMicros": 2, "auditMicros": 1222, "persistMicros": 229, "totalMicros": 1461}
+{"op":"write","decision":"ALLOW","identity":{"steward":"SERVER","user":"jake.jongejans@student.uva.nl","requestType":"vflTrainModelRequest","jobId":"jake-jongejans-2e581d30server1","localJobName":"jake-jongejans-2e581d30server1"},"stateClass":"vfl_server_model","stateKey":"latest","writtenUnixSeconds":1788603468,"agreementHash":"55cbe49675089cec5497558960c69f09c05543ff42338f35daf2a073f19a9981","policySource":"cached","cacheAgeMs":29929,"relationId":"GUID-state-aware","directives":{"allowed":true,"retentionSeconds":900,"resumeAllowed":false,"onRevocation":"purge"}}
+1.788603468789303e+09	[34mINFO[0m	/app/cmd/policy-checkpoint-gateway/handlers.go:218	Write timing	{"decideMicros": 2, "auditMicros": 4545, "persistMicros": 297, "totalMicros": 4853}
+{"op":"write","decision":"ALLOW","identity":{"steward":"SERVER","user":"jake.jongejans@student.uva.nl","requestType":"vflTrainModelRequest","jobId":"jake-jongejans-2e581d30server1","localJobName":"jake-jongejans-2e581d30server1"},"stateClass":"vfl_server_model","stateKey":"latest","writtenUnixSeconds":1788603469,"agreementHash":"55cbe49675089cec5497558960c69f09c05543ff42338f35daf2a073f19a9981","policySource":"cached","cacheAgeMs":423,"relationId":"GUID-state-aware","directives":{"allowed":true,"retentionSeconds":900,"resumeAllowed":false,"onRevocation":"purge"}}
+1.788603469285716e+09	[34mINFO[0m	/app/cmd/policy-checkpoint-gateway/handlers.go:218	Write timing	{"decideMicros": 1, "auditMicros": 641, "persistMicros": 185, "totalMicros": 834}
+{"op":"write","decision":"ALLOW","identity":{"steward":"SERVER","user":"jake.jongejans@student.uva.nl","requestType":"vflTrainModelRequest","jobId":"jake-jongejans-2e581d30server1","localJobName":"jake-jongejans-2e581d30server1"},"stateClass":"vfl_server_model","stateKey":"latest","writtenUnixSeconds":1788603469,"agreementHash":"55cbe49675089cec5497558960c69f09c05543ff42338f35daf2a073f19a9981","policySource":"cached","cacheAgeMs":912,"relationId":"GUID-state-aware","directives":{"allowed":true,"retentionSeconds":900,"resumeAllowed":false,"onRevocation":"purge"}}
+1.7886034697754111e+09	[34mINFO[0m	/app/cmd/policy-checkpoint-gateway/handlers.go:218	Write timing	{"decideMicros": 2, "auditMicros": 695, "persistMicros": 233, "totalMicros": 956}
+{"op":"write","decision":"ALLOW","identity":{"steward":"SERVER","user":"jake.jongejans@student.uva.nl","requestType":"vflTrainModelRequest","jobId":"jake-jongejans-2e581d30server1","localJobName":"jake-jongejans-2e581d30server1"},"stateClass":"vfl_server_model","stateKey":"latest","writtenUnixSeconds":1788603470,"agreementHash":"55cbe49675089cec5497558960c69f09c05543ff42338f35daf2a073f19a9981","policySource":"cached","cacheAgeMs":1427,"relationId":"GUID-state-aware","directives":{"allowed":true,"retentionSeconds":900,"resumeAllowed":false,"onRevocation":"purge"}}
+1.788603470289811e+09	[34mINFO[0m	/app/cmd/policy-checkpoint-gateway/handlers.go:218	Write timing	{"decideMicros": 2, "auditMicros": 609, "persistMicros": 236, "totalMicros": 854}
+{"op":"write","decision":"ALLOW","identity":{"steward":"SERVER","user":"jake.jongejans@student.uva.nl","requestType":"vflTrainModelRequest","jobId":"jake-jongejans-2e581d30server1","localJobName":"jake-jongejans-2e581d30server1"},"stateClass":"vfl_server_model","stateKey":"latest","writtenUnixSeconds":1788603470,"agreementHash":"55cbe49675089cec5497558960c69f09c05543ff42338f35daf2a073f19a9981","policySource":"cached","cacheAgeMs":2026,"relationId":"GUID-state-aware","directives":{"allowed":true,"retentionSeconds":900,"resumeAllowed":false,"onRevocation":"purge"}}
+1.7886034708887057e+09	[34mINFO[0m	/app/cmd/policy-checkpoint-gateway/handlers.go:218	Write timing	{"decideMicros": 2, "auditMicros": 718, "persistMicros": 265, "totalMicros": 1000}
+{"op":"write","decision":"ALLOW","identity":{"steward":"SERVER","user":"jake.jongejans@student.uva.nl","requestType":"vflTrainModelRequest","jobId":"jake-jongejans-2e581d30server1","localJobName":"jake-jongejans-2e581d30server1"},"stateClass":"vfl_server_model","stateKey":"latest","writtenUnixSeconds":1788603471,"agreementHash":"55cbe49675089cec5497558960c69f09c05543ff42338f35daf2a073f19a9981","policySource":"cached","cacheAgeMs":2494,"relationId":"GUID-state-aware","directives":{"allowed":true,"retentionSeconds":900,"resumeAllowed":false,"onRevocation":"purge"}}
+1.7886034713572998e+09	[34mINFO[0m	/app/cmd/policy-checkpoint-gateway/handlers.go:218	Write timing	{"decideMicros": 1, "auditMicros": 610, "persistMicros": 172, "totalMicros": 790}
+{"op":"write","decision":"ALLOW","identity":{"steward":"SERVER","user":"jake.jongejans@student.uva.nl","requestType":"vflTrainModelRequest","jobId":"jake-jongejans-2e581d30server1","localJobName":"jake-jongejans-2e581d30server1"},"stateClass":"vfl_server_model","stateKey":"latest","writtenUnixSeconds":1788603471,"agreementHash":"55cbe49675089cec5497558960c69f09c05543ff42338f35daf2a073f19a9981","policySource":"cached","cacheAgeMs":2989,"relationId":"GUID-state-aware","directives":{"allowed":true,"retentionSeconds":900,"resumeAllowed":false,"onRevocation":"purge"}}
+1.7886034718522918e+09	[34mINFO[0m	/app/cmd/policy-checkpoint-gateway/handlers.go:218	Write timing	{"decideMicros": 1, "auditMicros": 666, "persistMicros": 218, "totalMicros": 894}
+{"op":"shutdown","reason":"ms_exit","identity":{"steward":"SERVER","user":"jake.jongejans@student.uva.nl","requestType":"vflTrainModelRequest","jobId":"jake-jongejans-2e581d30server1","localJobName":"jake-jongejans-2e581d30server1"}}
+1.7886034720804405e+09	[34mINFO[0m	/app/cmd/policy-checkpoint-gateway/main.go:210	Stopping gateway, draining briefly before stop
+1.7886034740809398e+09	[34mINFO[0m	/app/cmd/policy-checkpoint-gateway/main.go:258	Exiting gateway server
+OK: startup read DENY
+    {"op":"read","decision":"DENY","reason":"resume disabled","identity":{"steward":"SERVER","user":"jake.jongejans@student.uva.nl","requestType":"vflTrainModelRequest","jobId":"jake-jongejans-2e581d30server1","localJobName":"jake-jongejans-2e581d30server1"},"stateClass":"vfl_server_model","stateKey":"latest","agreementHash":"55cbe49675089cec5497558960c69f09c05543ff42338f35daf2a073f19a9981","policySource":"cached","cacheAgeMs":2909,"relationId":"GUID-state-aware","directives":{"allowed":true,"retentionSeconds":900,"resumeAllowed":false,"onRevocation":"purge"}}
+OK: read deny reason is 'resume disabled'
+    {"op":"read","decision":"DENY","reason":"resume disabled","identity":{"steward":"SERVER","user":"jake.jongejans@student.uva.nl","requestType":"vflTrainModelRequest","jobId":"jake-jongejans-2e581d30server1","localJobName":"jake-jongejans-2e581d30server1"},"stateClass":"vfl_server_model","stateKey":"latest","agreementHash":"55cbe49675089cec5497558960c69f09c05543ff42338f35daf2a073f19a9981","policySource":"cached","cacheAgeMs":2909,"relationId":"GUID-state-aware","directives":{"allowed":true,"retentionSeconds":900,"resumeAllowed":false,"onRevocation":"purge"}}
+OK: 50 ALLOW write audit lines (persistence continues, only resume is denied)
+
+--- server MS lines ---
+2026-09-05 10:17:21,766 - main.py - main.py:365 - INFO - Resume read denied (resume disabled); starting fresh
+2026-09-05 10:17:24,722 - main.py - main.py:342 - INFO - Checkpoint write requested: round_index=1
+2026-09-05 10:17:24,725 - main.py - main.py:345 - INFO - Checkpoint write allowed: round_index=1
+2026-09-05 10:17:26,341 - main.py - main.py:342 - INFO - Checkpoint write requested: round_index=2
+2026-09-05 10:17:26,343 - main.py - main.py:345 - INFO - Checkpoint write allowed: round_index=2
+2026-09-05 10:17:26,925 - main.py - main.py:342 - INFO - Checkpoint write requested: round_index=3
+2026-09-05 10:17:26,927 - main.py - main.py:345 - INFO - Checkpoint write allowed: round_index=3
+2026-09-05 10:17:27,475 - main.py - main.py:342 - INFO - Checkpoint write requested: round_index=4
+2026-09-05 10:17:27,478 - main.py - main.py:345 - INFO - Checkpoint write allowed: round_index=4
+2026-09-05 10:17:28,067 - main.py - main.py:342 - INFO - Checkpoint write requested: round_index=5
+2026-09-05 10:17:28,069 - main.py - main.py:345 - INFO - Checkpoint write allowed: round_index=5
+2026-09-05 10:17:28,605 - main.py - main.py:342 - INFO - Checkpoint write requested: round_index=6
+2026-09-05 10:17:28,607 - main.py - main.py:345 - INFO - Checkpoint write allowed: round_index=6
+2026-09-05 10:17:29,135 - main.py - main.py:342 - INFO - Checkpoint write requested: round_index=7
+2026-09-05 10:17:29,137 - main.py - main.py:345 - INFO - Checkpoint write allowed: round_index=7
+2026-09-05 10:17:29,639 - main.py - main.py:342 - INFO - Checkpoint write requested: round_index=8
+2026-09-05 10:17:29,641 - main.py - main.py:345 - INFO - Checkpoint write allowed: round_index=8
+2026-09-05 10:17:30,200 - main.py - main.py:342 - INFO - Checkpoint write requested: round_index=9
+2026-09-05 10:17:30,201 - main.py - main.py:345 - INFO - Checkpoint write allowed: round_index=9
+2026-09-05 10:17:30,755 - main.py - main.py:342 - INFO - Checkpoint write requested: round_index=10
+2026-09-05 10:17:30,757 - main.py - main.py:345 - INFO - Checkpoint write allowed: round_index=10
+2026-09-05 10:17:31,294 - main.py - main.py:342 - INFO - Checkpoint write requested: round_index=11
+2026-09-05 10:17:31,296 - main.py - main.py:345 - INFO - Checkpoint write allowed: round_index=11
+2026-09-05 10:17:31,829 - main.py - main.py:342 - INFO - Checkpoint write requested: round_index=12
+2026-09-05 10:17:31,831 - main.py - main.py:345 - INFO - Checkpoint write allowed: round_index=12
+2026-09-05 10:17:32,353 - main.py - main.py:342 - INFO - Checkpoint write requested: round_index=13
+2026-09-05 10:17:32,356 - main.py - main.py:345 - INFO - Checkpoint write allowed: round_index=13
+2026-09-05 10:17:32,956 - main.py - main.py:342 - INFO - Checkpoint write requested: round_index=14
+2026-09-05 10:17:32,958 - main.py - main.py:345 - INFO - Checkpoint write allowed: round_index=14
+2026-09-05 10:17:33,503 - main.py - main.py:342 - INFO - Checkpoint write requested: round_index=15
+2026-09-05 10:17:33,506 - main.py - main.py:345 - INFO - Checkpoint write allowed: round_index=15
+2026-09-05 10:17:33,987 - main.py - main.py:342 - INFO - Checkpoint write requested: round_index=16
+2026-09-05 10:17:33,989 - main.py - main.py:345 - INFO - Checkpoint write allowed: round_index=16
+2026-09-05 10:17:34,563 - main.py - main.py:342 - INFO - Checkpoint write requested: round_index=17
+2026-09-05 10:17:34,565 - main.py - main.py:345 - INFO - Checkpoint write allowed: round_index=17
+2026-09-05 10:17:35,058 - main.py - main.py:342 - INFO - Checkpoint write requested: round_index=18
+2026-09-05 10:17:35,060 - main.py - main.py:345 - INFO - Checkpoint write allowed: round_index=18
+2026-09-05 10:17:35,745 - main.py - main.py:342 - INFO - Checkpoint write requested: round_index=19
+2026-09-05 10:17:35,748 - main.py - main.py:345 - INFO - Checkpoint write allowed: round_index=19
+2026-09-05 10:17:36,342 - main.py - main.py:342 - INFO - Checkpoint write requested: round_index=20
+2026-09-05 10:17:36,344 - main.py - main.py:345 - INFO - Checkpoint write allowed: round_index=20
+2026-09-05 10:17:36,840 - main.py - main.py:342 - INFO - Checkpoint write requested: round_index=21
+2026-09-05 10:17:36,842 - main.py - main.py:345 - INFO - Checkpoint write allowed: round_index=21
+2026-09-05 10:17:37,437 - main.py - main.py:342 - INFO - Checkpoint write requested: round_index=22
+2026-09-05 10:17:37,439 - main.py - main.py:345 - INFO - Checkpoint write allowed: round_index=22
+2026-09-05 10:17:37,943 - main.py - main.py:342 - INFO - Checkpoint write requested: round_index=23
+2026-09-05 10:17:37,945 - main.py - main.py:345 - INFO - Checkpoint write allowed: round_index=23
+2026-09-05 10:17:38,375 - main.py - main.py:342 - INFO - Checkpoint write requested: round_index=24
+2026-09-05 10:17:38,377 - main.py - main.py:345 - INFO - Checkpoint write allowed: round_index=24
+2026-09-05 10:17:38,916 - main.py - main.py:342 - INFO - Checkpoint write requested: round_index=25
+2026-09-05 10:17:38,918 - main.py - main.py:345 - INFO - Checkpoint write allowed: round_index=25
+2026-09-05 10:17:39,442 - main.py - main.py:342 - INFO - Checkpoint write requested: round_index=26
+2026-09-05 10:17:39,444 - main.py - main.py:345 - INFO - Checkpoint write allowed: round_index=26
+2026-09-05 10:17:39,908 - main.py - main.py:342 - INFO - Checkpoint write requested: round_index=27
+2026-09-05 10:17:39,909 - main.py - main.py:345 - INFO - Checkpoint write allowed: round_index=27
+2026-09-05 10:17:40,414 - main.py - main.py:342 - INFO - Checkpoint write requested: round_index=28
+2026-09-05 10:17:40,416 - main.py - main.py:345 - INFO - Checkpoint write allowed: round_index=28
+2026-09-05 10:17:40,954 - main.py - main.py:342 - INFO - Checkpoint write requested: round_index=29
+2026-09-05 10:17:40,956 - main.py - main.py:345 - INFO - Checkpoint write allowed: round_index=29
+2026-09-05 10:17:41,476 - main.py - main.py:342 - INFO - Checkpoint write requested: round_index=30
+2026-09-05 10:17:41,478 - main.py - main.py:345 - INFO - Checkpoint write allowed: round_index=30
+2026-09-05 10:17:41,999 - main.py - main.py:342 - INFO - Checkpoint write requested: round_index=31
+2026-09-05 10:17:42,001 - main.py - main.py:345 - INFO - Checkpoint write allowed: round_index=31
+2026-09-05 10:17:42,566 - main.py - main.py:342 - INFO - Checkpoint write requested: round_index=32
+2026-09-05 10:17:42,571 - main.py - main.py:345 - INFO - Checkpoint write allowed: round_index=32
+2026-09-05 10:17:43,133 - main.py - main.py:342 - INFO - Checkpoint write requested: round_index=33
+2026-09-05 10:17:43,135 - main.py - main.py:345 - INFO - Checkpoint write allowed: round_index=33
+2026-09-05 10:17:43,704 - main.py - main.py:342 - INFO - Checkpoint write requested: round_index=34
+2026-09-05 10:17:43,706 - main.py - main.py:345 - INFO - Checkpoint write allowed: round_index=34
+2026-09-05 10:17:44,160 - main.py - main.py:342 - INFO - Checkpoint write requested: round_index=35
+2026-09-05 10:17:44,165 - main.py - main.py:345 - INFO - Checkpoint write allowed: round_index=35
+2026-09-05 10:17:44,648 - main.py - main.py:342 - INFO - Checkpoint write requested: round_index=36
+2026-09-05 10:17:44,651 - main.py - main.py:345 - INFO - Checkpoint write allowed: round_index=36
+2026-09-05 10:17:45,081 - main.py - main.py:342 - INFO - Checkpoint write requested: round_index=37
+2026-09-05 10:17:45,084 - main.py - main.py:345 - INFO - Checkpoint write allowed: round_index=37
+2026-09-05 10:17:45,595 - main.py - main.py:342 - INFO - Checkpoint write requested: round_index=38
+2026-09-05 10:17:45,597 - main.py - main.py:345 - INFO - Checkpoint write allowed: round_index=38
+2026-09-05 10:17:46,126 - main.py - main.py:342 - INFO - Checkpoint write requested: round_index=39
+2026-09-05 10:17:46,128 - main.py - main.py:345 - INFO - Checkpoint write allowed: round_index=39
+2026-09-05 10:17:46,644 - main.py - main.py:342 - INFO - Checkpoint write requested: round_index=40
+2026-09-05 10:17:46,646 - main.py - main.py:345 - INFO - Checkpoint write allowed: round_index=40
+2026-09-05 10:17:47,168 - main.py - main.py:342 - INFO - Checkpoint write requested: round_index=41
+2026-09-05 10:17:47,170 - main.py - main.py:345 - INFO - Checkpoint write allowed: round_index=41
+2026-09-05 10:17:47,645 - main.py - main.py:342 - INFO - Checkpoint write requested: round_index=42
+2026-09-05 10:17:47,648 - main.py - main.py:345 - INFO - Checkpoint write allowed: round_index=42
+2026-09-05 10:17:48,196 - main.py - main.py:342 - INFO - Checkpoint write requested: round_index=43
+2026-09-05 10:17:48,199 - main.py - main.py:345 - INFO - Checkpoint write allowed: round_index=43
+2026-09-05 10:17:48,783 - main.py - main.py:342 - INFO - Checkpoint write requested: round_index=44
+2026-09-05 10:17:48,789 - main.py - main.py:345 - INFO - Checkpoint write allowed: round_index=44
+2026-09-05 10:17:49,284 - main.py - main.py:342 - INFO - Checkpoint write requested: round_index=45
+2026-09-05 10:17:49,286 - main.py - main.py:345 - INFO - Checkpoint write allowed: round_index=45
+2026-09-05 10:17:49,773 - main.py - main.py:342 - INFO - Checkpoint write requested: round_index=46
+2026-09-05 10:17:49,775 - main.py - main.py:345 - INFO - Checkpoint write allowed: round_index=46
+2026-09-05 10:17:50,288 - main.py - main.py:342 - INFO - Checkpoint write requested: round_index=47
+2026-09-05 10:17:50,290 - main.py - main.py:345 - INFO - Checkpoint write allowed: round_index=47
+2026-09-05 10:17:50,887 - main.py - main.py:342 - INFO - Checkpoint write requested: round_index=48
+2026-09-05 10:17:50,889 - main.py - main.py:345 - INFO - Checkpoint write allowed: round_index=48
+2026-09-05 10:17:51,356 - main.py - main.py:342 - INFO - Checkpoint write requested: round_index=49
+2026-09-05 10:17:51,357 - main.py - main.py:345 - INFO - Checkpoint write allowed: round_index=49
+2026-09-05 10:17:51,850 - main.py - main.py:342 - INFO - Checkpoint write requested: round_index=50
+2026-09-05 10:17:51,852 - main.py - main.py:345 - INFO - Checkpoint write allowed: round_index=50
+OK: absent as expected: no resume under resumeAllowed=false
+OK: fresh model still checkpoints round_index=1
+    2026-09-05 10:17:24,725 - main.py - main.py:345 - INFO - Checkpoint write allowed: round_index=1
+    2026-09-05 10:17:30,757 - main.py - main.py:345 - INFO - Checkpoint write allowed: round_index=10
+    2026-09-05 10:17:31,296 - main.py - main.py:345 - INFO - Checkpoint write allowed: round_index=11
+    2026-09-05 10:17:31,831 - main.py - main.py:345 - INFO - Checkpoint write allowed: round_index=12
+    2026-09-05 10:17:32,356 - main.py - main.py:345 - INFO - Checkpoint write allowed: round_index=13

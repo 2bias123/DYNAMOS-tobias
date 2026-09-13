@@ -9,7 +9,6 @@ set -u
 # which OVERWRITES these keys. Re-run this after any reset.sh.
 
 PORT="${PORT:-8082}"
-BASE="http://localhost:${PORT}/api/v1"
 FILES=(state_aware_server.json state_aware_clientone.json state_aware_clienttwo.json state_aware_clientthree.json)
 
 script_dir="$(cd "$(dirname "$0")" && pwd)"
@@ -22,9 +21,23 @@ kill_forward() {
 }
 trap kill_forward EXIT
 
-kubectl port-forward -n orchestrator svc/orchestrator "${PORT}:8080" >/dev/null 2>&1 &
-PF_PID=$!
-sleep 3
+# Transport mirrors capture_lib.sh: portforward (default, the kind path) or
+# nodeport (the FABRIC path — kubectl port-forward is broken on the testbed
+# VMs; the service is patched to NodePort and curled at a node IP).
+if [ "${E3_TRANSPORT:-portforward}" = "nodeport" ]; then
+	if [ "$(kubectl -n orchestrator get svc orchestrator -o jsonpath='{.spec.type}')" != "NodePort" ]; then
+		kubectl -n orchestrator patch svc orchestrator -p '{"spec":{"type":"NodePort"}}' >/dev/null
+	fi
+	np=$(kubectl -n orchestrator get svc orchestrator -o jsonpath='{.spec.ports[0].nodePort}')
+	ip="${E3_NODE_IP:-$(kubectl get nodes -o jsonpath='{.items[0].status.addresses[?(@.type=="InternalIP")].address}')}"
+	[ -n "$np" ] && [ -n "$ip" ] || { echo "[seed] cannot resolve orchestrator NodePort endpoint" >&2; exit 1; }
+	BASE="http://${ip}:${np}/api/v1"
+else
+	kubectl port-forward -n orchestrator svc/orchestrator "${PORT}:8080" >/dev/null 2>&1 &
+	PF_PID=$!
+	sleep "${PF_SETTLE:-3}"
+	BASE="http://localhost:${PORT}/api/v1"
+fi
 
 fail=0
 for f in "${FILES[@]}"; do

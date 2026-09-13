@@ -1,0 +1,169 @@
+$ date
+Sat Sep  5 12:12:52 PM CEST 2026
+
+$ git rev-parse HEAD
+51308f7fb2f1f259f218341a1699d21a43c9b530
+
+$ git status --short go/cmd/policy-checkpoint-gateway
+
+$ go version
+go version go1.23.8 linux/amd64
+
+$ cd go && go test -v -count=1 -run '^(TestDecideWrite|TestDecideRead|TestRequestStateWriteAllowsAndPersists|TestValidateStateReadExistingAndMissing|TestReadDenialHidesFileExistence|TestWriteDeniedWhenCacheStale|TestWriteDeniedAfterPolicyFlip|TestIdentityMismatchDeniedAndAudited|TestUnregisteredIdentityDenied|TestAcquireLockConflict|TestWriteProducesLineBeforeFileInvariantHolds|TestWriteRefusedWhenAuditUnavailable|TestCrashBetweenAuditAndRenameLeavesLineNoFile|TestReadRefusedWhenAuditUnavailable|TestSweepPurgesRevokedStateAfterConfirm|TestSweepDefersWhenConfirmFails|TestSweepCancelsOnRegrant|TestSweepRetainsWithoutPurgeDirective|TestSweepInvalidDirectivesAuditedNoPurge|TestBootIntoRevokedPurgesAtStartup|TestPurgeEventReachesSubscriber|TestSweepDeletesExpiredAfterConfirm|TestSweepRetainsExpiredWhenConfirmFails)$' ./cmd/policy-checkpoint-gateway/
+=== RUN   TestWriteProducesLineBeforeFileInvariantHolds
+1.7886031737534046e+09	[33mWARN[0m	/home/onebias/School/thesis/DYNAMOS-tobias/go/cmd/policy-checkpoint-gateway/handlers.go:128	Job registration check skipped: no etcd source or job name configured
+1.7886031737544487e+09	[34mINFO[0m	/home/onebias/School/thesis/DYNAMOS-tobias/go/cmd/policy-checkpoint-gateway/handlers.go:270	Write timing	{"decideMicros": 0, "auditMicros": 910, "persistMicros": 105, "totalMicros": 1045}
+--- PASS: TestWriteProducesLineBeforeFileInvariantHolds (0.00s)
+=== RUN   TestWriteRefusedWhenAuditUnavailable
+1.7886031737560854e+09	[33mWARN[0m	/home/onebias/School/thesis/DYNAMOS-tobias/go/cmd/policy-checkpoint-gateway/handlers.go:128	Job registration check skipped: no etcd source or job name configured
+1.788603173756119e+09	[31mERROR[0m	/home/onebias/School/thesis/DYNAMOS-tobias/go/cmd/policy-checkpoint-gateway/handlers.go:255	Audit append failed, refusing write	{"err": "append audit: write /tmp/TestWriteRefusedWhenAuditUnavailable173237893/001/audit/audit.log: file already closed"}
+github.com/Jorrit05/DYNAMOS/cmd/policy-checkpoint-gateway.(*gatewayServer).RequestStateWrite
+	/home/onebias/School/thesis/DYNAMOS-tobias/go/cmd/policy-checkpoint-gateway/handlers.go:255
+github.com/Jorrit05/DYNAMOS/pkg/proto._PolicyCheckpointGateway_RequestStateWrite_Handler
+	/home/onebias/School/thesis/DYNAMOS-tobias/go/pkg/proto/policyCheckpointGateway_grpc.pb.go:153
+google.golang.org/grpc.(*Server).processUnaryRPC
+	/home/onebias/go/pkg/mod/google.golang.org/grpc@v1.65.0/server.go:1379
+google.golang.org/grpc.(*Server).handleStream
+	/home/onebias/go/pkg/mod/google.golang.org/grpc@v1.65.0/server.go:1790
+google.golang.org/grpc.(*Server).serveStreams.func2.1
+	/home/onebias/go/pkg/mod/google.golang.org/grpc@v1.65.0/server.go:1029
+--- PASS: TestWriteRefusedWhenAuditUnavailable (0.00s)
+=== RUN   TestReadRefusedWhenAuditUnavailable
+1.788603173757894e+09	[33mWARN[0m	/home/onebias/School/thesis/DYNAMOS-tobias/go/cmd/policy-checkpoint-gateway/handlers.go:128	Job registration check skipped: no etcd source or job name configured
+1.788603173758714e+09	[34mINFO[0m	/home/onebias/School/thesis/DYNAMOS-tobias/go/cmd/policy-checkpoint-gateway/handlers.go:270	Write timing	{"decideMicros": 0, "auditMicros": 664, "persistMicros": 127, "totalMicros": 820}
+1.7886031737589514e+09	[31mERROR[0m	/home/onebias/School/thesis/DYNAMOS-tobias/go/cmd/policy-checkpoint-gateway/handlers.go:328	Audit append failed, refusing read	{"err": "append audit: write /tmp/TestReadRefusedWhenAuditUnavailable1572148984/001/audit/audit.log: file already closed"}
+github.com/Jorrit05/DYNAMOS/cmd/policy-checkpoint-gateway.(*gatewayServer).ValidateStateRead
+	/home/onebias/School/thesis/DYNAMOS-tobias/go/cmd/policy-checkpoint-gateway/handlers.go:328
+github.com/Jorrit05/DYNAMOS/pkg/proto._PolicyCheckpointGateway_ValidateStateRead_Handler
+	/home/onebias/School/thesis/DYNAMOS-tobias/go/pkg/proto/policyCheckpointGateway_grpc.pb.go:171
+google.golang.org/grpc.(*Server).processUnaryRPC
+	/home/onebias/go/pkg/mod/google.golang.org/grpc@v1.65.0/server.go:1379
+google.golang.org/grpc.(*Server).handleStream
+	/home/onebias/go/pkg/mod/google.golang.org/grpc@v1.65.0/server.go:1790
+google.golang.org/grpc.(*Server).serveStreams.func2.1
+	/home/onebias/go/pkg/mod/google.golang.org/grpc@v1.65.0/server.go:1029
+--- PASS: TestReadRefusedWhenAuditUnavailable (0.00s)
+=== RUN   TestCrashBetweenAuditAndRenameLeavesLineNoFile
+1.788603173760625e+09	[33mWARN[0m	/home/onebias/School/thesis/DYNAMOS-tobias/go/cmd/policy-checkpoint-gateway/handlers.go:128	Job registration check skipped: no etcd source or job name configured
+1.788603173761492e+09	[31mERROR[0m	/home/onebias/School/thesis/DYNAMOS-tobias/go/cmd/policy-checkpoint-gateway/handlers.go:264	State write failed	{"err": "create class dir /tmp/TestCrashBetweenAuditAndRenameLeavesLineNoFile3525567457/001/data/kv: mkdir /tmp/TestCrashBetweenAuditAndRenameLeavesLineNoFile3525567457/001/data/kv: permission denied"}
+github.com/Jorrit05/DYNAMOS/cmd/policy-checkpoint-gateway.(*gatewayServer).RequestStateWrite
+	/home/onebias/School/thesis/DYNAMOS-tobias/go/cmd/policy-checkpoint-gateway/handlers.go:264
+github.com/Jorrit05/DYNAMOS/pkg/proto._PolicyCheckpointGateway_RequestStateWrite_Handler
+	/home/onebias/School/thesis/DYNAMOS-tobias/go/pkg/proto/policyCheckpointGateway_grpc.pb.go:153
+google.golang.org/grpc.(*Server).processUnaryRPC
+	/home/onebias/go/pkg/mod/google.golang.org/grpc@v1.65.0/server.go:1379
+google.golang.org/grpc.(*Server).handleStream
+	/home/onebias/go/pkg/mod/google.golang.org/grpc@v1.65.0/server.go:1790
+google.golang.org/grpc.(*Server).serveStreams.func2.1
+	/home/onebias/go/pkg/mod/google.golang.org/grpc@v1.65.0/server.go:1029
+--- PASS: TestCrashBetweenAuditAndRenameLeavesLineNoFile (0.00s)
+=== RUN   TestRequestStateWriteAllowsAndPersists
+1.7886031737626696e+09	[33mWARN[0m	/home/onebias/School/thesis/DYNAMOS-tobias/go/cmd/policy-checkpoint-gateway/handlers.go:128	Job registration check skipped: no etcd source or job name configured
+1.7886031737634587e+09	[34mINFO[0m	/home/onebias/School/thesis/DYNAMOS-tobias/go/cmd/policy-checkpoint-gateway/handlers.go:270	Write timing	{"decideMicros": 0, "auditMicros": 651, "persistMicros": 94, "totalMicros": 789}
+--- PASS: TestRequestStateWriteAllowsAndPersists (0.00s)
+=== RUN   TestIdentityMismatchDeniedAndAudited
+--- PASS: TestIdentityMismatchDeniedAndAudited (0.00s)
+=== RUN   TestValidateStateReadExistingAndMissing
+1.788603173767183e+09	[33mWARN[0m	/home/onebias/School/thesis/DYNAMOS-tobias/go/cmd/policy-checkpoint-gateway/handlers.go:128	Job registration check skipped: no etcd source or job name configured
+1.7886031737687953e+09	[34mINFO[0m	/home/onebias/School/thesis/DYNAMOS-tobias/go/cmd/policy-checkpoint-gateway/handlers.go:270	Write timing	{"decideMicros": 0, "auditMicros": 498, "persistMicros": 151, "totalMicros": 653}
+1.7886031737694988e+09	[34mINFO[0m	/home/onebias/School/thesis/DYNAMOS-tobias/go/cmd/policy-checkpoint-gateway/handlers.go:340	Read timing	{"decideMicros": 0, "auditMicros": 545, "readMicros": 21, "totalMicros": 576}
+--- PASS: TestValidateStateReadExistingAndMissing (0.00s)
+=== RUN   TestReadDenialHidesFileExistence
+1.7886031737719724e+09	[33mWARN[0m	/home/onebias/School/thesis/DYNAMOS-tobias/go/cmd/policy-checkpoint-gateway/handlers.go:128	Job registration check skipped: no etcd source or job name configured
+1.7886031737728474e+09	[34mINFO[0m	/home/onebias/School/thesis/DYNAMOS-tobias/go/cmd/policy-checkpoint-gateway/handlers.go:270	Write timing	{"decideMicros": 1, "auditMicros": 708, "persistMicros": 128, "totalMicros": 876}
+--- PASS: TestReadDenialHidesFileExistence (0.00s)
+=== RUN   TestWriteDeniedWhenCacheStale
+1.7886031737755065e+09	[33mWARN[0m	/home/onebias/School/thesis/DYNAMOS-tobias/go/cmd/policy-checkpoint-gateway/handlers.go:128	Job registration check skipped: no etcd source or job name configured
+--- PASS: TestWriteDeniedWhenCacheStale (0.00s)
+=== RUN   TestWriteDeniedAfterPolicyFlip
+1.7886031737777338e+09	[33mWARN[0m	/home/onebias/School/thesis/DYNAMOS-tobias/go/cmd/policy-checkpoint-gateway/handlers.go:128	Job registration check skipped: no etcd source or job name configured
+--- PASS: TestWriteDeniedAfterPolicyFlip (0.00s)
+=== RUN   TestUnregisteredIdentityDenied
+1.7886031737808642e+09	[34mINFO[0m	/home/onebias/School/thesis/DYNAMOS-tobias/go/cmd/policy-checkpoint-gateway/handlers.go:270	Write timing	{"decideMicros": 0, "auditMicros": 505, "persistMicros": 112, "totalMicros": 626}
+--- PASS: TestUnregisteredIdentityDenied (0.00s)
+=== RUN   TestAcquireLockConflict
+--- PASS: TestAcquireLockConflict (0.00s)
+=== RUN   TestDecideWrite
+=== RUN   TestDecideWrite/no_relation_for_user
+=== RUN   TestDecideWrite/requestType_not_permitted
+=== RUN   TestDecideWrite/stateDirectives_absent
+=== RUN   TestDecideWrite/allowed_false
+=== RUN   TestDecideWrite/allowed_fresh
+=== RUN   TestDecideWrite/allowed_cached
+=== RUN   TestDecideWrite/allowed_but_stale
+=== RUN   TestDecideWrite/allowed_but_unavailable
+=== RUN   TestDecideWrite/allowed_but_confirmed_absent
+=== RUN   TestDecideWrite/invalid_onRevocation
+--- PASS: TestDecideWrite (0.00s)
+    --- PASS: TestDecideWrite/no_relation_for_user (0.00s)
+    --- PASS: TestDecideWrite/requestType_not_permitted (0.00s)
+    --- PASS: TestDecideWrite/stateDirectives_absent (0.00s)
+    --- PASS: TestDecideWrite/allowed_false (0.00s)
+    --- PASS: TestDecideWrite/allowed_fresh (0.00s)
+    --- PASS: TestDecideWrite/allowed_cached (0.00s)
+    --- PASS: TestDecideWrite/allowed_but_stale (0.00s)
+    --- PASS: TestDecideWrite/allowed_but_unavailable (0.00s)
+    --- PASS: TestDecideWrite/allowed_but_confirmed_absent (0.00s)
+    --- PASS: TestDecideWrite/invalid_onRevocation (0.00s)
+=== RUN   TestDecideRead
+=== RUN   TestDecideRead/no_relation_for_user
+=== RUN   TestDecideRead/requestType_not_permitted
+=== RUN   TestDecideRead/stateDirectives_absent
+=== RUN   TestDecideRead/allowed_false
+=== RUN   TestDecideRead/resume_disabled
+=== RUN   TestDecideRead/within_retention_cached
+=== RUN   TestDecideRead/within_retention_fresh
+=== RUN   TestDecideRead/retention_exceeded_fresh
+=== RUN   TestDecideRead/retention_exceeded_cached
+=== RUN   TestDecideRead/stale
+=== RUN   TestDecideRead/unavailable
+=== RUN   TestDecideRead/retention_exceeded_but_stale
+=== RUN   TestDecideRead/retention_exceeded_but_unavailable
+=== RUN   TestDecideRead/remaining_retention_decreases_with_file_age
+--- PASS: TestDecideRead (0.00s)
+    --- PASS: TestDecideRead/no_relation_for_user (0.00s)
+    --- PASS: TestDecideRead/requestType_not_permitted (0.00s)
+    --- PASS: TestDecideRead/stateDirectives_absent (0.00s)
+    --- PASS: TestDecideRead/allowed_false (0.00s)
+    --- PASS: TestDecideRead/resume_disabled (0.00s)
+    --- PASS: TestDecideRead/within_retention_cached (0.00s)
+    --- PASS: TestDecideRead/within_retention_fresh (0.00s)
+    --- PASS: TestDecideRead/retention_exceeded_fresh (0.00s)
+    --- PASS: TestDecideRead/retention_exceeded_cached (0.00s)
+    --- PASS: TestDecideRead/stale (0.00s)
+    --- PASS: TestDecideRead/unavailable (0.00s)
+    --- PASS: TestDecideRead/retention_exceeded_but_stale (0.00s)
+    --- PASS: TestDecideRead/retention_exceeded_but_unavailable (0.00s)
+    --- PASS: TestDecideRead/remaining_retention_decreases_with_file_age (0.00s)
+=== RUN   TestSweepPurgesRevokedStateAfterConfirm
+1.7886031737839823e+09	[33mWARN[0m	/home/onebias/School/thesis/DYNAMOS-tobias/go/cmd/policy-checkpoint-gateway/purge.go:244	Purged 2 state files under revoked agreement 46cdb065c0bc267fdd3dd055b1bed87e115d11f72b19420c0070fbc1665893db
+1.7886031737840073e+09	[34mINFO[0m	/home/onebias/School/thesis/DYNAMOS-tobias/go/cmd/policy-checkpoint-gateway/purge.go:204	Purge sweep timing	{"confirmMicros": 101, "sweepMicros": 1298, "totalMicros": 1400}
+--- PASS: TestSweepPurgesRevokedStateAfterConfirm (0.00s)
+=== RUN   TestSweepDefersWhenConfirmFails
+--- PASS: TestSweepDefersWhenConfirmFails (0.00s)
+=== RUN   TestSweepCancelsOnRegrant
+1.788603173786261e+09	[34mINFO[0m	/home/onebias/School/thesis/DYNAMOS-tobias/go/cmd/policy-checkpoint-gateway/watch.go:58	Agreement changed 46cdb065c0bc267fdd3dd055b1bed87e115d11f72b19420c0070fbc1665893db -> bf53726b902e0a7ebe4d6022d0ae31ecee6e6c17f6282a2ad84b4901318683b6
+--- PASS: TestSweepCancelsOnRegrant (0.00s)
+=== RUN   TestSweepRetainsWithoutPurgeDirective
+--- PASS: TestSweepRetainsWithoutPurgeDirective (0.00s)
+=== RUN   TestSweepInvalidDirectivesAuditedNoPurge
+--- PASS: TestSweepInvalidDirectivesAuditedNoPurge (0.00s)
+=== RUN   TestSweepDeletesExpiredAfterConfirm
+1.7886031737890081e+09	[33mWARN[0m	/home/onebias/School/thesis/DYNAMOS-tobias/go/cmd/policy-checkpoint-gateway/purge.go:131	Deleted 1 expired state files (retention 900s)
+--- PASS: TestSweepDeletesExpiredAfterConfirm (0.00s)
+=== RUN   TestSweepRetainsExpiredWhenConfirmFails
+1.7886031737894971e+09	[33mWARN[0m	/home/onebias/School/thesis/DYNAMOS-tobias/go/cmd/policy-checkpoint-gateway/purge.go:100	Cannot confirm retention sweep, deferring	{"err": "confirming get failed: etcd down"}
+--- PASS: TestSweepRetainsExpiredWhenConfirmFails (0.00s)
+=== RUN   TestBootIntoRevokedPurgesAtStartup
+1.7886031737899866e+09	[34mINFO[0m	/home/onebias/School/thesis/DYNAMOS-tobias/go/cmd/policy-checkpoint-gateway/watch.go:56	Agreement loaded 46cdb065c0bc267fdd3dd055b1bed87e115d11f72b19420c0070fbc1665893db
+1.7886031737907941e+09	[33mWARN[0m	/home/onebias/School/thesis/DYNAMOS-tobias/go/cmd/policy-checkpoint-gateway/purge.go:244	Purged 1 state files under revoked agreement 46cdb065c0bc267fdd3dd055b1bed87e115d11f72b19420c0070fbc1665893db
+1.7886031737908096e+09	[34mINFO[0m	/home/onebias/School/thesis/DYNAMOS-tobias/go/cmd/policy-checkpoint-gateway/purge.go:204	Purge sweep timing	{"confirmMicros": 33, "sweepMicros": 718, "totalMicros": 751}
+--- PASS: TestBootIntoRevokedPurgesAtStartup (0.01s)
+=== RUN   TestPurgeEventReachesSubscriber
+1.78860317379631e+09	[33mWARN[0m	/home/onebias/School/thesis/DYNAMOS-tobias/go/cmd/policy-checkpoint-gateway/handlers.go:128	Job registration check skipped: no etcd source or job name configured
+1.7886031737970166e+09	[34mINFO[0m	/home/onebias/School/thesis/DYNAMOS-tobias/go/cmd/policy-checkpoint-gateway/handlers.go:270	Write timing	{"decideMicros": 1, "auditMicros": 578, "persistMicros": 106, "totalMicros": 707}
+1.7886031737984726e+09	[33mWARN[0m	/home/onebias/School/thesis/DYNAMOS-tobias/go/cmd/policy-checkpoint-gateway/purge.go:244	Purged 1 state files under revoked agreement 46cdb065c0bc267fdd3dd055b1bed87e115d11f72b19420c0070fbc1665893db
+1.7886031737984922e+09	[34mINFO[0m	/home/onebias/School/thesis/DYNAMOS-tobias/go/cmd/policy-checkpoint-gateway/purge.go:204	Purge sweep timing	{"confirmMicros": 33, "sweepMicros": 1015, "totalMicros": 1049}
+--- PASS: TestPurgeEventReachesSubscriber (0.00s)
+PASS
+ok  	github.com/Jorrit05/DYNAMOS/cmd/policy-checkpoint-gateway	0.055s

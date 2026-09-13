@@ -1,0 +1,20 @@
+# Registry digests for the e3-balanced build on Docker Hub — the FABRIC
+# counted-run gate (run_e3_fabric_32quads.sh) reads this file.
+#
+# One line per image: <image-substring> <sha256:hex...>
+#   image-substring — matched against the running container's image ref
+#   (repo name is enough; the gate is repo-remap-tolerant, so it holds even
+#   if the charts pull the agent from tamjiyan/ instead of dynamos1/).
+#   sha256 digest — the REGISTRY digest printed by `docker push` (the
+#   "digest: sha256:..." line), not the local image ID.
+#
+# Fill in at Hub-push time and mirror the digests into the freeze record
+# (results/e3-balanced/env/20260913_e3-balanced-freeze-record.txt). Local
+# image IDs for cross-reference: agent da0affc99c9d3, gateway 8902cbf351be6,
+# vfl-train-demo f5c6d1a94dead, vfl-train-model-demo f77074962ecc5.
+#
+# The gate refuses to run while any digest still reads PENDING.
+agent PENDING
+policy-checkpoint-gateway PENDING
+vfl-train-demo PENDING
+vfl-train-model-demo PENDING

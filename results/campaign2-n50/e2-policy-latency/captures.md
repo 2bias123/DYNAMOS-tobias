@@ -1,0 +1,2 @@
+`e2-policy-latency/watch-regime/20260905-191226_flip-to-first-deny.txt | 20260905-191226 | scripts/capture_e2_latency.sh 50 | 51308f7 | E2 watch-regime: flip via /policyEnforcer PUT to first enforced DENY on the aggregator's next write, 50 trials`
+`e2-policy-latency/poll-regime/20260905-191524_poll-only-deny.txt | 20260905-191524 | scripts/capture_e2_pollcheck.sh 50 | 51308f7 | E2 poll-only regime (watch disabled): flip to first enforced DENY, 50 trials under the 30s poll bound; FAILED (exit=1)`

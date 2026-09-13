@@ -78,6 +78,12 @@ STEWARD_NS=(server clientone clienttwo clientthree)
 APIPORT="${APIPORT:-8080}"
 ORCHPORT="${ORCHPORT:-8082}"
 POLL_MAX="${POLL_MAX:-$(poll_max_for_cycles "$CYCLES")}"   # x5s
+# hard (default): the dial-retry-inside-round-0 ordering is asserted — valid
+# on kind, where both logs sit on one node clock. record: the ordering is
+# recorded but never failed — the FABRIC setting, where the server MS and the
+# api-gateway run on different nodes (two clocks). Marker presence stays a
+# hard assert in both modes.
+E3_CROSSLOG_ASSERT="${E3_CROSSLOG_ASSERT:-hard}"
 GATEWAY_MS=(vfl-train-model-demo vfl-train-demo)
 INSPECTOR_IMAGE="${INSPECTOR_IMAGE:-tamjiyan/vfl-train-demo:latest}"
 INSPECTOR=e3-inspector
@@ -106,6 +112,38 @@ provenance() {
 }
 
 # --- shared helpers -------------------------------------------------------
+
+# The dial-retry-absorbed proof for the no-gateway configs (a, g): the degrade
+# line in the server MS log must precede round 0's close in the api-gateway
+# log, so steady-state rounds never contain the retry wait. The comparison
+# crosses two container logs; E3_CROSSLOG_ASSERT picks hard vs record (see
+# the flag comment above). Uses the caller's SERVER_MS_LOG and GW_LOG.
+assert_dialretry_absorbed() {
+	local degrade_ts round0_close_ts verdict
+	degrade_ts=$(echo "$SERVER_MS_LOG" | grep -F "No policy gateway reachable" | head -1 | awk '{print $1}')
+	round0_close_ts=$(echo "$GW_LOG" | grep -F "Intermediate accuracy achieved" \
+		| grep -F "for round 0" | head -1 | awk '{print $1}')
+	[ -n "$degrade_ts" ] || fail "no timestamped degrade line in the server MS log"
+	[ -n "$round0_close_ts" ] || fail "no round 0 close marker in the api-gateway log"
+	if python3 -c "
+import re, sys
+from datetime import datetime
+def p(raw):
+    raw = re.sub(r'(\.\d{6})\d*', r'\1', raw).replace('Z', '+00:00')
+    return datetime.fromisoformat(raw)
+sys.exit(0 if p(sys.argv[1]) < p(sys.argv[2]) else 1)" "$degrade_ts" "$round0_close_ts"; then
+		verdict="degrade precedes round 0 close"
+	else
+		verdict="degrade AFTER round 0 close"
+	fi
+	if [ "$E3_CROSSLOG_ASSERT" = "record" ]; then
+		echo "RECORDED (not asserted; two node clocks): dial-retry degrade ($degrade_ts) vs round 0 close ($round0_close_ts) -> $verdict"
+	elif [ "$verdict" = "degrade precedes round 0 close" ]; then
+		echo "OK: dial-retry degrade ($degrade_ts) absorbed inside round 0 (closed $round0_close_ts)"
+	else
+		fail "the MS degraded after round 0 closed; steady-state rounds may contain the dial-retry"
+	fi
+}
 
 # Pass-through is armed by an env var on the steward agent deployments, which
 # the agent propagates into every gateway container it deploys. kubectl set
@@ -599,22 +637,8 @@ do_config_a() {
 	# The dial-retry lands inside round 0's span: the api-gateway opens the
 	# round while the MS is still retrying, so round 0 absorbs the wait. Prove
 	# the retry never reaches steady state: the degrade must precede round 0's
-	# close.
-	local degrade_ts round0_close_ts
-	degrade_ts=$(echo "$SERVER_MS_LOG" | grep -F "No policy gateway reachable" | head -1 | awk '{print $1}')
-	round0_close_ts=$(echo "$GW_LOG" | grep -F "Intermediate accuracy achieved" \
-		| grep -F "for round 0" | head -1 | awk '{print $1}')
-	[ -n "$degrade_ts" ] || fail "no timestamped degrade line in the server MS log"
-	[ -n "$round0_close_ts" ] || fail "no round 0 close marker in the api-gateway log"
-	python3 -c "
-import re, sys
-from datetime import datetime
-def p(raw):
-    raw = re.sub(r'(\.\d{6})\d*', r'\1', raw).replace('Z', '+00:00')
-    return datetime.fromisoformat(raw)
-sys.exit(0 if p(sys.argv[1]) < p(sys.argv[2]) else 1)" "$degrade_ts" "$round0_close_ts" \
-		&& echo "OK: dial-retry degrade ($degrade_ts) absorbed inside round 0 (closed $round0_close_ts)" \
-		|| fail "the MS degraded after round 0 closed; steady-state rounds may contain the dial-retry"
+	# close (asserted or recorded per E3_CROSSLOG_ASSERT).
+	assert_dialretry_absorbed
 
 	measure_rounds
 	echo "note: the flip is ephemeral; the next reset restores requiresGateway:true"
@@ -987,22 +1011,9 @@ do_config_g() {
 	echo "OK: all four gateways inert, no MS interaction anywhere"
 
 	# Same proof as config a: the dial-retry must be absorbed inside round 0,
-	# so steady-state rounds never contain it.
-	local degrade_ts round0_close_ts
-	degrade_ts=$(echo "$SERVER_MS_LOG" | grep -F "No policy gateway reachable" | head -1 | awk '{print $1}')
-	round0_close_ts=$(echo "$GW_LOG" | grep -F "Intermediate accuracy achieved" \
-		| grep -F "for round 0" | head -1 | awk '{print $1}')
-	[ -n "$degrade_ts" ] || fail "no timestamped degrade line in the server MS log"
-	[ -n "$round0_close_ts" ] || fail "no round 0 close marker in the api-gateway log"
-	python3 -c "
-import re, sys
-from datetime import datetime
-def p(raw):
-    raw = re.sub(r'(\.\d{6})\d*', r'\1', raw).replace('Z', '+00:00')
-    return datetime.fromisoformat(raw)
-sys.exit(0 if p(sys.argv[1]) < p(sys.argv[2]) else 1)" "$degrade_ts" "$round0_close_ts" \
-		&& echo "OK: dial-retry degrade ($degrade_ts) absorbed inside round 0 (closed $round0_close_ts)" \
-		|| fail "the MS degraded after round 0 closed; steady-state rounds may contain the dial-retry"
+	# so steady-state rounds never contain it (asserted or recorded per
+	# E3_CROSSLOG_ASSERT).
+	assert_dialretry_absorbed
 
 	# Presence-cost mechanism evidence: cumulative CPU of each inert gateway
 	# container over the run. Non-fatal — a missing snapshot never voids the run.

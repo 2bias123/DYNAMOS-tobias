@@ -1,0 +1,33 @@
+$ date
+Sat Sep  5 07:15:24 PM CEST 2026
+
+$ git rev-parse HEAD
+51308f7fb2f1f259f218341a1699d21a43c9b530
+
+$ git status --short
+?? results/campaign2-n50/
+?? results/e3-frozen-30triplets/captures.md
+?? results/e3-frozen-30triplets/config-a-no-gateway/
+?? results/e3-frozen-30triplets/config-b-passthrough/
+?? results/e3-frozen-30triplets/config-c-enforced/
+?? results/e3-frozen-30triplets/env/20260904-181403_env-snapshot.txt
+?? results/e3-frozen-30triplets/env/20260904-181403_images.txt
+
+$ kubectl config current-context
+kind-kind
+
+
+=== build the gateway (-tags local) and wire up etcd + orchestrator
+
+=== seed the server agreement allowed=true via /policyEnforcer
+
+=== run the local gateway with the watch disabled (poll interval 30s)
+--- gateway log ---
+1.7886285300489411e+09	[31mFATAL[0m	/home/onebias/School/thesis/DYNAMOS-tobias/go/cmd/policy-checkpoint-gateway/main.go:140	Failed to listen: %v	{"error": "listen tcp :50060: bind: address already in use"}
+main.setupListener
+	/home/onebias/School/thesis/DYNAMOS-tobias/go/cmd/policy-checkpoint-gateway/main.go:140
+main.main
+	/home/onebias/School/thesis/DYNAMOS-tobias/go/cmd/policy-checkpoint-gateway/main.go:252
+runtime.main
+	/nix/store/41y1amjfxmrrz3knk09ndrh3iacfz2sv-go-1.23.8/share/go/src/runtime/proc.go:272
+E2 FAIL: gateway did not start serving
