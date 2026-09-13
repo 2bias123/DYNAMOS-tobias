@@ -1,0 +1,35 @@
+E3 re-freeze record — tag :e3-frozen (2026-09-04)
+
+Build under test for the kind 30-triplet re-run and the FABRIC port:
+the frozen campaign build (campaign-n50/env) plus exactly one change,
+the dedicated gateway-state StorageClass for the state PVCs (agent,
+commit 5659239 on pvc-roundtrip-overhead). Only the agent image is
+re-cut; policy-checkpoint-gateway and both VFL images are the frozen
+campaign originals, re-tagged. This record supersedes the image IDs in
+campaign-n50/env as the counted reference.
+
+Validated by the TRIPLETS=2 CYCLES=5 dry run of 2026-09-03: 6/6 config
+runs exit 0, env gate passed, all four state PVCs Bound on
+gateway-state.
+
+Image IDs — docker (local) / crictl (kind node):
+
+  agent                      da0affc99c9d / da0affc99c9d3   NEW (storage-class rename)
+  policy-checkpoint-gateway  3e5d9e025f00 / 3e5d9e025f000   = frozen campaign
+  vfl-train-demo             f5c6d1a94dea / f5c6d1a94dead   = frozen campaign
+  vfl-train-model-demo       f77074962ecc / f77074962ecc5   = frozen campaign
+
+Tags:
+
+  local docker  tamjiyan/<name>:e3-frozen, all four
+  kind node     :e3-frozen parked alongside the canonical tags
+                (dynamos1/agent:main, tamjiyan/<name>:latest), which
+                carry the same IDs; the wrapper gate pins them
+
+Docker Hub registry digests, recorded at push (push serves FABRIC
+only — kind cannot pull from Hub):
+
+  tamjiyan/agent:e3-frozen                      PENDING (docker login required)
+  tamjiyan/policy-checkpoint-gateway:e3-frozen  PENDING
+  tamjiyan/vfl-train-demo:e3-frozen             PENDING
+  tamjiyan/vfl-train-model-demo:e3-frozen       PENDING

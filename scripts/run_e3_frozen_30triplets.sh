@@ -3,7 +3,7 @@ set -u
 
 # E3 30-triplet frozen-build session. Wraps
 # run_e3_replication.sh with the one gate the driver's env snapshot does not
-# provide: digest EQUALITY with the frozen campaign build, not just
+# provide: digest EQUALITY with the e3-frozen build, not just
 # kind-import origin — the gap the 2026-08-27 branch-build session fell
 # through. Then runs 30 interleaved a,b,c triplets of 50-round runs into
 # results/e3-frozen-30triplets/.
@@ -19,11 +19,13 @@ set -u
 
 root="$(cd "$(dirname "$0")/.." && pwd)"
 
-# The four decisive fork images at their frozen-campaign IDs, from
-# campaign-n50/env (same IDs the 2026-08-27 frozen session and the
-# 2026-08-29 pre-verification diffed against).
+# The four decisive fork images at their e3-frozen IDs (re-freeze
+# 2026-09-04): the frozen campaign build plus the gateway-state
+# storage-class rename in the agent (commit 5659239); gateway and both
+# VFL images stay the campaign originals. Record:
+# results/e3-frozen-30triplets/env/20260904_e3-frozen-freeze-record.txt
 FROZEN_REFS=(
-	"docker.io/dynamos1/agent:main a7854a1ecdc2c"
+	"docker.io/dynamos1/agent:main da0affc99c9d3"
 	"docker.io/tamjiyan/policy-checkpoint-gateway:latest 3e5d9e025f000"
 	"docker.io/tamjiyan/vfl-train-demo:latest f5c6d1a94dead"
 	"docker.io/tamjiyan/vfl-train-model-demo:latest f77074962ecc5"

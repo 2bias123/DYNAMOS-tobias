@@ -20,12 +20,19 @@ set -u
 #      on the steward agents, but its listener never binds: the MSs degrade
 #      exactly as in config a — isolates the container's presence cost from
 #      its interaction cost; needs images built with the GATEWAY_INERT flag)
+#   h  store-only write-through (config c's topology with GATEWAY_STORE_ONLY:
+#      identity, decision, and audit skipped, only the PVC write I/O remains.
+#      NOT the arm-f chain roundtrip — no STATE_ROUNDTRIP flags; h is c minus
+#      governance. The counted E3 redo's fourth arm: c-h prices governance on
+#      the write path at the counted tier.)
 #
 # Configs d, e, and f belong to their own experiment: they tag failures E7
 # and default their artifacts to results/e7-pvc-roundtrip, so a forgotten
 # E3_RESULTS_DIR override can never touch the frozen campaign tree. Config g
 # is a diagnostic probe and defaults to results/e3-inert-probe for the same
-# reason — it can never land in a counted tree by accident.
+# reason — it can never land in a counted tree by accident. Config h is an E3
+# arm and defaults to results/e3-balanced (its own redo tree), so a bare
+# invocation can never land in campaign-n50 either.
 #
 # Per-round latency comes from the api-gateway's own round markers ("Running
 # VFL training round N" to "Intermediate accuracy achieved ... for round N"),
@@ -44,7 +51,7 @@ set -u
 # canonical microservices config on every boot, so any reset restores
 # requiresGateway:true).
 #
-# Usage: capture_e3_overhead.sh <a|b|c|d|e|f|g> [cycles]   (cycles default CAMPAIGN_N)
+# Usage: capture_e3_overhead.sh <a|b|c|d|e|f|g|h> [cycles]   (cycles default CAMPAIGN_N)
 
 EXP=E3
 root="$(cd "$(dirname "$0")/.." && pwd)"
@@ -61,7 +68,8 @@ case "$CONFIG" in
 	e) subdir="config-e-chain-roundtrip"; EXP=E7; results_dir="${E3_RESULTS_DIR:-$root/results/e7-pvc-roundtrip}" ;;
 	f) subdir="config-f-store-only"; EXP=E7; results_dir="${E3_RESULTS_DIR:-$root/results/e7-pvc-roundtrip}" ;;
 	g) subdir="config-g-inert"; results_dir="${E3_RESULTS_DIR:-$root/results/e3-inert-probe}" ;;
-	*) echo "usage: $0 <a|b|c|d|e|f|g> [cycles]" >&2; exit 2 ;;
+	h) subdir="config-h-store-only"; results_dir="${E3_RESULTS_DIR:-$root/results/e3-balanced}" ;;
+	*) echo "usage: $0 <a|b|c|d|e|f|g|h> [cycles]" >&2; exit 2 ;;
 esac
 export EXP
 
@@ -82,6 +90,7 @@ cleanup() {
 	[ "$CONFIG" = e ] && { disable_roundtrip; disable_roundtrip_client; }
 	[ "$CONFIG" = f ] && { disable_roundtrip; disable_roundtrip_client; disable_store_only; }
 	[ "$CONFIG" = g ] && disable_inert
+	[ "$CONFIG" = h ] && disable_store_only
 	for p in "${PIDS[@]}"; do kill "$p" 2>/dev/null; done
 }
 trap cleanup EXIT
@@ -1009,6 +1018,67 @@ sys.exit(0 if p(sys.argv[1]) < p(sys.argv[2]) else 1)" "$degrade_ts" "$round0_cl
 	step "disarm inert gateway"
 	disable_inert
 	echo "[inert] GATEWAY_INERT removed from all four steward agents"
+}
+
+do_config_h() {
+	step "arm store-only write-through (gateway store-only, no roundtrip), then reset + canonical seed + clean slate"
+	enable_store_only
+	reset_and_seed
+	delete_state_pvcs
+
+	step "trigger the chain (cycles=${CYCLES}) with store-only write-through"
+	local rid
+	rid=$(trigger "$CYCLES") || exit 1
+
+	config_evidence with-gateway
+
+	step "wait for training to finish"
+	local status
+	status=$(wait_done "$rid") || exit 1
+	r2_series "$status"
+
+	full_logs with-gateway
+
+	# Store-only is armed on all four steward agents, so all four gateways
+	# boot with the banner. The write-count and span depth stay on the server,
+	# matching config c's server-focused enforcement asserts; read spans and
+	# restores are deliberately not asserted — without STATE_ROUNDTRIP there
+	# are no per-round reads, and the one clean-slate startup read carries no
+	# governance decision in store-only, so pinning a read-span count would be
+	# a fragile assertion the measurement does not need.
+	local ns v gw_log
+	step "store-only banner on all four gateways"
+	for ns in "${STEWARD_NS[@]}"; do
+		if [ "$ns" = server ]; then gw_log="$SERVER_GW_LOG"; else v="CLIENT_GW_LOG_${ns}"; gw_log="${!v}"; fi
+		[ -n "$gw_log" ] || fail "no retained gateway log for $ns"
+		must_grep "store-only banner on the $ns gateway" "$gw_log" \
+			-F "Store-only mode: governance and audit skipped, state I/O only"
+		must_not_grep "no pass-through banner on $ns" "$gw_log" -F "Pass-through mode:"
+	done
+
+	step "store-only evidence on server: per-round writes, ungoverned spans, zero decision audit"
+	must_grep "server MS connected to its gateway" "$SERVER_MS_LOG" \
+		-F "Successfully connected to gateway"
+	local ckpt_n wspan_n zero_n
+	ckpt_n=$(echo "$SERVER_MS_LOG" | grep -cF "Checkpoint write allowed: round_index=")
+	[ "$ckpt_n" -eq "$CYCLES" ] || fail "expected $CYCLES checkpoint writes in the server MS log, got $ckpt_n"
+	echo "OK: $ckpt_n checkpoint writes, one per round"
+	[ "$(echo "$SERVER_GW_LOG" | grep -c '"op":"write"')" -eq 0 ] || fail "write audit records present on the server despite store-only"
+	[ "$(echo "$SERVER_GW_LOG" | grep -c '"op":"read"')" -eq 0 ] || fail "read audit records present on the server despite store-only"
+	echo "OK: server: zero read/write decision audit records"
+	wspan_n=$(echo "$SERVER_GW_LOG" | grep -cF "Write timing")
+	[ "$wspan_n" -eq "$CYCLES" ] || fail "expected $CYCLES write spans on the server, got $wspan_n"
+	zero_n=$(echo "$SERVER_GW_LOG" | grep -F "Write timing" | grep -c '"decideMicros": 0, "auditMicros": 0')
+	[ "$zero_n" -eq "$CYCLES" ] || fail "expected $CYCLES zero-governance write spans on the server, got $zero_n"
+	echo "OK: server: $wspan_n write spans, all with zero decide/audit"
+
+	measure_rounds
+	payload_sizes_server
+	must_grep "persisted state files on the PVC" "$PAYLOAD_LISTING" -E "state files: [1-9]"
+
+	step "disarm store-only"
+	disable_store_only
+	echo "[store-only] GATEWAY_STORE_ONLY removed from all four steward agents"
 }
 
 run_capture "$subdir" overhead-run "scripts/capture_e3_overhead.sh ${CONFIG} ${CYCLES}" "do_config_${CONFIG}" \
