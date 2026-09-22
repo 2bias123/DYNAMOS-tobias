@@ -70,7 +70,11 @@ for p in pods['items']:
     ns = p['metadata']['namespace']
     for cs in (p['status'].get('containerStatuses') or []):
         img = cs.get('image', '')
-        if 'dynamos1/' not in img and 'tamjiyan/' not in img:
+        # 2bias123/ is the re-pointed Hub account the FABRIC install pulls
+        # from (2026-09-20); dynamos1/ and tamjiyan/ stay in the filter so
+        # any leftover foreign ref still surfaces below as unpinned.
+        if ('dynamos1/' not in img and 'tamjiyan/' not in img
+                and '2bias123/' not in img):
             continue
         iid = cs.get('imageID', '')
         # Only the four decisive images are pinned; other fork-org images

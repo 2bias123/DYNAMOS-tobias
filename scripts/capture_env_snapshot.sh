@@ -9,7 +9,8 @@ set -u
 # E3_ENV picks the environment shape:
 #
 #   kind (default) — the provenance check requires every container running a
-#   dynamos1/ or tamjiyan/ image to show a kind-import digest
+#   dynamos1/, tamjiyan/, or 2bias123/ image (2bias123 = the re-pointed Hub
+#   account the FABRIC install pulls from, 2026-09-20) to show a kind-import digest
 #   (docker.io/library/import-...). A registry digest means the node lost the
 #   locally-loaded fork build and silently pulled upstream; the script exits
 #   nonzero and the session must reload the image (kind load + reset) before
@@ -48,7 +49,8 @@ for p in json.load(sys.stdin)['items']:
     ns = p['metadata']['namespace']
     for cs in (p['status'].get('containerStatuses') or []):
         img = cs.get('image', '')
-        if 'dynamos1/' not in img and 'tamjiyan/' not in img:
+        if ('dynamos1/' not in img and 'tamjiyan/' not in img
+                and '2bias123/' not in img):
             continue
         iid = cs.get('imageID', '')
         # kind-import digests also carry @sha256, so the fabric check must
@@ -87,7 +89,7 @@ mkdir -p "$results_dir"
 		show kubectl get sc
 		show kubectl -n local-path-storage get cm local-path-config -o yaml
 	fi
-	echo "\$ fork-image provenance (containers on dynamos1/ or tamjiyan/ images)"
+	echo "\$ fork-image provenance (containers on dynamos1/, tamjiyan/, or 2bias123/ images)"
 	echo "$img_check"
 	echo
 } > "$results_dir/${ts}_env-snapshot.txt"
@@ -110,7 +112,8 @@ seen = set()
 for p in json.load(sys.stdin)['items']:
     for cs in (p['status'].get('containerStatuses') or []):
         img = cs.get('image', '')
-        if 'dynamos1/' not in img and 'tamjiyan/' not in img:
+        if ('dynamos1/' not in img and 'tamjiyan/' not in img
+                and '2bias123/' not in img):
             continue
         line = '%s -> %s' % (img, cs.get('imageID', ''))
         if line not in seen:

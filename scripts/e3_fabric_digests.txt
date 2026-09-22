@@ -2,19 +2,22 @@
 # counted-run gate (run_e3_fabric_32quads.sh) reads this file.
 #
 # One line per image: <image-substring> <sha256:hex...>
-#   image-substring — matched against the running container's image ref
-#   (repo name is enough; the gate is repo-remap-tolerant, so it holds even
-#   if the charts pull the agent from tamjiyan/ instead of dynamos1/).
+#   image-substring — matched against the running container's image ref.
+#   Account-qualified since 2026-09-20: every fork-line ref on FABRIC
+#   must resolve to the 2bias123/ account (tamjiyan is the lineage's
+#   account, not ours), so the pins tie to it deliberately. Tags are
+#   left out of the substrings: the job-deploy path pulls some images
+#   as :latest aliases, and the digest, not the tag, is the guarantee.
 #   sha256 digest — the REGISTRY digest printed by `docker push` (the
 #   "digest: sha256:..." line), not the local image ID.
 #
-# Fill in at Hub-push time and mirror the digests into the freeze record
-# (results/e3-balanced/env/20260913_e3-balanced-freeze-record.txt). Local
-# image IDs for cross-reference: agent da0affc99c9d3, gateway 8902cbf351be6,
-# vfl-train-demo f5c6d1a94dead, vfl-train-model-demo f77074962ecc5.
-#
-# The gate refuses to run while any digest still reads PENDING.
-agent PENDING
-policy-checkpoint-gateway PENDING
-vfl-train-demo PENDING
-vfl-train-model-demo PENDING
+# The four decisive images are pinned (judged). The other five images
+# of the 2026-09-20 push (orchestrator, api-gateway, policy-enforcer,
+# both sidecar builds) are provenance, recorded in the freeze record:
+# results/e3-balanced/env/20260913_e3-balanced-freeze-record.txt.
+# Recorded 2026-09-20 from the push output.
+
+2bias123/agent sha256:a208766b2240453e9670a3623503b1f61d6a40d043880fa6287ebdb22aedc9c5
+2bias123/policy-checkpoint-gateway sha256:6f0d31b5a4151eac430dd599b0710afc61bc60e2f474e788a8416cafe5044bf5
+2bias123/vfl-train-demo sha256:1d74776345cac836ba7dafc6ecc1459686664b2228d6023258d8313a35223407
+2bias123/vfl-train-model-demo sha256:8637fdd443d983a7ab9ed6d338268782cd534350234242acd043fe1452cc1b52

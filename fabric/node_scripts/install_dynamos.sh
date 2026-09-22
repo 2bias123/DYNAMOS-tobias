@@ -103,14 +103,13 @@ linkerd jaeger install \
   --set webhook.nodeSelector."kubernetes\\.io/hostname"=dynamos \
   | kubectl apply -f -
 
-mkdir -p homebrew
-curl -L https://github.com/Homebrew/brew/tarball/master | tar xz --strip 1 -C homebrew
-
-addPathExport "\$PATH:$HOME/homebrew/bin"
-export PATH="$PATH:$HOME/homebrew/bin"
-
-brew update
-brew install etcd
+# etcd client, debugging convenience only — nothing in the install or run
+# path needs a local etcdctl (the harness execs it inside the etcd pod, the
+# seed script just copies files). The lineage's Homebrew route broke by 2026:
+# `brew update` on a tarball install dies in the master->main migration
+# ("not a git repository"), and set -e then killed the script here before
+# the /etc/hosts line (21.09 sitting). Plain apt instead.
+sudo apt-get install -y etcd-client
 
 echo -e "127.0.0.1 api-gateway.api-gateway.svc.cluster.local" | sudo tee -a /etc/hosts
 

@@ -27,9 +27,9 @@ spec:
         - name: DATA_STEWARD_NAME
           value: clienttwo
         - name: MICROSERVICE_REPOSITORY_NAME
-          value: tamjiyan
+          value: {{ .Values.microserviceRepositoryName | default "tamjiyan" }}
         - name: SIDECAR_REPOSITORY_NAME
-          value: tamjiyan
+          value: {{ .Values.sidecarRepositoryName | default "tamjiyan" }}
         - name: OC_AGENT_HOST
           value: {{ .Values.tracingEndpoint }}
         - name: LOCAL_DEV

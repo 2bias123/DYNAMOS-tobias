@@ -29,7 +29,15 @@ SETTLE_SECONDS="${SETTLE_SECONDS:-45}"
 ROLLOUT_TIMEOUT="${ROLLOUT_TIMEOUT:-120s}"
 
 # Refuse to run if the required recovery patches aren't in the tree.
-"$script_dir/scripts/preflight_patches.sh"
+# preflight_patches.sh is a BUILD-tree guard (it greps python/ and go/). On
+# FABRIC the control node is deploy-only — the upload route ships
+# charts/configuration/scripts, no build tree — and image identity is
+# guaranteed by the digest gate + freeze record, so the check is skipped there.
+if [ "${E3_ENV:-kind}" = "fabric" ]; then
+	echo "[reset] E3_ENV=fabric: skipping build-tree preflight (deploy-only node)"
+else
+	"$script_dir/scripts/preflight_patches.sh"
+fi
 
 echo "[reset] deleting stale Jobs in steward namespaces"
 for ns in "${STEWARD_NS[@]}"; do

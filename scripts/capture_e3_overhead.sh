@@ -85,7 +85,16 @@ POLL_MAX="${POLL_MAX:-$(poll_max_for_cycles "$CYCLES")}"   # x5s
 # hard assert in both modes.
 E3_CROSSLOG_ASSERT="${E3_CROSSLOG_ASSERT:-hard}"
 GATEWAY_MS=(vfl-train-model-demo vfl-train-demo)
-INSPECTOR_IMAGE="${INSPECTOR_IMAGE:-tamjiyan/vfl-train-demo:latest}"
+# The inspector just needs a python3+shell image to mount the state PVC and
+# du/ls it; vfl-train-demo already fits and is on every chain node. The kind
+# default is the side-loaded tamjiyan build; on FABRIC that account is
+# arm64-only and unpullable ("no match for platform"), so default to the
+# re-pointed account there. Override with INSPECTOR_IMAGE.
+if [ "${E3_ENV:-kind}" = "fabric" ]; then
+	INSPECTOR_IMAGE="${INSPECTOR_IMAGE:-2bias123/vfl-train-demo:latest}"
+else
+	INSPECTOR_IMAGE="${INSPECTOR_IMAGE:-tamjiyan/vfl-train-demo:latest}"
+fi
 INSPECTOR=e3-inspector
 
 PIDS=()
