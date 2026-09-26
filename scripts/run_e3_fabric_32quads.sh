@@ -8,11 +8,16 @@ set -u
 # Artifacts land in results/e3-fabric/.
 #
 # Differences from the kind wrapper, all environment not protocol:
-#   - The frozen-build gate checks REGISTRY digests (scripts/
-#     e3_fabric_digests.txt, recorded at Hub-push time) against every running
-#     fork container's imageID via kubectl — no node access, works on any
-#     cluster. Same guarantee as the kind crictl gate: running code = frozen
-#     build.
+#   - The frozen-build gate is two-stage (scripts/e3_fabric_digests.txt,
+#     recorded at Hub-push time). Stage 1 checks every running fork
+#     container's imageID via kubectl; the pinned agent (persistent steward
+#     pods) must be running and matching. Stage 2 covers the three job-only
+#     pins (injected chain gateway + the two VFL training MSs), which exist
+#     only while a round runs: an absent one is verified against the Hub
+#     REGISTRY — the digest its :latest tag resolves to (the ref the
+#     job-deploy path pulls) must equal the pin. Fails closed on registry
+#     errors. Same guarantee as the kind crictl gate: code that runs =
+#     frozen build.
 #   - E3_TRANSPORT defaults to nodeport (kubectl port-forward is broken on
 #     the testbed VMs; services are patched to NodePort and curled at a node
 #     IP).
@@ -50,7 +55,34 @@ if ! kubectl get pods -A -o json > "$pods_json" 2>/dev/null; then
 fi
 
 if ! python3 - "$digests_file" "$pods_json" <<'PYEOF'
-import json, sys
+import json, sys, urllib.request
+
+REGISTRY_AUTH = ('https://auth.docker.io/token'
+                 '?service=registry.docker.io&scope=repository:%s:pull')
+REGISTRY_MANIFEST = 'https://registry-1.docker.io/v2/%s/manifests/latest'
+# Both docker and OCI types, single and index: Hub then answers with the
+# top-level digest — for our single-arch pushes, the digest `docker push`
+# printed (the :latest aliases were pushed digest-identical, 2026-09-20).
+ACCEPT = ', '.join((
+    'application/vnd.docker.distribution.manifest.v2+json',
+    'application/vnd.docker.distribution.manifest.list.v2+json',
+    'application/vnd.oci.image.manifest.v1+json',
+    'application/vnd.oci.image.index.v1+json',
+))
+
+# Steward agent pods are persistent — the pinned agent must be RUNNING.
+# The other pins are job-only images that exist while a round runs; when
+# absent they are judged against the registry instead (stage 2 below).
+MUST_RUN = ('agent',)
+
+def registry_digest(repo):
+    with urllib.request.urlopen(REGISTRY_AUTH % repo, timeout=30) as r:
+        token = json.load(r)['token']
+    req = urllib.request.Request(
+        REGISTRY_MANIFEST % repo, method='HEAD',
+        headers={'Authorization': 'Bearer ' + token, 'Accept': ACCEPT})
+    with urllib.request.urlopen(req, timeout=30) as r:
+        return r.headers.get('Docker-Content-Digest', '')
 
 pins = []
 with open(sys.argv[1]) as f:
@@ -91,10 +123,28 @@ for p in pods['items']:
         else:
             print('DRIFT %s/%s %s -> %s' % (ns, p['metadata']['name'], img, iid))
             bad += 1
-missing = [s for s, ok in seen.items() if not ok]
-for s in missing:
-    print('ABSENT no running container matches pin: %s' % s)
-sys.exit(1 if bad or missing else 0)
+# Stage 2: pins with no running container. The agent must be running —
+# absence fails the gate. Job-only pins are verified against the Hub
+# registry: the digest their :latest tag resolves to (what the job-deploy
+# path pulls mid-run) must equal the pin. Any registry error fails closed.
+for s in [s for s, ok in seen.items() if not ok]:
+    if any(m in s for m in MUST_RUN):
+        print('ABSENT pinned image must be running and is not: %s' % s)
+        bad += 1
+        continue
+    try:
+        reg = registry_digest(s)
+    except Exception as e:
+        print('REGISTRY-FAIL %s -> %s (no verdict, gate fails closed)' % (s, e))
+        bad += 1
+        continue
+    if reg == dict(pins)[s]:
+        print('REGISTRY-OK %s :latest resolves to the pinned digest' % s)
+    else:
+        print('REGISTRY-DRIFT %s :latest -> %s (pin %s)'
+              % (s, reg or '(no digest header)', dict(pins)[s]))
+        bad += 1
+sys.exit(1 if bad else 0)
 PYEOF
 then
 	rm -f "$pods_json"
