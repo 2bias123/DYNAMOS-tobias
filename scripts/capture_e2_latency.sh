@@ -45,10 +45,16 @@ PIDS=()
 WPID=""
 writer_py=""
 writer_log=""
+# run_capture pipes the capture body through tee, so WPID/PIDS/writer_py are
+# set in a subshell and are empty here: kill by pattern, not by pid.
 cleanup() {
 	[ -n "$WPID" ] && kill "$WPID" 2>/dev/null
-	kubectl exec -n "$NS" "$(server_pod)" -c "$MS_CONTAINER" -- pkill -f 'python3 -u -' 2>/dev/null
+	pkill -f "kubectl exec -i -n ${NS} .* -c ${MS_CONTAINER} --" 2>/dev/null
+	local pod; pod=$(server_pod)
+	[ -n "$pod" ] && kubectl exec -n "$NS" "$pod" -c "$MS_CONTAINER" -- pkill -f 'python3 -u -' 2>/dev/null
 	for p in "${PIDS[@]}"; do kill "$p" 2>/dev/null; done
+	pkill -f "port-forward.*${ORCHPORT}:8080" 2>/dev/null
+	pkill -f "port-forward.*${APIPORT}:8080" 2>/dev/null
 	[ -n "$writer_py" ] && rm -f "$writer_py"
 }
 trap cleanup EXIT

@@ -94,13 +94,23 @@ PIDS=()
 GWPID=""
 ETCD_PF_PID=""
 scratch=""
+# run_capture pipes the capture body through tee, so GWPID/ETCD_PF_PID/PIDS/
+# scratch are set in a subshell and are empty here: kill by pattern, not by
+# pid (the same pid-only cleanup left E2's local gateway holding its port).
 cleanup() {
 	[ -n "$GWPID" ] && kill "$GWPID" 2>/dev/null
 	[ -n "$ETCD_PF_PID" ] && kill "$ETCD_PF_PID" 2>/dev/null
 	for p in "${PIDS[@]}"; do kill "$p" 2>/dev/null; done
+	pkill -f '^/tmp/e6-staleness\.[^/]+/gw$' 2>/dev/null
 	pkill -f "port-forward.*${ETCD_LOCAL_PORT}:2379" 2>/dev/null
+	pkill -f "port-forward.*${ORCHPORT}:8080" 2>/dev/null
+	pkill -f "port-forward.*${GWPORT_POD}:50050" 2>/dev/null
 	kubectl delete pod "$GW_POD" -n "$NS" --ignore-not-found=true --wait=false 2>/dev/null
+	local i
+	for i in 1 2 3 4 5 6; do ss -ltn 2>/dev/null | grep -q ":${GWPORT_LOCAL} " || break; sleep 0.5; done
+	ss -ltn 2>/dev/null | grep -q ":${GWPORT_LOCAL} " && pkill -9 -f '^/tmp/e6-staleness\.[^/]+/gw$' 2>/dev/null
 	[ -n "$scratch" ] && rm -rf "$scratch"
+	rm -rf /tmp/e6-staleness.* 2>/dev/null
 }
 trap cleanup EXIT
 
@@ -315,7 +325,7 @@ gw_write_local() {
 }
 
 do_staleness() {
-	scratch=$(mktemp -d)
+	scratch=$(mktemp -d /tmp/e6-staleness.XXXXXX)
 	local gw_bin="$scratch/gw" state_dir="$scratch/state" gw_log="$scratch/gw.log"
 	local blob="$state_dir/data/e6_probe/probe.bin" audit="$state_dir/audit/audit.log"
 	mkdir -p "$state_dir"

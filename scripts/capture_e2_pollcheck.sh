@@ -42,11 +42,20 @@ IDENTITY='{"steward":"SERVER","user":"'"$USER_NAME"'","request_type":"vflTrainMo
 PIDS=()
 GWPID=""
 scratch=""
+# run_capture pipes the capture body through tee, so GWPID/PIDS/scratch are set
+# in a subshell and are empty here: kill by pattern, not by pid (a pid-only
+# cleanup left the local gateway holding :50060 and broke the next run).
 cleanup() {
 	[ -n "$GWPID" ] && kill "$GWPID" 2>/dev/null
 	for p in "${PIDS[@]}"; do kill "$p" 2>/dev/null; done
+	pkill -f '^/tmp/e2-pollcheck\.[^/]+/gw$' 2>/dev/null
 	pkill -f "port-forward.*${ETCD_LOCAL_PORT}:2379" 2>/dev/null
+	pkill -f "port-forward.*${ORCHPORT}:8080" 2>/dev/null
+	local i
+	for i in 1 2 3 4 5 6; do ss -ltn 2>/dev/null | grep -q ":${GWPORT} " || break; sleep 0.5; done
+	ss -ltn 2>/dev/null | grep -q ":${GWPORT} " && pkill -9 -f '^/tmp/e2-pollcheck\.[^/]+/gw$' 2>/dev/null
 	[ -n "$scratch" ] && rm -rf "$scratch"
+	rm -rf /tmp/e2-pollcheck.* 2>/dev/null
 }
 trap cleanup EXIT
 
@@ -72,9 +81,16 @@ print(json.dumps(a))" > "$tmp" || { rm -f "$tmp"; fail "flip json build failed";
 }
 
 do_pollcheck() {
-	scratch=$(mktemp -d)
+	scratch=$(mktemp -d /tmp/e2-pollcheck.XXXXXX)
 	local gw_bin="$scratch/gw" state_dir="$scratch/state" gw_log="$scratch/gw.log"
 	mkdir -p "$state_dir"
+
+	step "pre-flight: local gateway port ${GWPORT} must be free"
+	if ss -ltn 2>/dev/null | grep -q ":${GWPORT} "; then
+		echo "--- holder of :${GWPORT} ---"; ss -ltnp 2>/dev/null | grep ":${GWPORT} "
+		fail "port ${GWPORT} already bound (stale local gateway? kill it, then re-run)"
+	fi
+	echo "port ${GWPORT} free"
 
 	step "build the gateway (-tags local) and wire up etcd + orchestrator"
 	( cd "$root/go" && go build -tags local -o "$gw_bin" ./cmd/policy-checkpoint-gateway/ ) || fail "gateway build failed"
