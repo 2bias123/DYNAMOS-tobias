@@ -19,10 +19,11 @@ set -e
 # only has to carry a matching "gateway-state" entry in storageClassConfigs.
 #
 # NVME_MOUNT must match the mount point the notebook passed to
-# configure_nvme() (default /mnt/nvme). The per-node map below encodes the
-# server-only NVMe scope; for per-steward NVMe, add one
-# {"node": "<name>", "paths": ["${NVME_MOUNT}"]} line per steward node that
-# got an NVMe component in the slice.
+# configure_nvme() (default /mnt/nvme). NVME_NODES lists the steward nodes
+# whose gateway-state claims live on that mount (default "server", the
+# counted e3-fabric rig); the per-steward NVMe session passes
+# NVME_NODES="server clientone clienttwo clientthree" — every node named
+# here must have got an NVMe component in the slice and the Phase 3 mount.
 # ---------------------------------------------------------------------------
 
 NVME_MOUNT="${NVME_MOUNT:-/mnt/nvme}"
@@ -38,6 +39,10 @@ PATCH="$(python3 - <<'PYEOF'
 import json, os
 
 nvme_mount = os.environ["NVME_MOUNT"]
+# NVME_NODES: space-separated steward nodes whose gateway-state claims live on
+# their own NVMe mount. Default "server" = the counted e3-fabric rig; the
+# per-steward NVMe session passes all four.
+nvme_nodes = os.environ.get("NVME_NODES", "server").split()
 config = {
     "nodePathMap": [],
     "storageClassConfigs": {
@@ -51,7 +56,7 @@ config = {
         },
         "gateway-state": {
             "nodePathMap": [
-                {"node": "server", "paths": [nvme_mount]},
+                *[{"node": n, "paths": [nvme_mount]} for n in nvme_nodes],
                 {
                     "node": "DEFAULT_PATH_FOR_NON_LISTED_NODES",
                     "paths": ["/opt/gateway-state"],

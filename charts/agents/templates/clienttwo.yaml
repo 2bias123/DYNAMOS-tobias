@@ -33,7 +33,9 @@ spec:
         - name: OC_AGENT_HOST
           value: {{ .Values.tracingEndpoint }}
         - name: LOCAL_DEV
-          value: "true"
+          # "true" leaves job placement to the scheduler (single-node kind);
+          # "false" pins each steward's job to the node named after it (FABRIC).
+          value: {{ .Values.localDev | quote }}
       - name: sidecar
         image: {{ .Values.dockerArtifactAccount }}/sidecar:{{ .Values.branchNameTag }}
         imagePullPolicy: Always

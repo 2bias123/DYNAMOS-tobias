@@ -36,6 +36,12 @@ fi
 if [ -n "${DYNAMOS_IMG_TAG:-}" ]; then
     img_overrides="${img_overrides} --set branchNameTag=${DYNAMOS_IMG_TAG}"
 fi
+# Job placement: DYNAMOS_LOCAL_DEV=false pins each steward's training job to
+# the node named after it (deploy_job.go). Unset, the chart default ("true",
+# scheduler-placed) applies, which is what single-node kind needs.
+if [ -n "${DYNAMOS_LOCAL_DEV:-}" ]; then
+    agents_img_overrides="${agents_img_overrides} --set-string localDev=${DYNAMOS_LOCAL_DEV}"
+fi
 
 rabbit_definitions_file="${k8s_service_files}/definitions.json"
 example_definitions_file="${k8s_service_files}/definitions_example.json"
