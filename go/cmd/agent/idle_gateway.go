@@ -289,6 +289,12 @@ func jobFailed(job batchv1.Job) bool {
 	})
 }
 
+// gatewayEnforces reports whether the agent deploys its gateways in the
+// enforcing mode. Under passthrough or store-only a PVC gets no idle job.
+func gatewayEnforces() bool {
+	return os.Getenv("GATEWAY_PASSTHROUGH") != "true" && os.Getenv("GATEWAY_STORE_ONLY") != "true"
+}
+
 // superviseStatePVCs is one supervision pass over the steward's state PVCs.
 // A PVC with no gateway alive and no idle job gets an idle job. A completed
 // idle job stays: it marks the PVC as empty. A failed one is deleted, and a
@@ -345,7 +351,7 @@ func superviseStatePVCs(ctx context.Context, pvcs statePVCLister, jobs supervisi
 			logger.Sugar().Infof("Idle job %s deleted: %s", name, reason)
 			continue
 		}
-		if pvc.DeletionTimestamp != nil || gatewayAlive(pvc.Name, jobList.Items, podList.Items) {
+		if pvc.DeletionTimestamp != nil || !gatewayEnforces() || gatewayAlive(pvc.Name, jobList.Items, podList.Items) {
 			continue
 		}
 		if err := ownStamp(&pvc, dataStewardName); err != nil {

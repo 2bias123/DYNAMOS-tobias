@@ -1009,6 +1009,56 @@ func TestSuperviseStatePVCs(t *testing.T) {
 	})
 }
 
+func TestSuperviseStatePVCsGatewayMode(t *testing.T) {
+	ctx := context.Background()
+	t.Setenv("LOCAL_DEV", "true")
+
+	stamp := pvcStamp{dataSteward: "SERVER", requestUser: "jake.jongejans@student.uva.nl", requestType: "vflTrainModelRequest"}
+	pvcName := statePVCName("server", stamp.requestUser, stamp.requestType)
+	pvc := statePVC(pvcName, stamp)
+
+	tests := []struct {
+		name    string
+		env     string
+		created []string
+	}{
+		{
+			name: "GATEWAY_STORE_ONLY=true: no idle job is created",
+			env:  "GATEWAY_STORE_ONLY",
+		},
+		{
+			name: "GATEWAY_PASSTHROUGH=true: no idle job is created",
+			env:  "GATEWAY_PASSTHROUGH",
+		},
+		{
+			name:    "neither: an idle job is created",
+			created: []string{"idle-" + pvcName},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			t.Setenv("GATEWAY_STORE_ONLY", "")
+			t.Setenv("GATEWAY_PASSTHROUGH", "")
+			if tt.env != "" {
+				t.Setenv(tt.env, "true")
+			}
+			pvcs := &fakePVCLister{pvcs: []v1.PersistentVolumeClaim{pvc}}
+			jobs := newFakeJobClient()
+			pods := &fakePodLister{}
+
+			assert.NilError(t, superviseStatePVCs(ctx, pvcs, jobs, pods, "server"))
+
+			var created []string
+			for _, job := range jobs.created {
+				created = append(created, job.Name)
+			}
+			assert.DeepEqual(t, created, tt.created)
+			assert.Equal(t, len(jobs.deleted), 0)
+		})
+	}
+}
+
 func TestSuperviseLoop(t *testing.T) {
 	t.Run("a pass at once, before the first period is over", func(t *testing.T) {
 		ctx, cancel := context.WithCancel(context.Background())

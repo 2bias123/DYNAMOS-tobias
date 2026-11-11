@@ -122,7 +122,32 @@ provenance() {
 
 # --- shared helpers -------------------------------------------------------
 
-# The dial-retry-absorbed proof for the no-gateway configs (a, g): the degrade
+# The no-dial proof for config a. A service that dials a gateway that is not
+# there gives up after 39.5 s (eight attempts), and round 0 would span that
+# wait: round 0 must be shorter than it. Both markers are in the api-gateway
+# log, so one clock. Uses the caller's GW_LOG.
+DIAL_WAIT_MS=39500
+assert_round0_without_dial_wait() {
+	local open_ts close_ts ms
+	open_ts=$(echo "$GW_LOG" | grep -F "Running VFL training round 0" | head -1 | awk '{print $1}')
+	close_ts=$(echo "$GW_LOG" | grep -F "Intermediate accuracy achieved" \
+		| grep -F "for round 0" | head -1 | awk '{print $1}')
+	[ -n "$open_ts" ] || fail "no round 0 open marker in the api-gateway log"
+	[ -n "$close_ts" ] || fail "no round 0 close marker in the api-gateway log"
+	ms=$(python3 -c "
+import re, sys
+from datetime import datetime
+def p(raw):
+    raw = re.sub(r'(\.\d{6})\d*', r'\1', raw).replace('Z', '+00:00')
+    return datetime.fromisoformat(raw)
+print(round((p(sys.argv[2]) - p(sys.argv[1])).total_seconds() * 1000))" "$open_ts" "$close_ts") \
+		|| fail "cannot parse the round 0 markers ($open_ts, $close_ts)"
+	[ "$ms" -lt "$DIAL_WAIT_MS" ] \
+		|| fail "round 0 took ${ms} ms, not less than the ${DIAL_WAIT_MS} ms a dial to an absent gateway waits"
+	echo "OK: round 0 took ${ms} ms, less than the ${DIAL_WAIT_MS} ms a dial to an absent gateway waits"
+}
+
+# The dial-retry-absorbed proof for the inert config (g): the degrade
 # line in the server MS log must precede round 0's close in the api-gateway
 # log, so steady-state rounds never contain the retry wait. The comparison
 # crosses two container logs; E3_CROSSLOG_ASSERT picks hard vs record (see
@@ -637,17 +662,15 @@ do_config_a() {
 
 	full_logs no-gateway
 
-	step "microservice evidence: gateway degrade line, no checkpoint writes"
-	must_grep "server MS degraded to no-gateway mode" "$SERVER_MS_LOG" \
-		-F "No policy gateway reachable, continuing without one"
+	step "microservice evidence: no gateway deployed, no dial, no checkpoint writes"
+	must_grep "server MS found no gateway deployed" "$SERVER_MS_LOG" \
+		-F "No policy gateway deployed (GATEWAY_PORT not set), continuing without one"
+	must_not_grep "no dial attempt in no-gateway mode" "$SERVER_MS_LOG" -F "Gateway not ready at"
 	must_not_grep "no checkpoint write in no-gateway mode" "$SERVER_MS_LOG" -F "Checkpoint write allowed"
 	must_not_grep "no gateway connection in no-gateway mode" "$SERVER_MS_LOG" -F "Successfully connected to gateway"
 
-	# The dial-retry lands inside round 0's span: the api-gateway opens the
-	# round while the MS is still retrying, so round 0 absorbs the wait. Prove
-	# the retry never reaches steady state: the degrade must precede round 0's
-	# close (asserted or recorded per E3_CROSSLOG_ASSERT).
-	assert_dialretry_absorbed
+	# With no dial, round 0 holds no dial wait.
+	assert_round0_without_dial_wait
 
 	measure_rounds
 	echo "note: the flip is ephemeral; the next reset restores requiresGateway:true"

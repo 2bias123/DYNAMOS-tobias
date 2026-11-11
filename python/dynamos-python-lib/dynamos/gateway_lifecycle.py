@@ -8,13 +8,15 @@ Structural glue between a stateful microservice and its policy checkpoint
 gateway: dial at startup, listen for state events on a background thread,
 and request gateway shutdown when the microservice exits.
 
-A chain without a gateway is a supported deployment: dial failure degrades to
+A chain without a gateway is a supported deployment: without GATEWAY_PORT no
+gateway was deployed and none is dialled; with it, dial failure degrades to
 no-gateway behaviour (returns None, all later calls no-op). Identity problems
 do NOT degrade — the client exits fail-closed on missing or changed env.
 
 Notes:
 """
 
+import os
 import threading
 
 import grpc
@@ -38,6 +40,10 @@ def connect_gateway(subscriber_id, on_purge=None, max_attempts=8):
         GatewayClient when the gateway is reachable, None otherwise.
     """
     logger = InitLogger()
+
+    if os.environ.get("GATEWAY_PORT", "") == "":
+        logger.info("No policy gateway deployed (GATEWAY_PORT not set), continuing without one")
+        return None
 
     try:
         client = GatewayClient(max_attempts=max_attempts)

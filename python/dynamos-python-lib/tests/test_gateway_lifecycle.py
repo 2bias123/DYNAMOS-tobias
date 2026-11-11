@@ -4,6 +4,7 @@ Unit tests for dynamos/gateway_lifecycle.py against an in-process gRPC server.
 
 import os
 import threading
+import time
 import unittest
 from concurrent import futures
 
@@ -92,6 +93,23 @@ class GatewayLifecycleTest(unittest.TestCase):
         os.environ["GATEWAY_PORT"] = "1"  # nothing listens here
         client = connect_gateway("test-ms", max_attempts=2)
         self.assertIsNone(client)
+
+    def _connect_without_port(self):
+        start = time.monotonic()
+        try:
+            client = connect_gateway("test-ms")
+        except SystemExit:
+            self.fail("connect_gateway ended the process")
+        self.assertIsNone(client)
+        self.assertLess(time.monotonic() - start, 0.5)
+
+    def test_unset_gateway_port_returns_none_without_dial(self):
+        del os.environ["GATEWAY_PORT"]
+        self._connect_without_port()
+
+    def test_empty_gateway_port_returns_none_without_dial(self):
+        os.environ["GATEWAY_PORT"] = ""
+        self._connect_without_port()
 
     def test_missing_identity_env_still_fail_closed(self):
         del os.environ["REQUEST_USER"]

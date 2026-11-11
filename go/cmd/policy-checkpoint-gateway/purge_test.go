@@ -232,6 +232,7 @@ func TestSweepExpiryCancelledByLongerRetention(t *testing.T) {
 	out := auditOutput(g)
 	assert.Equal(t, strings.Count(out, `"op":"expired","decision":"CANCELLED"`), 1)
 	assert.Assert(t, strings.Contains(out, `"policySource":"fresh"`))
+	assert.Assert(t, strings.Contains(out, `"reason":"no state past the confirmed retention"`))
 	assert.Assert(t, strings.Contains(out, `"retentionSeconds":3600`))
 	assert.Assert(t, !strings.Contains(out, `"decision":"DELETED"`))
 }
@@ -250,6 +251,7 @@ func TestSweepPurgeCancelledByRegrantRecordedOnce(t *testing.T) {
 	out := auditOutput(g)
 	assert.Equal(t, strings.Count(out, `"op":"purge","decision":"CANCELLED"`), 1)
 	assert.Assert(t, strings.Contains(out, `"policySource":"fresh"`))
+	assert.Assert(t, strings.Contains(out, `"reason":"confirmed terms no longer prescribe purge"`))
 	assert.Assert(t, strings.Contains(out, `"allowed":true`))
 	assert.Assert(t, !strings.Contains(out, `"decision":"PURGED"`))
 }
@@ -278,6 +280,7 @@ func TestSweepCancelledWhenAgreementGoneAtConfirm(t *testing.T) {
 			assert.NilError(t, err)
 			out := auditOutput(g)
 			assert.Equal(t, strings.Count(out, `"op":"`+tt.op+`","decision":"CANCELLED"`), 1)
+			assert.Assert(t, strings.Contains(out, `"reason":"agreement absent at confirmation"`))
 			assert.Assert(t, strings.Contains(out, `"policySource":"absent"`))
 			assert.Assert(t, !strings.Contains(out, `"decision":"PURGED"`))
 			assert.Assert(t, !strings.Contains(out, `"decision":"DELETED"`))
