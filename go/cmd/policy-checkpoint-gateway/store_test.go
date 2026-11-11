@@ -10,6 +10,7 @@ import (
 	"strings"
 	"sync"
 	"testing"
+	"time"
 
 	"gotest.tools/assert"
 )
@@ -104,6 +105,8 @@ func TestStoreAuditEmitsNDJSON(t *testing.T) {
 
 	var buf bytes.Buffer
 	s.auditW = &buf
+	at := time.Date(2026, 11, 11, 12, 0, 0, 0, time.UTC)
+	s.now = func() time.Time { return at }
 
 	rec := auditRecord{
 		Op:         "write",
@@ -120,7 +123,55 @@ func TestStoreAuditEmitsNDJSON(t *testing.T) {
 
 	var got auditRecord
 	assert.NilError(t, json.Unmarshal([]byte(out), &got))
+	assert.Equal(t, got.DecidedUnixMicros, at.UnixMicro())
+	got.DecidedUnixMicros = 0
 	assert.DeepEqual(t, got, rec)
+}
+
+func TestStoreAuditStampsDecisionTime(t *testing.T) {
+	s, err := NewStore(t.TempDir())
+	assert.NilError(t, err)
+
+	var buf bytes.Buffer
+	s.auditW = &buf
+	at := time.Date(2026, 11, 11, 12, 0, 0, 123456000, time.UTC)
+	s.now = func() time.Time { return at }
+
+	assert.NilError(t, s.Audit(auditRecord{Op: "write", Decision: "ALLOW"}))
+
+	want := fmt.Sprintf(`"decidedUnixMicros":%d`, at.UnixMicro())
+	assert.Assert(t, strings.Contains(buf.String(), want))
+	lines := auditLogLines(t, s)
+	assert.Equal(t, len(lines), 1)
+	assert.Assert(t, strings.Contains(lines[0], want))
+}
+
+func TestStoreAuditDecisionTimeNeverDecreases(t *testing.T) {
+	s, err := NewStore(t.TempDir())
+	assert.NilError(t, err)
+	s.auditW = &bytes.Buffer{}
+
+	base := time.Date(2026, 11, 11, 12, 0, 0, 0, time.UTC)
+	// the wall clock steps back one second between the first two records
+	readings := []time.Duration{2 * time.Second, time.Second, 3 * time.Second}
+	want := []time.Duration{2 * time.Second, 2 * time.Second, 3 * time.Second}
+	s.now = func() time.Time {
+		at := base.Add(readings[0])
+		readings = readings[1:]
+		return at
+	}
+
+	for range want {
+		assert.NilError(t, s.Audit(auditRecord{Op: "write"}))
+	}
+
+	lines := auditLogLines(t, s)
+	assert.Equal(t, len(lines), len(want))
+	for i, line := range lines {
+		var got auditRecord
+		assert.NilError(t, json.Unmarshal([]byte(line), &got))
+		assert.Equal(t, got.DecidedUnixMicros, base.Add(want[i]).UnixMicro())
+	}
 }
 
 func TestStoreConcurrentWritesOneKey(t *testing.T) {

@@ -226,59 +226,20 @@ wait_done() { # $1 = request_id, $2 = max polls (5s each, default POLL_MAX); pri
 
 steward_pod() { kubectl get pods -n "$1" -o name 2>/dev/null | grep jake | head -1 | cut -d/ -f2; }
 
-# Delete the four state PVCs so a run starts stateless (they are recreated at
-# job deploy — or, on a rig that pins jobs, pre-created empty right here).
+# Delete the four state PVCs so a run starts stateless (the agent recreates
+# them at job deploy, naming the steward's node itself when it pins jobs).
+# The idle Jobs go first, with their pods: an idle pod holds its PVC. One the
+# agent starts in between is deleted by the agent once the PVC is being
+# deleted, within a supervision period.
 delete_state_pvcs() {
 	local ns
 	for ns in "${STEWARD_NS[@]}"; do
+		kubectl delete jobs -n "$ns" -l dynamos/gateway=idle --cascade=foreground --wait=true --timeout=60s >/dev/null \
+			|| fail "the idle Jobs in $ns were not gone after 60s"
 		kubectl get pvc -n "$ns" -o name 2>/dev/null | grep 'persistentvolumeclaim/state-' \
-			| xargs -r kubectl delete -n "$ns" --wait=true
-	done
-	precreate_pinned_state_pvcs
-}
-
-# Pinned job placement (agent LOCAL_DEV=false -> podSpec.NodeName) bypasses
-# the scheduler, and it is the scheduler that stamps a WaitForFirstConsumer
-# claim with its selected-node. A state PVC the agent creates for a pinned
-# job therefore never binds and the gateway pod never starts. So on such a
-# rig the clean slate pre-creates the four claims — same name, class, size
-# and mode as ensure_pvc.go — carrying the stamp for the steward's own node;
-# the agent's ensureStatePVC finds them and uses them as they are. Verified
-# on the MAX slice 01.10: a stamped claim binds on <node>:<class path> with
-# no pod involved. No-op when the stewards run LOCAL_DEV=true (kind).
-state_pvc_name() { # $1 ns — mirrors statePVCName() in go/cmd/agent/ensure_pvc.go
-	local hash
-	hash=$(printf '%s' "$USER_NAME" | sha256sum | cut -c1-8)
-	echo "state-$1-${hash}-${E3_STATE_REQUEST_TYPE:-vfltrainmodelrequest}"
-}
-
-steward_pins_jobs() { # $1 ns -> true when its agent sets podSpec.NodeName
-	local v
-	v=$(kubectl -n "$1" get deploy "$1" \
-		-o jsonpath="{.spec.template.spec.containers[0].env[?(@.name=='LOCAL_DEV')].value}" 2>/dev/null)
-	[ "$(printf '%s' "$v" | tr 'A-Z' 'a-z')" = "false" ]
-}
-
-precreate_pinned_state_pvcs() {
-	local ns name
-	for ns in "${STEWARD_NS[@]}"; do
-		steward_pins_jobs "$ns" || continue
-		name=$(state_pvc_name "$ns")
-		kubectl apply -f - >/dev/null <<-YAML
-		apiVersion: v1
-		kind: PersistentVolumeClaim
-		metadata:
-		  name: $name
-		  namespace: $ns
-		  annotations: { volume.kubernetes.io/selected-node: "$ns" }
-		spec:
-		  accessModes: [ReadWriteOnce]
-		  storageClassName: gateway-state
-		  resources: { requests: { storage: 1Gi } }
-		YAML
-		kubectl -n "$ns" wait --for=jsonpath='{.status.phase}'=Bound "pvc/$name" --timeout=60s >/dev/null 2>&1 \
-			|| fail "pinned state PVC $ns/$name did not bind within 60s"
-		echo "[pvc] $ns: $name pre-created for node $ns ($(kubectl -n "$ns" get pvc "$name" -o jsonpath='{.spec.volumeName}'))"
+			| xargs -r kubectl delete -n "$ns" --wait=true --timeout=60s \
+			|| fail "the state PVCs in $ns were not gone after 60s"
+		[ -z "$(state_pvc_of "$ns")" ] || fail "$ns still has a state PVC"
 	done
 }
 

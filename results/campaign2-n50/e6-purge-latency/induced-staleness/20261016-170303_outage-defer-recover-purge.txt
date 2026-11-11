@@ -1,0 +1,56 @@
+$ date
+Fri Oct 16 05:03:03 PM CEST 2026
+
+$ git rev-parse HEAD
+20fd5660d961e5d1d41d7873654370afd61fe787
+
+$ git status --short
+ M results/campaign2-n50/e2-policy-latency/captures.md
+?? e3-fabric-kit-038e6fe.tar.gz
+?? e3-fabric-kit-15a43a6.tar.gz
+?? e3-fabric-kit-20fd566.tar.gz
+?? e3-fabric-kit-38b07fd.tar.gz
+?? e3-fabric-kit-4abe3cc.tar.gz
+?? e3-fabric-kit-cc4b845.tar.gz
+?? results/campaign2-n50/e2-policy-latency/poll-regime/20260928-181132_poll-only-deny.txt
+?? results/campaign2-n50/e2-policy-latency/watch-regime/20260928-175910_flip-to-first-deny.txt
+?? results/campaign2-n50/e6-purge-latency/
+?? results/campaign2-n50/env/20260928-175826_env-snapshot.txt
+?? results/campaign2-n50/env/20260928-175826_images.txt
+?? results/campaign2-n50/env/20261008-120952_env-snapshot.txt
+?? results/campaign2-n50/env/20261008-120952_images.txt
+?? results/campaign2-n50/env/20261016-164935_counted-session.txt
+?? results/campaign2-n50/env/20261016-165306_env-snapshot.txt
+?? results/campaign2-n50/env/20261016-165306_images.txt
+
+$ kubectl config current-context
+kind-kind
+
+
+=== build the gateway (-tags local); etcd through a killable port-forward
+
+=== seed the server agreement allowed=true (canonical carries onRevocation=purge)
+
+=== run the local gateway: poll-only every 5s, staleness bound 20s
+
+=== baseline: ALLOW write puts the blob on the state dir
+baseline: ALLOW, blob present
+
+=== outage: kill the etcd forward; the cache must age to stale and writes must fail closed
+stale DENY after 19.0s of outage (bound 20s + last-poll age)
+last stale record: {"op":"write","decision":"DENY","reason":"cache stale; fail closed","identity":{"steward":"SERVER","user":"jake.jongejans@student.uva.nl","requestType":"vflTrainModelRequest","jobId":"e6-staleness","localJobName":"e6-staleness"},"stateClass":"e6_probe","stateKey":"probe","agreementHash":"54d9c11105ec0d7535efe6f88afcc1bd5ec7ea185bdbfcda1a3ffa6f7df4bad0","policySource":"stale","cacheAgeMs":20020}
+
+=== flip allowed=false during the outage; the gateway cannot observe it
+t_flip=1792163010.146521923 (revocation pending in etcd, unobserved by the gateway)
+
+=== hold through the outage: nothing may be destroyed on a non-fresh view
+OK: blob intact through the outage; no purge records; writes failing closed stale
+cache_age_ms rising: 20020
+
+=== recovery: restore the etcd forward; the deferred purge must complete fresh within one poll bound
+recovery -> purge-complete: 16840.0 ms (bound: 5s poll + confirming Get)
+purge record: {"op":"purge","decision":"PURGED","reason":"revoked; onRevocation=purge","identity":{"steward":"SERVER","user":"jake.jongejans@student.uva.nl","requestType":"vflTrainModelRequest","jobId":"e6-staleness","localJobName":"e6-staleness"},"stateClass":"e6_probe","stateKey":"probe","agreementHash":"1fe2344b3ac63c17fa234798a498775bf2f5fd0e90a15fa80d924a2abb7c46f9","policySource":"fresh","cacheAgeMs":0,"relationId":"GUID-state-aware","directives":{"allowed":false,"retentionSeconds":900,"resumeAllowed":true,"onRevocation":"purge"}}
+
+cache_age_ms trajectory: rose through the outage (stale DENY records), closed to a confirmed-fresh purge
+note: the per-reconsideration DEFERRED line needs a confirm failure milliseconds after a
+successful observation; not stageable externally, unit-proven (TestSweepDefersWhenConfirmFails).

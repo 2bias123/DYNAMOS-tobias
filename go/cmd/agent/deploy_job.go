@@ -237,10 +237,14 @@ func deployJob(ctx context.Context, msChain []mschain.MicroserviceMetadata, jobN
 
 	if requiresGateway {
 		pvcName := statePVCName(dataStewardName, compositionRequest.GetUser().GetUserName(), compositionRequest.RequestType)
-		if err := ensureStatePVC(ctx, clientSet.CoreV1().PersistentVolumeClaims(dataStewardName), pvcName); err != nil {
+		stamp := newPVCStamp(dataStewardName, compositionRequest)
+		stamp.selectedNode = podSpec.NodeName
+		if err := ensureStatePVC(ctx, clientSet.CoreV1().PersistentVolumeClaims(dataStewardName), pvcName, stamp); err != nil {
 			logger.Sugar().Errorf("failed to ensure state PVC %s: %v", pvcName, err)
 			return nil, err
 		}
+		release := handOverStatePVC(ctx, clientSet.BatchV1().Jobs(dataStewardName), clientSet.CoreV1().Pods(dataStewardName), pvcName)
+		defer release()
 		job.Spec.Template.Spec.Volumes = append(job.Spec.Template.Spec.Volumes, v1.Volume{
 			Name: "gateway-state",
 			VolumeSource: v1.VolumeSource{

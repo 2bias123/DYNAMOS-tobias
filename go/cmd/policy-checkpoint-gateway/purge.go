@@ -98,13 +98,17 @@ func (g *gatewayServer) confirmAndExpire(observed decision) {
 	a, hash, err := g.confirmFresh()
 	if err != nil {
 		logger.Sugar().Warnw("Cannot confirm retention sweep, deferring", "err", err)
+		g.auditNotDestroyed("expired", "DEFERRED", observed, err.Error())
 		return
 	}
 	if a == nil {
+		g.auditNotDestroyed("expired", "CANCELLED", decision{Source: sourceAbsent}, "agreement absent at confirmation")
 		return
 	}
 	sd, relID, _ := directivesFor(a, g.identity.GetUser(), g.identity.GetRequestType())
 	if sd == nil || validateDirectives(sd) != nil {
+		g.auditNotDestroyed("expired", "CANCELLED", decision{Source: sourceFresh, Hash: hash, RelationID: relID, Directives: sd},
+			"confirmed terms give no usable retention")
 		return
 	}
 
@@ -115,8 +119,13 @@ func (g *gatewayServer) confirmAndExpire(observed decision) {
 		Directives: sd,
 		Reason:     "retention exceeded",
 	}
+	expired := g.expiredKeys(sd.RetentionSeconds)
+	if len(expired) == 0 {
+		g.auditNotDestroyed("expired", "CANCELLED", d, "no state past the confirmed retention")
+		return
+	}
 	deleted := 0
-	for _, k := range g.expiredKeys(sd.RetentionSeconds) {
+	for _, k := range expired {
 		if err := g.store.Audit(decisionRecord("expired", "DELETED", d, k.Class, k.Key, 0, g.identity)); err != nil {
 			logger.Sugar().Errorw("Audit append failed, aborting retention sweep", "err", err)
 			return
@@ -186,10 +195,13 @@ func (g *gatewayServer) confirmAndPurge(observed decision) {
 		return
 	}
 	if a == nil {
+		g.auditNotDestroyed("purge", "CANCELLED", decision{Source: sourceAbsent}, "agreement absent at confirmation")
 		return
 	}
 	sd, relID, _ := directivesFor(a, g.identity.GetUser(), g.identity.GetRequestType())
 	if sd == nil || validateDirectives(sd) != nil || sd.Allowed || sd.OnRevocation != "purge" {
+		g.auditNotDestroyed("purge", "CANCELLED", decision{Source: sourceFresh, Hash: hash, RelationID: relID, Directives: sd},
+			"confirmed terms no longer prescribe purge")
 		return // current policy no longer prescribes purge: cancelled
 	}
 
@@ -208,6 +220,14 @@ func (g *gatewayServer) confirmAndPurge(observed decision) {
 
 func (g *gatewayServer) auditPurgeDeferred(observed decision, why string) {
 	rec := decisionRecord("purge", "DEFERRED", observed, "", "", 0, g.identity)
+	rec.Reason = why
+	g.audit(rec)
+}
+
+// auditNotDestroyed records a destruction the confirming read postponed or
+// cancelled, with the view that outcome was decided on.
+func (g *gatewayServer) auditNotDestroyed(op, verdict string, d decision, why string) {
+	rec := decisionRecord(op, verdict, d, "", "", 0, g.identity)
 	rec.Reason = why
 	g.audit(rec)
 }

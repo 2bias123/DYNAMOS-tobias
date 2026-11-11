@@ -2,10 +2,13 @@ package main
 
 import (
 	"context"
+	"encoding/json"
+	"errors"
 	"os"
 	"path/filepath"
 	"strings"
 	"testing"
+	"time"
 
 	pb "github.com/Jorrit05/DYNAMOS/pkg/proto"
 	"google.golang.org/grpc/codes"
@@ -50,6 +53,75 @@ func TestWriteProducesLineBeforeFileInvariantHolds(t *testing.T) {
 	})
 	assert.NilError(t, err)
 	assertFileImpliesLine(t, g.store)
+}
+
+// Every record carries the instant it was appended at, whichever path emits
+// it, and a deletion's instant is read while its file is still on disk.
+func TestEveryRecordCarriesDecisionTime(t *testing.T) {
+	client, g := newTestServer(t)
+
+	base := time.Date(2026, 11, 11, 12, 0, 0, 0, time.UTC)
+	var onDisk []map[string]bool // per clock reading: the state files present
+	g.store.now = func() time.Time {
+		present := map[string]bool{}
+		for _, key := range []string{"old", "k1"} {
+			_, err := os.Stat(filepath.Join(g.store.dataDir, "kv", key+".bin"))
+			present[key] = err == nil
+		}
+		onDisk = append(onDisk, present)
+		return base.Add(time.Duration(len(onDisk)) * time.Second)
+	}
+
+	ctx := context.Background()
+	for _, key := range []string{"old", "k1"} {
+		_, err := client.RequestStateWrite(ctx, &pb.StateWriteRequest{
+			Identity: testIdentity(), StateClass: "kv", StateKey: key, Payload: []byte{1},
+		})
+		assert.NilError(t, err)
+	}
+
+	bad := testIdentity()
+	bad.User = "attacker@x"
+	_, err := client.RequestStateWrite(ctx, &pb.StateWriteRequest{
+		Identity: bad, StateClass: "kv", StateKey: "k1", Payload: []byte{1},
+	})
+	assert.Equal(t, status.Code(err), codes.PermissionDenied)
+
+	noResume := allowAll()
+	noResume.ResumeAllowed = false
+	setPolicy(t, g, noResume)
+	resp, err := client.ValidateStateRead(ctx, &pb.StateReadRequest{
+		Identity: testIdentity(), StateClass: "kv", StateKey: "k1",
+	})
+	assert.NilError(t, err)
+	assert.Assert(t, !resp.GetAllowed())
+
+	backdate(t, g, "kv", "old", 20*time.Minute) // retention is 900s
+	setPolicy(t, g, allowAll())
+	g.source = &mockSource{getKvs: [][]byte{sweepAgreementBytes(t, allowAll())}}
+	g.evaluateDisposition()
+
+	setPolicy(t, g, revokedPurge())
+	g.source = &mockSource{getKvs: [][]byte{sweepAgreementBytes(t, revokedPurge())}}
+	g.evaluateDisposition()
+
+	lines := auditLogLines(t, g.store)
+	assert.Equal(t, len(lines), 6)
+	ops := make([]string, len(lines))
+	for i, line := range lines {
+		var rec auditRecord
+		assert.NilError(t, json.Unmarshal([]byte(line), &rec))
+		ops[i] = rec.Op
+		assert.Equal(t, rec.DecidedUnixMicros, base.Add(time.Duration(i+1)*time.Second).UnixMicro())
+		if rec.Op == "expired" || rec.Op == "purge" {
+			assert.Assert(t, onDisk[i][rec.StateKey], "%s record of %s stamped after the unlink", rec.Op, rec.StateKey)
+		}
+	}
+	assert.DeepEqual(t, ops, []string{"write", "write", "identity_mismatch", "read", "expired", "purge"})
+	for _, key := range []string{"old", "k1"} {
+		_, err := g.store.Read("kv", key)
+		assert.Assert(t, errors.Is(err, os.ErrNotExist))
+	}
 }
 
 func TestWriteRefusedWhenAuditUnavailable(t *testing.T) {

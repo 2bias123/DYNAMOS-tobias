@@ -8,10 +8,14 @@ rules:
   verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
 # The agent creates the per-identity state PVC mounted by the policy gateway.
 # Scoped per steward namespace through the RoleBindings below; deliberately no
-# delete/update - the agent only ever gets or creates the claim.
+# delete/update - the agent only ever gets, lists or creates the claim.
 - apiGroups: [""]
   resources: ["persistentvolumeclaims"]
-  verbs: ["get", "create"]
+  verbs: ["get", "list", "create"]
+# Read-only: the agent looks for a gateway container that holds a state PVC.
+- apiGroups: [""]
+  resources: ["pods"]
+  verbs: ["get", "list"]
 
 ---
 apiVersion: v1

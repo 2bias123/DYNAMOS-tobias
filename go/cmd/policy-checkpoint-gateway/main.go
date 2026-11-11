@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"flag"
 	"fmt"
 	"net"
@@ -20,6 +21,17 @@ import (
 var logger = lib.InitLogger(logLevel)
 
 const lockCheckInterval = 10 * time.Second
+
+const (
+	lockRetryWindow   = 20 * time.Second
+	lockRetryInterval = 200 * time.Millisecond
+)
+
+// lockNotAcquiredMarker is the fixed text in the one line a process prints
+// when it never got the state lock.
+const lockNotAcquiredMarker = "STATE_LOCK_NOT_ACQUIRED"
+
+var errLockNotAcquired = errors.New(lockNotAcquiredMarker)
 
 func newGatewayServer(store *Store, identity *pb.Identity) *gatewayServer {
 	return &gatewayServer{
@@ -195,6 +207,31 @@ func watchLock(g *gatewayServer, f *os.File, path string, interval time.Duration
 	}
 }
 
+// acquireLockWithRetry retries a busy state lock until the window has passed,
+// so a process that is still letting go of the volume does not fail its
+// successor. Any other failure is returned at once, and closing stop ends
+// the wait; a nil stop never does.
+func acquireLockWithRetry(path string, window, interval time.Duration, stop <-chan struct{}) (*os.File, error) {
+	deadline := time.Now().Add(window)
+	for {
+		f, err := acquireLock(path)
+		if err == nil {
+			return f, nil
+		}
+		if !errors.Is(err, syscall.EWOULDBLOCK) {
+			return nil, fmt.Errorf("%w: %s: %w", errLockNotAcquired, path, err)
+		}
+		if !time.Now().Before(deadline) {
+			return nil, fmt.Errorf("%w: %s still held after %s", errLockNotAcquired, path, window)
+		}
+		select {
+		case <-stop:
+			return nil, fmt.Errorf("%w: %s: stopped while it was held", errLockNotAcquired, path)
+		case <-time.After(interval):
+		}
+	}
+}
+
 func releaseLock(f *os.File) {
 	if f == nil {
 		return
@@ -214,18 +251,42 @@ func stopGateway(s *grpc.Server, g *gatewayServer, lockFile *os.File, finished c
 	close(finished)
 }
 
-func main() {
-	flag.Parse()
-	cfg := loadConfig()
+// startGateway takes the state lock, then opens the store, then starts the
+// agreement sync, in that order: a process that does not hold the lock reads
+// no agreement and writes nothing on the volume. Closing stop ends the wait
+// for a busy lock. onFresh runs after every fresh observation of the
+// agreement.
+func startGateway(cfg gatewayConfig, src agreementSource, lockWindow time.Duration, stop <-chan struct{}, onFresh func(*gatewayServer)) (*gatewayServer, *os.File, error) {
+	lockFile, err := acquireLockWithRetry(filepath.Join(cfg.stateDir, ".lock"), lockWindow, lockRetryInterval, stop)
+	if err != nil {
+		return nil, nil, err
+	}
 
 	store, err := NewStore(cfg.stateDir)
 	if err != nil {
-		logger.Sugar().Fatalf("Failed to init store: %v", err)
+		releaseLock(lockFile)
+		return nil, nil, fmt.Errorf("init store: %w", err)
 	}
 
 	g := newGatewayServer(store, cfg.identity)
 	g.policy = newPolicyCache(cfg.maxStaleness)
 	g.regJobName = cfg.regJobName
+	g.source = src
+	go syncAgreement(g.stop, src, agreementKey(cfg.identity.GetSteward()), g.policy, cfg.pollInterval, func() { onFresh(g) })
+	return g, lockFile, nil
+}
+
+func main() {
+	flag.Parse()
+	if os.Getenv("GATEWAY_IDLE") == "true" {
+		os.Exit(idleMain())
+	}
+	cfg := loadConfig()
+
+	g, lockFile, err := startGateway(cfg, etcd.GetEtcdClient(etcdEndpoints), lockRetryWindow, nil, (*gatewayServer).evaluateDisposition)
+	if err != nil {
+		logger.Sugar().Fatalf("Failed to start gateway: %v", err)
+	}
 	if os.Getenv("GATEWAY_PASSTHROUGH") == "true" {
 		g.passthrough = true
 		logger.Sugar().Warn("Pass-through mode: decisions and audit only, state writes skipped")
@@ -238,17 +299,7 @@ func main() {
 		logger.Sugar().Warn("Store-only mode: governance and audit skipped, state I/O only")
 	}
 
-	etcdClient := etcd.GetEtcdClient(etcdEndpoints)
-	g.source = etcdClient
-	go syncAgreement(g.stop, etcdClient, agreementKey(cfg.identity.GetSteward()), g.policy, cfg.pollInterval, g.evaluateDisposition)
-
 	lockPath := filepath.Join(cfg.stateDir, ".lock")
-	lockFile, err := acquireLock(lockPath)
-	if err != nil {
-		g.audit(auditRecord{Op: "lock_conflict", Reason: err.Error(), Identity: auditIdentityOf(cfg.identity)})
-		logger.Sugar().Fatalf("Failed to acquire state lock: %v", err)
-	}
-
 	lis := setupListener(cfg.port)
 	grpcServer := setupGRPCServer(g)
 

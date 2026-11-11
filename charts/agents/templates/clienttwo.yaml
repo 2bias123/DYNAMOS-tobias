@@ -36,6 +36,20 @@ spec:
           # "true" leaves job placement to the scheduler (single-node kind);
           # "false" pins each steward's job to the node named after it (FABRIC).
           value: {{ .Values.localDev | quote }}
+        {{- if .Values.chainImageTag }}
+        - name: VFL-TRAIN-MODEL-DEMO_TAG
+          value: {{ .Values.chainImageTag | quote }}
+        - name: ANONYMIZE-TEST_TAG
+          value: {{ .Values.chainImageTag | quote }}
+        - name: VFL-TRAIN-DEMO_TAG
+          value: {{ .Values.chainImageTag | quote }}
+        - name: DIFFERENTIAL-P-TEST_TAG
+          value: {{ .Values.chainImageTag | quote }}
+        - name: SIDECAR_TAG
+          value: {{ .Values.chainImageTag | quote }}
+        - name: POLICY-CHECKPOINT-GATEWAY_TAG
+          value: {{ .Values.chainImageTag | quote }}
+        {{- end }}
       - name: sidecar
         image: {{ .Values.dockerArtifactAccount }}/sidecar:{{ .Values.branchNameTag }}
         imagePullPolicy: Always

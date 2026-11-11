@@ -26,6 +26,10 @@ type Store struct {
 	auditF  *os.File
 	auditW  io.Writer
 	auditMu sync.Mutex
+	// A record's decision time is read from now under auditMu and is never
+	// earlier than the previous record's, also when the wall clock steps back.
+	now         func() time.Time
+	lastDecided int64
 	// locks are process-local. Cross-pod exclusion on the same volume is the
 	// gateway's startup flock, not this map.
 	locks sync.Map
@@ -63,6 +67,7 @@ type auditRecord struct {
 	CacheAgeMs         *int64           `json:"cacheAgeMs,omitempty"`
 	RelationID         string           `json:"relationId,omitempty"`
 	Directives         *auditDirectives `json:"directives,omitempty"`
+	DecidedUnixMicros  int64            `json:"decidedUnixMicros"`
 }
 
 // nameRe constrains a state class or key to a single safe path segment: no
@@ -76,6 +81,7 @@ func NewStore(stateDir string) (*Store, error) {
 		dataDir:  filepath.Join(stateDir, "data"),
 		auditDir: filepath.Join(stateDir, "audit"),
 		auditW:   os.Stdout,
+		now:      time.Now,
 	}
 	for _, dir := range []string{s.dataDir, s.auditDir} {
 		if err := os.MkdirAll(dir, 0o755); err != nil {
@@ -210,14 +216,16 @@ func (s *Store) Remove(class, key string) error {
 // after it returns. Any failure is the caller's to treat as fatal for
 // operations that are about to create state.
 func (s *Store) Audit(rec auditRecord) error {
+	s.auditMu.Lock()
+	defer s.auditMu.Unlock()
+	s.lastDecided = max(s.lastDecided, s.now().UnixMicro())
+	rec.DecidedUnixMicros = s.lastDecided
 	line, err := json.Marshal(rec)
 	if err != nil {
 		return fmt.Errorf("marshal audit: %w", err)
 	}
 	line = append(line, '\n')
 
-	s.auditMu.Lock()
-	defer s.auditMu.Unlock()
 	if s.auditF != nil {
 		if _, err := s.auditF.Write(line); err != nil {
 			return fmt.Errorf("append audit: %w", err)

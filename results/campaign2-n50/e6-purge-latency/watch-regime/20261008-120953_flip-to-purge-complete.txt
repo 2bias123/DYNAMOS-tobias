@@ -1,0 +1,296 @@
+$ date
+Thu Oct  8 12:09:53 PM CEST 2026
+
+$ git rev-parse HEAD
+20fd5660d961e5d1d41d7873654370afd61fe787
+
+$ git status --short
+ M results/campaign2-n50/e2-policy-latency/captures.md
+?? e3-fabric-kit-038e6fe.tar.gz
+?? e3-fabric-kit-15a43a6.tar.gz
+?? e3-fabric-kit-20fd566.tar.gz
+?? e3-fabric-kit-38b07fd.tar.gz
+?? e3-fabric-kit-4abe3cc.tar.gz
+?? e3-fabric-kit-cc4b845.tar.gz
+?? results/campaign2-n50/e2-policy-latency/poll-regime/20260928-181132_poll-only-deny.txt
+?? results/campaign2-n50/e2-policy-latency/watch-regime/20260928-175910_flip-to-first-deny.txt
+?? results/campaign2-n50/e6-purge-latency/
+?? results/campaign2-n50/env/20260928-175826_env-snapshot.txt
+?? results/campaign2-n50/env/20260928-175826_images.txt
+?? results/campaign2-n50/env/20261008-120952_env-snapshot.txt
+?? results/campaign2-n50/env/20261008-120952_images.txt
+
+$ kubectl config current-context
+kind-kind
+
+
+=== standalone gateway pod: the frozen image, in-cluster etcd path, no chain to disturb
+pod/e6-gateway created
+gateway pod up:
+    1.7914541967547755e+09	[34mINFO[0m	/app/cmd/policy-checkpoint-gateway/main.go:142	Serving on 50050
+    1.791454196756976e+09	[34mINFO[0m	/app/cmd/policy-checkpoint-gateway/watch.go:56	Agreement loaded 54d9c11105ec0d7535efe6f88afcc1bd5ec7ea185bdbfcda1a3ffa6f7df4bad0
+
+=== baseline: probe write must ALLOW and create the purge target
+baseline: ALLOW, blob present
+
+trial,t_put_start,t_put_returned,t_purge,flip_to_purge_ms,put_rtt_ms,observe_ms,sweep_ms,purge_records
+1,1791454202.113077235,1791454202.145301734,1791454202.143902,30.8,32.2,27.7,3.1,1
+  purge records this trial:
+    {"op":"purge","decision":"PURGED","reason":"revoked; onRevocation=purge","identity":{"steward":"SERVER","user":"jake.jongejans@student.uva.nl","requestType":"vflTrainModelRequest","jobId":"e6-latency","localJobName":"e6-latency"},"stateClass":"e6_probe","stateKey":"probe","agreementHash":"1fe2344b3ac63c17fa234798a498775bf2f5fd0e90a15fa80d924a2abb7c46f9","policySource":"fresh","cacheAgeMs":0,"relationId":"GUID-state-aware","directives":{"allowed":false,"retentionSeconds":900,"resumeAllowed":true,"onRevocation":"purge"}}
+    1.791454202143927e+09	[34mINFO[0m	/app/cmd/policy-checkpoint-gateway/purge.go:204	Purge sweep timing	{"confirmMicros": 2030, "sweepMicros": 968, "totalMicros": 3000}
+  post-purge probe write: DENY 'allowed = false'
+2,1791454203.003282038,1791454203.033264079,1791454203.031922,28.6,30.0,26.1,2.6,1
+  purge records this trial:
+    {"op":"purge","decision":"PURGED","reason":"revoked; onRevocation=purge","identity":{"steward":"SERVER","user":"jake.jongejans@student.uva.nl","requestType":"vflTrainModelRequest","jobId":"e6-latency","localJobName":"e6-latency"},"stateClass":"e6_probe","stateKey":"probe","agreementHash":"1fe2344b3ac63c17fa234798a498775bf2f5fd0e90a15fa80d924a2abb7c46f9","policySource":"fresh","cacheAgeMs":0,"relationId":"GUID-state-aware","directives":{"allowed":false,"retentionSeconds":900,"resumeAllowed":true,"onRevocation":"purge"}}
+    1.7914542030319378e+09	[34mINFO[0m	/app/cmd/policy-checkpoint-gateway/purge.go:204	Purge sweep timing	{"confirmMicros": 1085, "sweepMicros": 1434, "totalMicros": 2521}
+  post-purge probe write: DENY 'allowed = false'
+3,1791454203.917574969,1791454203.946209330,1791454203.943501,25.9,28.6,24.1,1.8,1
+  purge records this trial:
+    {"op":"purge","decision":"PURGED","reason":"revoked; onRevocation=purge","identity":{"steward":"SERVER","user":"jake.jongejans@student.uva.nl","requestType":"vflTrainModelRequest","jobId":"e6-latency","localJobName":"e6-latency"},"stateClass":"e6_probe","stateKey":"probe","agreementHash":"1fe2344b3ac63c17fa234798a498775bf2f5fd0e90a15fa80d924a2abb7c46f9","policySource":"fresh","cacheAgeMs":0,"relationId":"GUID-state-aware","directives":{"allowed":false,"retentionSeconds":900,"resumeAllowed":true,"onRevocation":"purge"}}
+    1.7914542039435177e+09	[34mINFO[0m	/app/cmd/policy-checkpoint-gateway/purge.go:204	Purge sweep timing	{"confirmMicros": 1022, "sweepMicros": 723, "totalMicros": 1747}
+  post-purge probe write: DENY 'allowed = false'
+4,1791454204.841111971,1791454204.893822842,1791454204.889490,48.4,52.7,45.4,3.0,1
+  purge records this trial:
+    {"op":"purge","decision":"PURGED","reason":"revoked; onRevocation=purge","identity":{"steward":"SERVER","user":"jake.jongejans@student.uva.nl","requestType":"vflTrainModelRequest","jobId":"e6-latency","localJobName":"e6-latency"},"stateClass":"e6_probe","stateKey":"probe","agreementHash":"1fe2344b3ac63c17fa234798a498775bf2f5fd0e90a15fa80d924a2abb7c46f9","policySource":"fresh","cacheAgeMs":0,"relationId":"GUID-state-aware","directives":{"allowed":false,"retentionSeconds":900,"resumeAllowed":true,"onRevocation":"purge"}}
+    1.7914542048895223e+09	[34mINFO[0m	/app/cmd/policy-checkpoint-gateway/purge.go:204	Purge sweep timing	{"confirmMicros": 1968, "sweepMicros": 945, "totalMicros": 2915}
+  post-purge probe write: DENY 'allowed = false'
+5,1791454206.081529736,1791454206.131793045,1791454206.127688,46.2,50.3,43.1,3.0,1
+  purge records this trial:
+    {"op":"purge","decision":"PURGED","reason":"revoked; onRevocation=purge","identity":{"steward":"SERVER","user":"jake.jongejans@student.uva.nl","requestType":"vflTrainModelRequest","jobId":"e6-latency","localJobName":"e6-latency"},"stateClass":"e6_probe","stateKey":"probe","agreementHash":"1fe2344b3ac63c17fa234798a498775bf2f5fd0e90a15fa80d924a2abb7c46f9","policySource":"fresh","cacheAgeMs":0,"relationId":"GUID-state-aware","directives":{"allowed":false,"retentionSeconds":900,"resumeAllowed":true,"onRevocation":"purge"}}
+    1.7914542061277156e+09	[34mINFO[0m	/app/cmd/policy-checkpoint-gateway/purge.go:204	Purge sweep timing	{"confirmMicros": 1918, "sweepMicros": 1000, "totalMicros": 2919}
+  post-purge probe write: DENY 'allowed = false'
+6,1791454207.274202413,1791454207.326864772,1791454207.321598,47.4,52.7,45.1,2.3,1
+  purge records this trial:
+    {"op":"purge","decision":"PURGED","reason":"revoked; onRevocation=purge","identity":{"steward":"SERVER","user":"jake.jongejans@student.uva.nl","requestType":"vflTrainModelRequest","jobId":"e6-latency","localJobName":"e6-latency"},"stateClass":"e6_probe","stateKey":"probe","agreementHash":"1fe2344b3ac63c17fa234798a498775bf2f5fd0e90a15fa80d924a2abb7c46f9","policySource":"fresh","cacheAgeMs":0,"relationId":"GUID-state-aware","directives":{"allowed":false,"retentionSeconds":900,"resumeAllowed":true,"onRevocation":"purge"}}
+    1.7914542073216317e+09	[34mINFO[0m	/app/cmd/policy-checkpoint-gateway/purge.go:204	Purge sweep timing	{"confirmMicros": 1406, "sweepMicros": 815, "totalMicros": 2222}
+  post-purge probe write: DENY 'allowed = false'
+7,1791454208.478238907,1791454208.509348145,1791454208.506544,28.3,31.1,26.6,1.7,1
+  purge records this trial:
+    {"op":"purge","decision":"PURGED","reason":"revoked; onRevocation=purge","identity":{"steward":"SERVER","user":"jake.jongejans@student.uva.nl","requestType":"vflTrainModelRequest","jobId":"e6-latency","localJobName":"e6-latency"},"stateClass":"e6_probe","stateKey":"probe","agreementHash":"1fe2344b3ac63c17fa234798a498775bf2f5fd0e90a15fa80d924a2abb7c46f9","policySource":"fresh","cacheAgeMs":0,"relationId":"GUID-state-aware","directives":{"allowed":false,"retentionSeconds":900,"resumeAllowed":true,"onRevocation":"purge"}}
+    1.7914542085065634e+09	[34mINFO[0m	/app/cmd/policy-checkpoint-gateway/purge.go:204	Purge sweep timing	{"confirmMicros": 996, "sweepMicros": 613, "totalMicros": 1610}
+  post-purge probe write: DENY 'allowed = false'
+8,1791454209.346712401,1791454209.377634170,1791454209.375140,28.4,30.9,26.5,1.9,1
+  purge records this trial:
+    {"op":"purge","decision":"PURGED","reason":"revoked; onRevocation=purge","identity":{"steward":"SERVER","user":"jake.jongejans@student.uva.nl","requestType":"vflTrainModelRequest","jobId":"e6-latency","localJobName":"e6-latency"},"stateClass":"e6_probe","stateKey":"probe","agreementHash":"1fe2344b3ac63c17fa234798a498775bf2f5fd0e90a15fa80d924a2abb7c46f9","policySource":"fresh","cacheAgeMs":0,"relationId":"GUID-state-aware","directives":{"allowed":false,"retentionSeconds":900,"resumeAllowed":true,"onRevocation":"purge"}}
+    1.7914542093751576e+09	[34mINFO[0m	/app/cmd/policy-checkpoint-gateway/purge.go:204	Purge sweep timing	{"confirmMicros": 1006, "sweepMicros": 842, "totalMicros": 1850}
+  post-purge probe write: DENY 'allowed = false'
+9,1791454210.233152509,1791454210.260798843,1791454210.258360,25.2,27.6,23.7,1.5,1
+  purge records this trial:
+    {"op":"purge","decision":"PURGED","reason":"revoked; onRevocation=purge","identity":{"steward":"SERVER","user":"jake.jongejans@student.uva.nl","requestType":"vflTrainModelRequest","jobId":"e6-latency","localJobName":"e6-latency"},"stateClass":"e6_probe","stateKey":"probe","agreementHash":"1fe2344b3ac63c17fa234798a498775bf2f5fd0e90a15fa80d924a2abb7c46f9","policySource":"fresh","cacheAgeMs":0,"relationId":"GUID-state-aware","directives":{"allowed":false,"retentionSeconds":900,"resumeAllowed":true,"onRevocation":"purge"}}
+    1.7914542102583742e+09	[34mINFO[0m	/app/cmd/policy-checkpoint-gateway/purge.go:204	Purge sweep timing	{"confirmMicros": 753, "sweepMicros": 679, "totalMicros": 1433}
+  post-purge probe write: DENY 'allowed = false'
+10,1791454211.081536861,1791454211.109426349,1791454211.107329,25.8,27.9,24.0,1.8,1
+  purge records this trial:
+    {"op":"purge","decision":"PURGED","reason":"revoked; onRevocation=purge","identity":{"steward":"SERVER","user":"jake.jongejans@student.uva.nl","requestType":"vflTrainModelRequest","jobId":"e6-latency","localJobName":"e6-latency"},"stateClass":"e6_probe","stateKey":"probe","agreementHash":"1fe2344b3ac63c17fa234798a498775bf2f5fd0e90a15fa80d924a2abb7c46f9","policySource":"fresh","cacheAgeMs":0,"relationId":"GUID-state-aware","directives":{"allowed":false,"retentionSeconds":900,"resumeAllowed":true,"onRevocation":"purge"}}
+    1.791454211107346e+09	[34mINFO[0m	/app/cmd/policy-checkpoint-gateway/purge.go:204	Purge sweep timing	{"confirmMicros": 976, "sweepMicros": 703, "totalMicros": 1680}
+  post-purge probe write: DENY 'allowed = false'
+11,1791454211.937041492,1791454211.965806823,1791454211.963100,26.1,28.8,24.4,1.6,1
+  purge records this trial:
+    {"op":"purge","decision":"PURGED","reason":"revoked; onRevocation=purge","identity":{"steward":"SERVER","user":"jake.jongejans@student.uva.nl","requestType":"vflTrainModelRequest","jobId":"e6-latency","localJobName":"e6-latency"},"stateClass":"e6_probe","stateKey":"probe","agreementHash":"1fe2344b3ac63c17fa234798a498775bf2f5fd0e90a15fa80d924a2abb7c46f9","policySource":"fresh","cacheAgeMs":0,"relationId":"GUID-state-aware","directives":{"allowed":false,"retentionSeconds":900,"resumeAllowed":true,"onRevocation":"purge"}}
+    1.791454211963119e+09	[34mINFO[0m	/app/cmd/policy-checkpoint-gateway/purge.go:204	Purge sweep timing	{"confirmMicros": 818, "sweepMicros": 750, "totalMicros": 1569}
+  post-purge probe write: DENY 'allowed = false'
+12,1791454212.854942750,1791454212.908080644,1791454212.903699,48.8,53.1,46.6,2.2,1
+  purge records this trial:
+    {"op":"purge","decision":"PURGED","reason":"revoked; onRevocation=purge","identity":{"steward":"SERVER","user":"jake.jongejans@student.uva.nl","requestType":"vflTrainModelRequest","jobId":"e6-latency","localJobName":"e6-latency"},"stateClass":"e6_probe","stateKey":"probe","agreementHash":"1fe2344b3ac63c17fa234798a498775bf2f5fd0e90a15fa80d924a2abb7c46f9","policySource":"fresh","cacheAgeMs":0,"relationId":"GUID-state-aware","directives":{"allowed":false,"retentionSeconds":900,"resumeAllowed":true,"onRevocation":"purge"}}
+    1.7914542129037309e+09	[34mINFO[0m	/app/cmd/policy-checkpoint-gateway/purge.go:204	Purge sweep timing	{"confirmMicros": 1152, "sweepMicros": 898, "totalMicros": 2052}
+  post-purge probe write: DENY 'allowed = false'
+13,1791454214.061503363,1791454214.110607935,1791454214.108658,47.2,49.1,43.0,4.2,1
+  purge records this trial:
+    {"op":"purge","decision":"PURGED","reason":"revoked; onRevocation=purge","identity":{"steward":"SERVER","user":"jake.jongejans@student.uva.nl","requestType":"vflTrainModelRequest","jobId":"e6-latency","localJobName":"e6-latency"},"stateClass":"e6_probe","stateKey":"probe","agreementHash":"1fe2344b3ac63c17fa234798a498775bf2f5fd0e90a15fa80d924a2abb7c46f9","policySource":"fresh","cacheAgeMs":0,"relationId":"GUID-state-aware","directives":{"allowed":false,"retentionSeconds":900,"resumeAllowed":true,"onRevocation":"purge"}}
+    1.7914542141086934e+09	[34mINFO[0m	/app/cmd/policy-checkpoint-gateway/purge.go:204	Purge sweep timing	{"confirmMicros": 1577, "sweepMicros": 2497, "totalMicros": 4076}
+  post-purge probe write: DENY 'allowed = false'
+14,1791454215.266450203,1791454215.320344850,1791454215.315649,49.2,53.9,46.3,2.9,1
+  purge records this trial:
+    {"op":"purge","decision":"PURGED","reason":"revoked; onRevocation=purge","identity":{"steward":"SERVER","user":"jake.jongejans@student.uva.nl","requestType":"vflTrainModelRequest","jobId":"e6-latency","localJobName":"e6-latency"},"stateClass":"e6_probe","stateKey":"probe","agreementHash":"1fe2344b3ac63c17fa234798a498775bf2f5fd0e90a15fa80d924a2abb7c46f9","policySource":"fresh","cacheAgeMs":0,"relationId":"GUID-state-aware","directives":{"allowed":false,"retentionSeconds":900,"resumeAllowed":true,"onRevocation":"purge"}}
+    1.791454215315684e+09	[34mINFO[0m	/app/cmd/policy-checkpoint-gateway/purge.go:204	Purge sweep timing	{"confirmMicros": 1916, "sweepMicros": 955, "totalMicros": 2873}
+  post-purge probe write: DENY 'allowed = false'
+15,1791454216.476891456,1791454216.527397393,1791454216.522197,45.3,50.5,42.7,2.6,1
+  purge records this trial:
+    {"op":"purge","decision":"PURGED","reason":"revoked; onRevocation=purge","identity":{"steward":"SERVER","user":"jake.jongejans@student.uva.nl","requestType":"vflTrainModelRequest","jobId":"e6-latency","localJobName":"e6-latency"},"stateClass":"e6_probe","stateKey":"probe","agreementHash":"1fe2344b3ac63c17fa234798a498775bf2f5fd0e90a15fa80d924a2abb7c46f9","policySource":"fresh","cacheAgeMs":0,"relationId":"GUID-state-aware","directives":{"allowed":false,"retentionSeconds":900,"resumeAllowed":true,"onRevocation":"purge"}}
+    1.7914542165222228e+09	[34mINFO[0m	/app/cmd/policy-checkpoint-gateway/purge.go:204	Purge sweep timing	{"confirmMicros": 1568, "sweepMicros": 907, "totalMicros": 2476}
+  post-purge probe write: DENY 'allowed = false'
+16,1791454217.527991048,1791454217.559856873,1791454217.557733,29.7,31.9,27.4,2.3,1
+  purge records this trial:
+    {"op":"purge","decision":"PURGED","reason":"revoked; onRevocation=purge","identity":{"steward":"SERVER","user":"jake.jongejans@student.uva.nl","requestType":"vflTrainModelRequest","jobId":"e6-latency","localJobName":"e6-latency"},"stateClass":"e6_probe","stateKey":"probe","agreementHash":"1fe2344b3ac63c17fa234798a498775bf2f5fd0e90a15fa80d924a2abb7c46f9","policySource":"fresh","cacheAgeMs":0,"relationId":"GUID-state-aware","directives":{"allowed":false,"retentionSeconds":900,"resumeAllowed":true,"onRevocation":"purge"}}
+    1.7914542175577552e+09	[34mINFO[0m	/app/cmd/policy-checkpoint-gateway/purge.go:204	Purge sweep timing	{"confirmMicros": 1428, "sweepMicros": 818, "totalMicros": 2247}
+  post-purge probe write: DENY 'allowed = false'
+17,1791454218.419265848,1791454218.448713450,1791454218.445798,26.5,29.4,24.9,1.6,1
+  purge records this trial:
+    {"op":"purge","decision":"PURGED","reason":"revoked; onRevocation=purge","identity":{"steward":"SERVER","user":"jake.jongejans@student.uva.nl","requestType":"vflTrainModelRequest","jobId":"e6-latency","localJobName":"e6-latency"},"stateClass":"e6_probe","stateKey":"probe","agreementHash":"1fe2344b3ac63c17fa234798a498775bf2f5fd0e90a15fa80d924a2abb7c46f9","policySource":"fresh","cacheAgeMs":0,"relationId":"GUID-state-aware","directives":{"allowed":false,"retentionSeconds":900,"resumeAllowed":true,"onRevocation":"purge"}}
+    1.791454218445813e+09	[34mINFO[0m	/app/cmd/policy-checkpoint-gateway/purge.go:204	Purge sweep timing	{"confirmMicros": 921, "sweepMicros": 661, "totalMicros": 1583}
+  post-purge probe write: DENY 'allowed = false'
+18,1791454219.290687183,1791454219.325027064,1791454219.322586,31.9,34.3,30.4,1.5,1
+  purge records this trial:
+    {"op":"purge","decision":"PURGED","reason":"revoked; onRevocation=purge","identity":{"steward":"SERVER","user":"jake.jongejans@student.uva.nl","requestType":"vflTrainModelRequest","jobId":"e6-latency","localJobName":"e6-latency"},"stateClass":"e6_probe","stateKey":"probe","agreementHash":"1fe2344b3ac63c17fa234798a498775bf2f5fd0e90a15fa80d924a2abb7c46f9","policySource":"fresh","cacheAgeMs":0,"relationId":"GUID-state-aware","directives":{"allowed":false,"retentionSeconds":900,"resumeAllowed":true,"onRevocation":"purge"}}
+    1.791454219322602e+09	[34mINFO[0m	/app/cmd/policy-checkpoint-gateway/purge.go:204	Purge sweep timing	{"confirmMicros": 815, "sweepMicros": 658, "totalMicros": 1474}
+  post-purge probe write: DENY 'allowed = false'
+19,1791454220.184320593,1791454220.213476415,1791454220.210911,26.6,29.2,25.0,1.6,1
+  purge records this trial:
+    {"op":"purge","decision":"PURGED","reason":"revoked; onRevocation=purge","identity":{"steward":"SERVER","user":"jake.jongejans@student.uva.nl","requestType":"vflTrainModelRequest","jobId":"e6-latency","localJobName":"e6-latency"},"stateClass":"e6_probe","stateKey":"probe","agreementHash":"1fe2344b3ac63c17fa234798a498775bf2f5fd0e90a15fa80d924a2abb7c46f9","policySource":"fresh","cacheAgeMs":0,"relationId":"GUID-state-aware","directives":{"allowed":false,"retentionSeconds":900,"resumeAllowed":true,"onRevocation":"purge"}}
+    1.7914542202109237e+09	[34mINFO[0m	/app/cmd/policy-checkpoint-gateway/purge.go:204	Purge sweep timing	{"confirmMicros": 916, "sweepMicros": 661, "totalMicros": 1579}
+  post-purge probe write: DENY 'allowed = false'
+20,1791454221.097993923,1791454221.150998811,1791454221.146232,48.2,53.0,45.5,2.8,1
+  purge records this trial:
+    {"op":"purge","decision":"PURGED","reason":"revoked; onRevocation=purge","identity":{"steward":"SERVER","user":"jake.jongejans@student.uva.nl","requestType":"vflTrainModelRequest","jobId":"e6-latency","localJobName":"e6-latency"},"stateClass":"e6_probe","stateKey":"probe","agreementHash":"1fe2344b3ac63c17fa234798a498775bf2f5fd0e90a15fa80d924a2abb7c46f9","policySource":"fresh","cacheAgeMs":0,"relationId":"GUID-state-aware","directives":{"allowed":false,"retentionSeconds":900,"resumeAllowed":true,"onRevocation":"purge"}}
+    1.7914542211462564e+09	[34mINFO[0m	/app/cmd/policy-checkpoint-gateway/purge.go:204	Purge sweep timing	{"confirmMicros": 1817, "sweepMicros": 871, "totalMicros": 2690}
+  post-purge probe write: DENY 'allowed = false'
+21,1791454222.320788512,1791454222.372140690,1791454222.366755,46.0,51.4,43.6,2.4,1
+  purge records this trial:
+    {"op":"purge","decision":"PURGED","reason":"revoked; onRevocation=purge","identity":{"steward":"SERVER","user":"jake.jongejans@student.uva.nl","requestType":"vflTrainModelRequest","jobId":"e6-latency","localJobName":"e6-latency"},"stateClass":"e6_probe","stateKey":"probe","agreementHash":"1fe2344b3ac63c17fa234798a498775bf2f5fd0e90a15fa80d924a2abb7c46f9","policySource":"fresh","cacheAgeMs":0,"relationId":"GUID-state-aware","directives":{"allowed":false,"retentionSeconds":900,"resumeAllowed":true,"onRevocation":"purge"}}
+    1.7914542223667893e+09	[34mINFO[0m	/app/cmd/policy-checkpoint-gateway/purge.go:204	Purge sweep timing	{"confirmMicros": 1332, "sweepMicros": 1009, "totalMicros": 2342}
+  post-purge probe write: DENY 'allowed = false'
+22,1791454223.524204571,1791454223.574713730,1791454223.570528,46.3,50.5,43.2,3.1,1
+  purge records this trial:
+    {"op":"purge","decision":"PURGED","reason":"revoked; onRevocation=purge","identity":{"steward":"SERVER","user":"jake.jongejans@student.uva.nl","requestType":"vflTrainModelRequest","jobId":"e6-latency","localJobName":"e6-latency"},"stateClass":"e6_probe","stateKey":"probe","agreementHash":"1fe2344b3ac63c17fa234798a498775bf2f5fd0e90a15fa80d924a2abb7c46f9","policySource":"fresh","cacheAgeMs":0,"relationId":"GUID-state-aware","directives":{"allowed":false,"retentionSeconds":900,"resumeAllowed":true,"onRevocation":"purge"}}
+    1.7914542235705535e+09	[34mINFO[0m	/app/cmd/policy-checkpoint-gateway/purge.go:204	Purge sweep timing	{"confirmMicros": 1768, "sweepMicros": 1254, "totalMicros": 3023}
+  post-purge probe write: DENY 'allowed = false'
+23,1791454224.722811412,1791454224.783214385,1791454224.777062,54.3,60.4,51.5,2.8,1
+  purge records this trial:
+    {"op":"purge","decision":"PURGED","reason":"revoked; onRevocation=purge","identity":{"steward":"SERVER","user":"jake.jongejans@student.uva.nl","requestType":"vflTrainModelRequest","jobId":"e6-latency","localJobName":"e6-latency"},"stateClass":"e6_probe","stateKey":"probe","agreementHash":"1fe2344b3ac63c17fa234798a498775bf2f5fd0e90a15fa80d924a2abb7c46f9","policySource":"fresh","cacheAgeMs":0,"relationId":"GUID-state-aware","directives":{"allowed":false,"retentionSeconds":900,"resumeAllowed":true,"onRevocation":"purge"}}
+    1.7914542247770898e+09	[34mINFO[0m	/app/cmd/policy-checkpoint-gateway/purge.go:204	Purge sweep timing	{"confirmMicros": 1826, "sweepMicros": 848, "totalMicros": 2676}
+  post-purge probe write: DENY 'allowed = false'
+24,1791454225.970154739,1791454226.023288468,1791454226.018343,48.2,53.1,45.9,2.3,1
+  purge records this trial:
+    {"op":"purge","decision":"PURGED","reason":"revoked; onRevocation=purge","identity":{"steward":"SERVER","user":"jake.jongejans@student.uva.nl","requestType":"vflTrainModelRequest","jobId":"e6-latency","localJobName":"e6-latency"},"stateClass":"e6_probe","stateKey":"probe","agreementHash":"1fe2344b3ac63c17fa234798a498775bf2f5fd0e90a15fa80d924a2abb7c46f9","policySource":"fresh","cacheAgeMs":0,"relationId":"GUID-state-aware","directives":{"allowed":false,"retentionSeconds":900,"resumeAllowed":true,"onRevocation":"purge"}}
+    1.7914542260183709e+09	[34mINFO[0m	/app/cmd/policy-checkpoint-gateway/purge.go:204	Purge sweep timing	{"confirmMicros": 1322, "sweepMicros": 858, "totalMicros": 2181}
+  post-purge probe write: DENY 'allowed = false'
+25,1791454227.171236217,1791454227.226709717,1791454227.220735,49.5,55.5,47.0,2.5,1
+  purge records this trial:
+    {"op":"purge","decision":"PURGED","reason":"revoked; onRevocation=purge","identity":{"steward":"SERVER","user":"jake.jongejans@student.uva.nl","requestType":"vflTrainModelRequest","jobId":"e6-latency","localJobName":"e6-latency"},"stateClass":"e6_probe","stateKey":"probe","agreementHash":"1fe2344b3ac63c17fa234798a498775bf2f5fd0e90a15fa80d924a2abb7c46f9","policySource":"fresh","cacheAgeMs":0,"relationId":"GUID-state-aware","directives":{"allowed":false,"retentionSeconds":900,"resumeAllowed":true,"onRevocation":"purge"}}
+    1.7914542272207577e+09	[34mINFO[0m	/app/cmd/policy-checkpoint-gateway/purge.go:204	Purge sweep timing	{"confirmMicros": 1591, "sweepMicros": 803, "totalMicros": 2395}
+  post-purge probe write: DENY 'allowed = false'
+26,1791454228.393646060,1791454228.445192600,1791454228.441761,48.1,51.5,44.8,3.4,1
+  purge records this trial:
+    {"op":"purge","decision":"PURGED","reason":"revoked; onRevocation=purge","identity":{"steward":"SERVER","user":"jake.jongejans@student.uva.nl","requestType":"vflTrainModelRequest","jobId":"e6-latency","localJobName":"e6-latency"},"stateClass":"e6_probe","stateKey":"probe","agreementHash":"1fe2344b3ac63c17fa234798a498775bf2f5fd0e90a15fa80d924a2abb7c46f9","policySource":"fresh","cacheAgeMs":0,"relationId":"GUID-state-aware","directives":{"allowed":false,"retentionSeconds":900,"resumeAllowed":true,"onRevocation":"purge"}}
+    1.7914542284417932e+09	[34mINFO[0m	/app/cmd/policy-checkpoint-gateway/purge.go:204	Purge sweep timing	{"confirmMicros": 1628, "sweepMicros": 1569, "totalMicros": 3199}
+  post-purge probe write: DENY 'allowed = false'
+27,1791454229.565124272,1791454229.593730486,1791454229.592338,27.2,28.6,25.0,2.3,1
+  purge records this trial:
+    {"op":"purge","decision":"PURGED","reason":"revoked; onRevocation=purge","identity":{"steward":"SERVER","user":"jake.jongejans@student.uva.nl","requestType":"vflTrainModelRequest","jobId":"e6-latency","localJobName":"e6-latency"},"stateClass":"e6_probe","stateKey":"probe","agreementHash":"1fe2344b3ac63c17fa234798a498775bf2f5fd0e90a15fa80d924a2abb7c46f9","policySource":"fresh","cacheAgeMs":0,"relationId":"GUID-state-aware","directives":{"allowed":false,"retentionSeconds":900,"resumeAllowed":true,"onRevocation":"purge"}}
+    1.7914542295923536e+09	[34mINFO[0m	/app/cmd/policy-checkpoint-gateway/purge.go:204	Purge sweep timing	{"confirmMicros": 874, "sweepMicros": 1310, "totalMicros": 2185}
+  post-purge probe write: DENY 'allowed = false'
+28,1791454230.419745835,1791454230.446382744,1791454230.445079,25.3,26.6,23.0,2.4,1
+  purge records this trial:
+    {"op":"purge","decision":"PURGED","reason":"revoked; onRevocation=purge","identity":{"steward":"SERVER","user":"jake.jongejans@student.uva.nl","requestType":"vflTrainModelRequest","jobId":"e6-latency","localJobName":"e6-latency"},"stateClass":"e6_probe","stateKey":"probe","agreementHash":"1fe2344b3ac63c17fa234798a498775bf2f5fd0e90a15fa80d924a2abb7c46f9","policySource":"fresh","cacheAgeMs":0,"relationId":"GUID-state-aware","directives":{"allowed":false,"retentionSeconds":900,"resumeAllowed":true,"onRevocation":"purge"}}
+    1.791454230445094e+09	[34mINFO[0m	/app/cmd/policy-checkpoint-gateway/purge.go:204	Purge sweep timing	{"confirmMicros": 1004, "sweepMicros": 1329, "totalMicros": 2334}
+  post-purge probe write: DENY 'allowed = false'
+29,1791454231.280297520,1791454231.306559344,1791454231.304336,24.0,26.3,22.5,1.5,1
+  purge records this trial:
+    {"op":"purge","decision":"PURGED","reason":"revoked; onRevocation=purge","identity":{"steward":"SERVER","user":"jake.jongejans@student.uva.nl","requestType":"vflTrainModelRequest","jobId":"e6-latency","localJobName":"e6-latency"},"stateClass":"e6_probe","stateKey":"probe","agreementHash":"1fe2344b3ac63c17fa234798a498775bf2f5fd0e90a15fa80d924a2abb7c46f9","policySource":"fresh","cacheAgeMs":0,"relationId":"GUID-state-aware","directives":{"allowed":false,"retentionSeconds":900,"resumeAllowed":true,"onRevocation":"purge"}}
+    1.7914542313043547e+09	[34mINFO[0m	/app/cmd/policy-checkpoint-gateway/purge.go:204	Purge sweep timing	{"confirmMicros": 691, "sweepMicros": 747, "totalMicros": 1439}
+  post-purge probe write: DENY 'allowed = false'
+30,1791454232.157735622,1791454232.191939928,1791454232.188841,31.1,34.2,29.3,1.8,1
+  purge records this trial:
+    {"op":"purge","decision":"PURGED","reason":"revoked; onRevocation=purge","identity":{"steward":"SERVER","user":"jake.jongejans@student.uva.nl","requestType":"vflTrainModelRequest","jobId":"e6-latency","localJobName":"e6-latency"},"stateClass":"e6_probe","stateKey":"probe","agreementHash":"1fe2344b3ac63c17fa234798a498775bf2f5fd0e90a15fa80d924a2abb7c46f9","policySource":"fresh","cacheAgeMs":0,"relationId":"GUID-state-aware","directives":{"allowed":false,"retentionSeconds":900,"resumeAllowed":true,"onRevocation":"purge"}}
+    1.7914542321888554e+09	[34mINFO[0m	/app/cmd/policy-checkpoint-gateway/purge.go:204	Purge sweep timing	{"confirmMicros": 1096, "sweepMicros": 678, "totalMicros": 1775}
+  post-purge probe write: DENY 'allowed = false'
+31,1791454233.033342932,1791454233.063547167,1791454233.062625,29.3,30.2,26.4,2.9,1
+  purge records this trial:
+    {"op":"purge","decision":"PURGED","reason":"revoked; onRevocation=purge","identity":{"steward":"SERVER","user":"jake.jongejans@student.uva.nl","requestType":"vflTrainModelRequest","jobId":"e6-latency","localJobName":"e6-latency"},"stateClass":"e6_probe","stateKey":"probe","agreementHash":"1fe2344b3ac63c17fa234798a498775bf2f5fd0e90a15fa80d924a2abb7c46f9","policySource":"fresh","cacheAgeMs":0,"relationId":"GUID-state-aware","directives":{"allowed":false,"retentionSeconds":900,"resumeAllowed":true,"onRevocation":"purge"}}
+    1.7914542330626426e+09	[34mINFO[0m	/app/cmd/policy-checkpoint-gateway/purge.go:204	Purge sweep timing	{"confirmMicros": 1294, "sweepMicros": 1491, "totalMicros": 2786}
+  post-purge probe write: DENY 'allowed = false'
+32,1791454233.976458679,1791454234.029169241,1791454234.025168,48.7,52.7,45.7,3.0,1
+  purge records this trial:
+    {"op":"purge","decision":"PURGED","reason":"revoked; onRevocation=purge","identity":{"steward":"SERVER","user":"jake.jongejans@student.uva.nl","requestType":"vflTrainModelRequest","jobId":"e6-latency","localJobName":"e6-latency"},"stateClass":"e6_probe","stateKey":"probe","agreementHash":"1fe2344b3ac63c17fa234798a498775bf2f5fd0e90a15fa80d924a2abb7c46f9","policySource":"fresh","cacheAgeMs":0,"relationId":"GUID-state-aware","directives":{"allowed":false,"retentionSeconds":900,"resumeAllowed":true,"onRevocation":"purge"}}
+    1.7914542340252066e+09	[34mINFO[0m	/app/cmd/policy-checkpoint-gateway/purge.go:204	Purge sweep timing	{"confirmMicros": 1931, "sweepMicros": 994, "totalMicros": 2926}
+  post-purge probe write: DENY 'allowed = false'
+33,1791454235.217591825,1791454235.271550493,1791454235.266912,49.3,54.0,46.7,2.6,1
+  purge records this trial:
+    {"op":"purge","decision":"PURGED","reason":"revoked; onRevocation=purge","identity":{"steward":"SERVER","user":"jake.jongejans@student.uva.nl","requestType":"vflTrainModelRequest","jobId":"e6-latency","localJobName":"e6-latency"},"stateClass":"e6_probe","stateKey":"probe","agreementHash":"1fe2344b3ac63c17fa234798a498775bf2f5fd0e90a15fa80d924a2abb7c46f9","policySource":"fresh","cacheAgeMs":0,"relationId":"GUID-state-aware","directives":{"allowed":false,"retentionSeconds":900,"resumeAllowed":true,"onRevocation":"purge"}}
+    1.791454235266937e+09	[34mINFO[0m	/app/cmd/policy-checkpoint-gateway/purge.go:204	Purge sweep timing	{"confirmMicros": 1669, "sweepMicros": 836, "totalMicros": 2505}
+  post-purge probe write: DENY 'allowed = false'
+34,1791454236.452749336,1791454236.503396598,1791454236.499849,47.1,50.6,44.0,3.1,1
+  purge records this trial:
+    {"op":"purge","decision":"PURGED","reason":"revoked; onRevocation=purge","identity":{"steward":"SERVER","user":"jake.jongejans@student.uva.nl","requestType":"vflTrainModelRequest","jobId":"e6-latency","localJobName":"e6-latency"},"stateClass":"e6_probe","stateKey":"probe","agreementHash":"1fe2344b3ac63c17fa234798a498775bf2f5fd0e90a15fa80d924a2abb7c46f9","policySource":"fresh","cacheAgeMs":0,"relationId":"GUID-state-aware","directives":{"allowed":false,"retentionSeconds":900,"resumeAllowed":true,"onRevocation":"purge"}}
+    1.791454236499883e+09	[34mINFO[0m	/app/cmd/policy-checkpoint-gateway/purge.go:204	Purge sweep timing	{"confirmMicros": 2211, "sweepMicros": 834, "totalMicros": 3046}
+  post-purge probe write: DENY 'allowed = false'
+35,1791454237.671128744,1791454237.725180310,1791454237.719837,48.7,54.1,46.4,2.3,1
+  purge records this trial:
+    {"op":"purge","decision":"PURGED","reason":"revoked; onRevocation=purge","identity":{"steward":"SERVER","user":"jake.jongejans@student.uva.nl","requestType":"vflTrainModelRequest","jobId":"e6-latency","localJobName":"e6-latency"},"stateClass":"e6_probe","stateKey":"probe","agreementHash":"1fe2344b3ac63c17fa234798a498775bf2f5fd0e90a15fa80d924a2abb7c46f9","policySource":"fresh","cacheAgeMs":0,"relationId":"GUID-state-aware","directives":{"allowed":false,"retentionSeconds":900,"resumeAllowed":true,"onRevocation":"purge"}}
+    1.791454237719861e+09	[34mINFO[0m	/app/cmd/policy-checkpoint-gateway/purge.go:204	Purge sweep timing	{"confirmMicros": 1297, "sweepMicros": 860, "totalMicros": 2159}
+  post-purge probe write: DENY 'allowed = false'
+36,1791454238.888008977,1791454238.937333860,1791454238.935225,47.2,49.3,43.1,4.1,1
+  purge records this trial:
+    {"op":"purge","decision":"PURGED","reason":"revoked; onRevocation=purge","identity":{"steward":"SERVER","user":"jake.jongejans@student.uva.nl","requestType":"vflTrainModelRequest","jobId":"e6-latency","localJobName":"e6-latency"},"stateClass":"e6_probe","stateKey":"probe","agreementHash":"1fe2344b3ac63c17fa234798a498775bf2f5fd0e90a15fa80d924a2abb7c46f9","policySource":"fresh","cacheAgeMs":0,"relationId":"GUID-state-aware","directives":{"allowed":false,"retentionSeconds":900,"resumeAllowed":true,"onRevocation":"purge"}}
+    1.7914542389352598e+09	[34mINFO[0m	/app/cmd/policy-checkpoint-gateway/purge.go:204	Purge sweep timing	{"confirmMicros": 1612, "sweepMicros": 2390, "totalMicros": 4004}
+  post-purge probe write: DENY 'allowed = false'
+37,1791454240.120883127,1791454240.173366302,1791454240.171078,50.2,52.5,45.7,4.5,1
+  purge records this trial:
+    {"op":"purge","decision":"PURGED","reason":"revoked; onRevocation=purge","identity":{"steward":"SERVER","user":"jake.jongejans@student.uva.nl","requestType":"vflTrainModelRequest","jobId":"e6-latency","localJobName":"e6-latency"},"stateClass":"e6_probe","stateKey":"probe","agreementHash":"1fe2344b3ac63c17fa234798a498775bf2f5fd0e90a15fa80d924a2abb7c46f9","policySource":"fresh","cacheAgeMs":0,"relationId":"GUID-state-aware","directives":{"allowed":false,"retentionSeconds":900,"resumeAllowed":true,"onRevocation":"purge"}}
+    1.791454240171113e+09	[34mINFO[0m	/app/cmd/policy-checkpoint-gateway/purge.go:204	Purge sweep timing	{"confirmMicros": 2035, "sweepMicros": 2376, "totalMicros": 4413}
+  post-purge probe write: DENY 'allowed = false'
+38,1791454241.360208213,1791454241.415600755,1791454241.410144,49.9,55.4,47.5,2.4,1
+  purge records this trial:
+    {"op":"purge","decision":"PURGED","reason":"revoked; onRevocation=purge","identity":{"steward":"SERVER","user":"jake.jongejans@student.uva.nl","requestType":"vflTrainModelRequest","jobId":"e6-latency","localJobName":"e6-latency"},"stateClass":"e6_probe","stateKey":"probe","agreementHash":"1fe2344b3ac63c17fa234798a498775bf2f5fd0e90a15fa80d924a2abb7c46f9","policySource":"fresh","cacheAgeMs":0,"relationId":"GUID-state-aware","directives":{"allowed":false,"retentionSeconds":900,"resumeAllowed":true,"onRevocation":"purge"}}
+    1.79145424141018e+09	[34mINFO[0m	/app/cmd/policy-checkpoint-gateway/purge.go:204	Purge sweep timing	{"confirmMicros": 1460, "sweepMicros": 861, "totalMicros": 2322}
+  post-purge probe write: DENY 'allowed = false'
+39,1791454242.537758712,1791454242.566078501,1791454242.563392,25.6,28.3,24.0,1.7,1
+  purge records this trial:
+    {"op":"purge","decision":"PURGED","reason":"revoked; onRevocation=purge","identity":{"steward":"SERVER","user":"jake.jongejans@student.uva.nl","requestType":"vflTrainModelRequest","jobId":"e6-latency","localJobName":"e6-latency"},"stateClass":"e6_probe","stateKey":"probe","agreementHash":"1fe2344b3ac63c17fa234798a498775bf2f5fd0e90a15fa80d924a2abb7c46f9","policySource":"fresh","cacheAgeMs":0,"relationId":"GUID-state-aware","directives":{"allowed":false,"retentionSeconds":900,"resumeAllowed":true,"onRevocation":"purge"}}
+    1.791454242563411e+09	[34mINFO[0m	/app/cmd/policy-checkpoint-gateway/purge.go:204	Purge sweep timing	{"confirmMicros": 873, "sweepMicros": 754, "totalMicros": 1628}
+  post-purge probe write: DENY 'allowed = false'
+40,1791454243.412016965,1791454243.441211565,1791454243.438984,27.0,29.2,25.2,1.7,1
+  purge records this trial:
+    {"op":"purge","decision":"PURGED","reason":"revoked; onRevocation=purge","identity":{"steward":"SERVER","user":"jake.jongejans@student.uva.nl","requestType":"vflTrainModelRequest","jobId":"e6-latency","localJobName":"e6-latency"},"stateClass":"e6_probe","stateKey":"probe","agreementHash":"1fe2344b3ac63c17fa234798a498775bf2f5fd0e90a15fa80d924a2abb7c46f9","policySource":"fresh","cacheAgeMs":0,"relationId":"GUID-state-aware","directives":{"allowed":false,"retentionSeconds":900,"resumeAllowed":true,"onRevocation":"purge"}}
+    1.791454243438999e+09	[34mINFO[0m	/app/cmd/policy-checkpoint-gateway/purge.go:204	Purge sweep timing	{"confirmMicros": 1022, "sweepMicros": 624, "totalMicros": 1647}
+  post-purge probe write: DENY 'allowed = false'
+41,1791454244.290127182,1791454244.316163008,1791454244.314076,23.9,26.0,22.4,1.5,1
+  purge records this trial:
+    {"op":"purge","decision":"PURGED","reason":"revoked; onRevocation=purge","identity":{"steward":"SERVER","user":"jake.jongejans@student.uva.nl","requestType":"vflTrainModelRequest","jobId":"e6-latency","localJobName":"e6-latency"},"stateClass":"e6_probe","stateKey":"probe","agreementHash":"1fe2344b3ac63c17fa234798a498775bf2f5fd0e90a15fa80d924a2abb7c46f9","policySource":"fresh","cacheAgeMs":0,"relationId":"GUID-state-aware","directives":{"allowed":false,"retentionSeconds":900,"resumeAllowed":true,"onRevocation":"purge"}}
+    1.7914542443141e+09	[34mINFO[0m	/app/cmd/policy-checkpoint-gateway/purge.go:204	Purge sweep timing	{"confirmMicros": 750, "sweepMicros": 685, "totalMicros": 1436}
+  post-purge probe write: DENY 'allowed = false'
+42,1791454245.152774331,1791454245.183693060,1791454245.181064,28.3,30.9,26.6,1.7,1
+  purge records this trial:
+    {"op":"purge","decision":"PURGED","reason":"revoked; onRevocation=purge","identity":{"steward":"SERVER","user":"jake.jongejans@student.uva.nl","requestType":"vflTrainModelRequest","jobId":"e6-latency","localJobName":"e6-latency"},"stateClass":"e6_probe","stateKey":"probe","agreementHash":"1fe2344b3ac63c17fa234798a498775bf2f5fd0e90a15fa80d924a2abb7c46f9","policySource":"fresh","cacheAgeMs":0,"relationId":"GUID-state-aware","directives":{"allowed":false,"retentionSeconds":900,"resumeAllowed":true,"onRevocation":"purge"}}
+    1.7914542451810777e+09	[34mINFO[0m	/app/cmd/policy-checkpoint-gateway/purge.go:204	Purge sweep timing	{"confirmMicros": 921, "sweepMicros": 700, "totalMicros": 1622}
+  post-purge probe write: DENY 'allowed = false'
+43,1791454246.065580927,1791454246.091623719,1791454246.090199,24.6,26.0,22.4,2.3,1
+  purge records this trial:
+    {"op":"purge","decision":"PURGED","reason":"revoked; onRevocation=purge","identity":{"steward":"SERVER","user":"jake.jongejans@student.uva.nl","requestType":"vflTrainModelRequest","jobId":"e6-latency","localJobName":"e6-latency"},"stateClass":"e6_probe","stateKey":"probe","agreementHash":"1fe2344b3ac63c17fa234798a498775bf2f5fd0e90a15fa80d924a2abb7c46f9","policySource":"fresh","cacheAgeMs":0,"relationId":"GUID-state-aware","directives":{"allowed":false,"retentionSeconds":900,"resumeAllowed":true,"onRevocation":"purge"}}
+    1.7914542460902152e+09	[34mINFO[0m	/app/cmd/policy-checkpoint-gateway/purge.go:204	Purge sweep timing	{"confirmMicros": 943, "sweepMicros": 1268, "totalMicros": 2213}
+  post-purge probe write: DENY 'allowed = false'
+44,1791454246.982653871,1791454247.033759185,1791454247.027596,44.9,51.1,42.6,2.3,1
+  purge records this trial:
+    {"op":"purge","decision":"PURGED","reason":"revoked; onRevocation=purge","identity":{"steward":"SERVER","user":"jake.jongejans@student.uva.nl","requestType":"vflTrainModelRequest","jobId":"e6-latency","localJobName":"e6-latency"},"stateClass":"e6_probe","stateKey":"probe","agreementHash":"1fe2344b3ac63c17fa234798a498775bf2f5fd0e90a15fa80d924a2abb7c46f9","policySource":"fresh","cacheAgeMs":0,"relationId":"GUID-state-aware","directives":{"allowed":false,"retentionSeconds":900,"resumeAllowed":true,"onRevocation":"purge"}}
+    1.791454247027629e+09	[34mINFO[0m	/app/cmd/policy-checkpoint-gateway/purge.go:204	Purge sweep timing	{"confirmMicros": 1179, "sweepMicros": 1016, "totalMicros": 2197}
+  post-purge probe write: DENY 'allowed = false'
+45,1791454248.214918642,1791454248.267248455,1791454248.262092,47.2,52.3,44.3,2.8,1
+  purge records this trial:
+    {"op":"purge","decision":"PURGED","reason":"revoked; onRevocation=purge","identity":{"steward":"SERVER","user":"jake.jongejans@student.uva.nl","requestType":"vflTrainModelRequest","jobId":"e6-latency","localJobName":"e6-latency"},"stateClass":"e6_probe","stateKey":"probe","agreementHash":"1fe2344b3ac63c17fa234798a498775bf2f5fd0e90a15fa80d924a2abb7c46f9","policySource":"fresh","cacheAgeMs":0,"relationId":"GUID-state-aware","directives":{"allowed":false,"retentionSeconds":900,"resumeAllowed":true,"onRevocation":"purge"}}
+    1.7914542482621236e+09	[34mINFO[0m	/app/cmd/policy-checkpoint-gateway/purge.go:204	Purge sweep timing	{"confirmMicros": 1728, "sweepMicros": 983, "totalMicros": 2713}
+  post-purge probe write: DENY 'allowed = false'
+46,1791454249.456108916,1791454249.508218814,1791454249.505003,48.9,52.1,45.1,3.8,1
+  purge records this trial:
+    {"op":"purge","decision":"PURGED","reason":"revoked; onRevocation=purge","identity":{"steward":"SERVER","user":"jake.jongejans@student.uva.nl","requestType":"vflTrainModelRequest","jobId":"e6-latency","localJobName":"e6-latency"},"stateClass":"e6_probe","stateKey":"probe","agreementHash":"1fe2344b3ac63c17fa234798a498775bf2f5fd0e90a15fa80d924a2abb7c46f9","policySource":"fresh","cacheAgeMs":0,"relationId":"GUID-state-aware","directives":{"allowed":false,"retentionSeconds":900,"resumeAllowed":true,"onRevocation":"purge"}}
+    1.791454249505038e+09	[34mINFO[0m	/app/cmd/policy-checkpoint-gateway/purge.go:204	Purge sweep timing	{"confirmMicros": 2856, "sweepMicros": 833, "totalMicros": 3691}
+  post-purge probe write: DENY 'allowed = false'
+47,1791454250.682242174,1791454250.740617052,1791454250.735249,53.0,58.4,50.8,2.2,1
+  purge records this trial:
+    {"op":"purge","decision":"PURGED","reason":"revoked; onRevocation=purge","identity":{"steward":"SERVER","user":"jake.jongejans@student.uva.nl","requestType":"vflTrainModelRequest","jobId":"e6-latency","localJobName":"e6-latency"},"stateClass":"e6_probe","stateKey":"probe","agreementHash":"1fe2344b3ac63c17fa234798a498775bf2f5fd0e90a15fa80d924a2abb7c46f9","policySource":"fresh","cacheAgeMs":0,"relationId":"GUID-state-aware","directives":{"allowed":false,"retentionSeconds":900,"resumeAllowed":true,"onRevocation":"purge"}}
+    1.7914542507352743e+09	[34mINFO[0m	/app/cmd/policy-checkpoint-gateway/purge.go:204	Purge sweep timing	{"confirmMicros": 1258, "sweepMicros": 788, "totalMicros": 2047}
+  post-purge probe write: DENY 'allowed = false'
+48,1791454251.924157691,1791454251.977872416,1791454251.973047,48.9,53.7,46.1,2.8,1
+  purge records this trial:
+    {"op":"purge","decision":"PURGED","reason":"revoked; onRevocation=purge","identity":{"steward":"SERVER","user":"jake.jongejans@student.uva.nl","requestType":"vflTrainModelRequest","jobId":"e6-latency","localJobName":"e6-latency"},"stateClass":"e6_probe","stateKey":"probe","agreementHash":"1fe2344b3ac63c17fa234798a498775bf2f5fd0e90a15fa80d924a2abb7c46f9","policySource":"fresh","cacheAgeMs":0,"relationId":"GUID-state-aware","directives":{"allowed":false,"retentionSeconds":900,"resumeAllowed":true,"onRevocation":"purge"}}
+    1.791454251973078e+09	[34mINFO[0m	/app/cmd/policy-checkpoint-gateway/purge.go:204	Purge sweep timing	{"confirmMicros": 1929, "sweepMicros": 771, "totalMicros": 2702}
+  post-purge probe write: DENY 'allowed = false'
+49,1791454253.149329001,1791454253.200931557,1791454253.196293,47.0,51.6,44.3,2.7,1
+  purge records this trial:
+    {"op":"purge","decision":"PURGED","reason":"revoked; onRevocation=purge","identity":{"steward":"SERVER","user":"jake.jongejans@student.uva.nl","requestType":"vflTrainModelRequest","jobId":"e6-latency","localJobName":"e6-latency"},"stateClass":"e6_probe","stateKey":"probe","agreementHash":"1fe2344b3ac63c17fa234798a498775bf2f5fd0e90a15fa80d924a2abb7c46f9","policySource":"fresh","cacheAgeMs":0,"relationId":"GUID-state-aware","directives":{"allowed":false,"retentionSeconds":900,"resumeAllowed":true,"onRevocation":"purge"}}
+    1.7914542531963174e+09	[34mINFO[0m	/app/cmd/policy-checkpoint-gateway/purge.go:204	Purge sweep timing	{"confirmMicros": 1846, "sweepMicros": 775, "totalMicros": 2622}
+  post-purge probe write: DENY 'allowed = false'
+50,1791454254.364654865,1791454254.421035488,1791454254.416206,51.6,56.4,48.6,2.9,1
+  purge records this trial:
+    {"op":"purge","decision":"PURGED","reason":"revoked; onRevocation=purge","identity":{"steward":"SERVER","user":"jake.jongejans@student.uva.nl","requestType":"vflTrainModelRequest","jobId":"e6-latency","localJobName":"e6-latency"},"stateClass":"e6_probe","stateKey":"probe","agreementHash":"1fe2344b3ac63c17fa234798a498775bf2f5fd0e90a15fa80d924a2abb7c46f9","policySource":"fresh","cacheAgeMs":0,"relationId":"GUID-state-aware","directives":{"allowed":false,"retentionSeconds":900,"resumeAllowed":true,"onRevocation":"purge"}}
+    1.791454254416242e+09	[34mINFO[0m	/app/cmd/policy-checkpoint-gateway/purge.go:204	Purge sweep timing	{"confirmMicros": 1636, "sweepMicros": 1241, "totalMicros": 2878}
+  post-purge probe write: DENY 'allowed = false'
+
+flip -> purge-complete (from PUT initiation; includes the PUT round trip shown per trial):
+n=50  min=23.9 ms  p50=46.1 ms  p90=49.9 ms  max=54.3 ms  mean=39.1 ms
+flip -> observed (Agreement changed line), 50/50 trials:
+n=50  min=22.4 ms  p50=43.0 ms  p90=47.0 ms  max=51.5 ms  mean=36.6 ms
+regime: watch-delivered; the flip -> first-DENY side is E2's capture
+note: t_purge is the gateway's own sweep-completion log timestamp; the state dir is pod-local
+note: purge-record count covers the probe blob (and nothing else in this pod)
+note: observe_ms/sweep_ms split delivery from sweep; the Purge-sweep-timing line splits confirm from unlink
+pod "e6-gateway" deleted

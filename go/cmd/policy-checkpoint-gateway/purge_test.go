@@ -111,7 +111,9 @@ func TestSweepCancelsOnRegrant(t *testing.T) {
 
 	_, err := g.store.Read("kv", "k1")
 	assert.NilError(t, err)
-	assert.Assert(t, !strings.Contains(auditOutput(g), `"op":"purge"`))
+	out := auditOutput(g)
+	assert.Equal(t, strings.Count(out, `"op":"purge","decision":"CANCELLED"`), 1)
+	assert.Assert(t, !strings.Contains(out, `"decision":"PURGED"`))
 	// the confirming read folded the regrant into the cache
 	a, _, _, _ := g.policy.snapshot()
 	assert.Equal(t, a.Relations["u@x"].StateDirectives.Allowed, true)
@@ -190,7 +192,97 @@ func TestSweepRetainsExpiredWhenConfirmFails(t *testing.T) {
 
 	_, err := g.store.Read("kv", "old")
 	assert.NilError(t, err) // nothing destroyed on a non-fresh view
-	assert.Assert(t, !strings.Contains(auditOutput(g), `"op":"expired"`))
+	out := auditOutput(g)
+	assert.Equal(t, strings.Count(out, `"op":"expired","decision":"DEFERRED"`), 1)
+	assert.Assert(t, !strings.Contains(out, `"decision":"DELETED"`))
+}
+
+func TestSweepDefersExpiryOnEveryReconsideration(t *testing.T) {
+	g := newSweepServer(t)
+	assert.NilError(t, g.store.Write("kv", "old", []byte("a")))
+	backdate(t, g, "kv", "old", 20*time.Minute)
+	setPolicy(t, g, allowAll())
+	g.source = &mockSource{getErr: errors.New("etcd down")}
+
+	g.evaluateDisposition()
+	g.evaluateDisposition() // each reconsideration appends its own line
+
+	_, err := g.store.Read("kv", "old")
+	assert.NilError(t, err)
+	out := auditOutput(g)
+	assert.Equal(t, strings.Count(out, `"op":"expired","decision":"DEFERRED"`), 2)
+	assert.Assert(t, strings.Contains(out, "etcd down"))
+	assert.Assert(t, !strings.Contains(out, `"decision":"DELETED"`))
+}
+
+func TestSweepExpiryCancelledByLongerRetention(t *testing.T) {
+	g := newSweepServer(t)
+	assert.NilError(t, g.store.Write("kv", "old", []byte("a")))
+	backdate(t, g, "kv", "old", 20*time.Minute) // retention is 900s
+	setPolicy(t, g, allowAll())
+	longer := allowAll()
+	longer.RetentionSeconds = 3600
+	g.source = &mockSource{getKvs: [][]byte{sweepAgreementBytes(t, longer)}}
+
+	g.evaluateDisposition()
+	g.evaluateDisposition() // the confirmed terms are cached by now: nothing left to cancel
+
+	_, err := g.store.Read("kv", "old")
+	assert.NilError(t, err)
+	out := auditOutput(g)
+	assert.Equal(t, strings.Count(out, `"op":"expired","decision":"CANCELLED"`), 1)
+	assert.Assert(t, strings.Contains(out, `"policySource":"fresh"`))
+	assert.Assert(t, strings.Contains(out, `"retentionSeconds":3600`))
+	assert.Assert(t, !strings.Contains(out, `"decision":"DELETED"`))
+}
+
+func TestSweepPurgeCancelledByRegrantRecordedOnce(t *testing.T) {
+	g := newSweepServer(t)
+	assert.NilError(t, g.store.Write("kv", "k1", []byte("a")))
+	setPolicy(t, g, revokedPurge())
+	g.source = &mockSource{getKvs: [][]byte{sweepAgreementBytes(t, allowAll())}}
+
+	g.evaluateDisposition()
+	g.evaluateDisposition() // the regrant is cached by now: nothing left to cancel
+
+	_, err := g.store.Read("kv", "k1")
+	assert.NilError(t, err)
+	out := auditOutput(g)
+	assert.Equal(t, strings.Count(out, `"op":"purge","decision":"CANCELLED"`), 1)
+	assert.Assert(t, strings.Contains(out, `"policySource":"fresh"`))
+	assert.Assert(t, strings.Contains(out, `"allowed":true`))
+	assert.Assert(t, !strings.Contains(out, `"decision":"PURGED"`))
+}
+
+func TestSweepCancelledWhenAgreementGoneAtConfirm(t *testing.T) {
+	tests := []struct {
+		name     string
+		observed *api.StateDirectives
+		op       string
+	}{
+		{"deletion on revocation", revokedPurge(), "purge"},
+		{"expiry", allowAll(), "expired"},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			g := newSweepServer(t)
+			assert.NilError(t, g.store.Write("kv", "old", []byte("a")))
+			backdate(t, g, "kv", "old", 20*time.Minute) // retention is 900s
+			setPolicy(t, g, tt.observed)
+			g.source = &mockSource{getKvs: [][]byte{nil}} // the key is absent at the confirming read
+
+			g.evaluateDisposition()
+			g.evaluateDisposition() // the cache is empty by now: nothing left to cancel
+
+			_, err := g.store.Read("kv", "old")
+			assert.NilError(t, err)
+			out := auditOutput(g)
+			assert.Equal(t, strings.Count(out, `"op":"`+tt.op+`","decision":"CANCELLED"`), 1)
+			assert.Assert(t, strings.Contains(out, `"policySource":"absent"`))
+			assert.Assert(t, !strings.Contains(out, `"decision":"PURGED"`))
+			assert.Assert(t, !strings.Contains(out, `"decision":"DELETED"`))
+		})
+	}
 }
 
 func TestBootIntoRevokedPurgesAtStartup(t *testing.T) {

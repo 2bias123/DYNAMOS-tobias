@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"sync"
+	"sync/atomic"
 	"testing"
 	"time"
 
@@ -190,6 +191,41 @@ func TestSyncWatchCancelReconnects(t *testing.T) {
 	close(ch) // watch loss
 
 	waitFor(t, 5*time.Second, func() bool { src.mu.Lock(); defer src.mu.Unlock(); return src.watchCalls >= 2 })
+}
+
+// lostWatchSource hands out watches that are already closed.
+type lostWatchSource struct {
+	*mockSource
+}
+
+func (s *lostWatchSource) Watch(ctx context.Context, key string, opts ...clientv3.OpOption) clientv3.WatchChan {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	s.watchCalls++
+	ch := make(chan clientv3.WatchResponse)
+	close(ch)
+	return ch
+}
+
+func TestSyncPollsWhileWatchReconnects(t *testing.T) {
+	src := &lostWatchSource{&mockSource{getKvs: [][]byte{agreementBytes(t, allowAll())}}}
+	cache := newPolicyCache(60 * time.Second)
+	stop := make(chan struct{})
+	defer close(stop)
+	var fresh atomic.Int64
+
+	go syncAgreement(stop, src, agreementKey("SERVER"), cache, 10*time.Millisecond, func() { fresh.Add(1) })
+	waitFor(t, time.Second, func() bool { src.mu.Lock(); defer src.mu.Unlock(); return src.watchCalls >= 1 })
+	reads := func() int { src.mu.Lock(); defer src.mu.Unlock(); return src.getCalls }
+	readsAtLoss, freshAtLoss := reads(), fresh.Load()
+
+	// the first reconnect back-off lasts a second; the polls due within it must be served
+	end := time.Now().Add(900 * time.Millisecond)
+	for time.Now().Before(end) && reads() < readsAtLoss+20 {
+		time.Sleep(5 * time.Millisecond)
+	}
+	assert.Assert(t, reads()-readsAtLoss >= 20, "reads since the watch was lost: %d", reads()-readsAtLoss)
+	assert.Assert(t, fresh.Load() > freshAtLoss)
 }
 
 func TestVerifyRegistration(t *testing.T) {

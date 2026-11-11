@@ -22,9 +22,10 @@ set -u
 #            back, and the client stewards (never revoked) must keep
 #            persisting. Run 2 is the resume-impossible-past-retention leg:
 #            reset, re-seed with a short retentionSeconds variant, wait out
-#            the bound, re-trigger; the boot sweep must destroy the aged
-#            checkpoint under confirmed-fresh policy (op=expired DELETED),
-#            the startup read then DENYs "not found", and the model
+#            the bound; the idle gateways must destroy the aged checkpoints
+#            under confirmed-fresh policy (op=expired DELETED on the PVC's
+#            audit log, no job fields) and exit. Then re-trigger: the
+#            startup read DENYs "not found", and the model
 #            restarts from init (round_index=1, no resume line). The
 #            expired record is also the proof that the flip retained: there
 #            was still a blob to destroy. A per-round curve table (round,
@@ -166,6 +167,19 @@ pvc_listing() { # $1 = ns
 		|| fail "listing failed for $ns"
 	echo "$PVC_LISTING"
 	kubectl -n "$ns" delete pod "$INSPECTOR" --ignore-not-found=true --wait=false >/dev/null 2>&1
+}
+
+# The expired records in the audit log on $1's state PVC, read through a
+# throwaway inspector pod beside whatever holds the PVC.
+claim_expired() { # $1 = ns
+	local ns="$1" out rc
+	start_state_inspector "$ns" "$INSPECTOR" "$INSPECTOR_IMAGE" >&2 || return 1
+	out=$(kubectl exec -n "$ns" "$INSPECTOR" -c inspector -- cat /state/audit/audit.log)
+	rc=$?
+	kubectl -n "$ns" delete pod "$INSPECTOR" --ignore-not-found=true --grace-period=1 --wait=true --timeout=60s >/dev/null 2>&1
+	[ "$rc" -eq 0 ] || return 1
+	echo "$out" | grep '"op":"expired"'
+	return 0
 }
 
 # The per-round growth table: cumulative audit records and bytes at each
@@ -465,6 +479,25 @@ for line in sys.stdin:
 	while [ $(( $(date +%s) - t_run1_done )) -le "$RETENTION_SHORT" ]; do sleep 5; done
 	echo "youngest blob now $(( $(date +%s) - t_run1_done ))s old (> ${RETENTION_SHORT}s)"
 
+	step "expiry while idle: the idle gateways must destroy the aged checkpoints and exit"
+	local ns exp cexp
+	for ns in "${STEWARD_NS[@]}"; do
+		kubectl -n "$ns" wait --for=condition=complete "job/idle-$(state_pvc_of "$ns")" --timeout=90s >/dev/null \
+			|| fail "the idle Job in $ns did not complete within 90s of the retention passing"
+	done
+	exp=$(claim_expired server) || fail "cannot read the state PVC in server"
+	cexp=$(claim_expired clientone) || fail "cannot read the state PVC in clientone"
+	echo; echo "--- server state PVC audit, expired records ---"; echo "$exp"
+	echo "--- clientone state PVC audit, expired records ---"; echo "$cexp"
+	must_grep "aged checkpoint destroyed while idle under confirmed-fresh policy" "$exp" \
+		-e '"decision":"DELETED".*"policySource":"fresh"'
+	must_grep "expired record carries 'retention exceeded' and the state class" "$exp" \
+		-e '"reason":"retention exceeded".*"stateClass":"vfl_server_model"'
+	must_not_grep "job fields on the server's expired record" "$exp" -e '"jobId"' -e '"localJobName"'
+	must_grep "clientone's aged state destroyed while idle too" "$cexp" -e '"decision":"DELETED".*"policySource":"fresh"'
+	must_not_grep "job fields on clientone's expired record" "$cexp" -e '"jobId"' -e '"localJobName"'
+
+	step "run 2: cycles=${CYCLES_RESUME}; nothing to resume from"
 	local rid2 status2
 	rid2=$(trigger "$CYCLES_RESUME") || exit 1
 	status2=$(wait_done "$rid2") || exit 1
@@ -478,18 +511,12 @@ for line in sys.stdin:
 	echo; echo "--- server MS lines (run 2) ---"; echo "$ms2"
 	echo "--- clientone MS lines (run 2) ---"; echo "$cms2"
 
-	must_grep "aged checkpoint destroyed under confirmed-fresh policy" "$(echo "$aud2" | grep '"op":"expired"')" \
-		-e '"decision":"DELETED".*"policySource":"fresh"'
-	must_grep "expired record carries 'retention exceeded' and the state class" "$(echo "$aud2" | grep '"op":"expired"')" \
-		-e '"reason":"retention exceeded".*"stateClass":"vfl_server_model"'
-	must_grep "startup read DENY 'not found' (the sweep already destroyed the state)" "$(echo "$aud2" | grep '"op":"read"')" \
+	must_grep "startup read DENY 'not found' (the idle gateway already destroyed the state)" "$(echo "$aud2" | grep '"op":"read"')" \
 		-e '"decision":"DENY".*"reason":"not found"'
 	must_not_grep "no resume past retention" "$ms2" -e "Resumed server model"
 	must_grep "the model restarted from init" "$ms2" -e "Checkpoint write allowed: round_index=1"
-	must_grep "clientone's aged state destroyed too" "$(gw_log clientone | grep '"op":"expired"')" \
-		-e '"decision":"DELETED"'
 	must_not_grep "clientone did not resume either" "$cms2" -e "Resuming client model"
-	echo "note: run 2's expired record is also run 1's retain proof: the flip left a blob to destroy"
+	echo "note: the expired record before run 2 is also run 1's retain proof: the flip left a blob to destroy"
 }
 
 block_growth() {
@@ -499,7 +526,7 @@ block_growth() {
 
 block_flip() {
 	run_capture flip-curve allow-flip-deny-curve "scripts/capture_e4_storage_growth.sh flip ${FLIP_CYCLES} ${FLIP_AFTER}" do_flip \
-		"E4 flip curve: allowed=false after ${FLIP_AFTER} of ${FLIP_CYCLES} rounds (onRevocation retain) -> training continues, persistence stops; aged checkpoint expires, no resume"
+		"E4 flip curve: allowed=false after ${FLIP_AFTER} of ${FLIP_CYCLES} rounds (onRevocation retain) -> training continues, persistence stops; aged checkpoint expires while idle, no resume"
 }
 
 # --- main -----------------------------------------------------------------

@@ -154,10 +154,19 @@ func syncAgreement(stop <-chan struct{}, src agreementSource, key string, cache 
 		wcancel()
 
 		logger.Sugar().Warnw("Agreement watch lost, reconnecting", "key", key, "backoff", backoff)
-		select {
-		case <-stop:
-			return
-		case <-time.After(backoff):
+		reconnect := time.After(backoff)
+		waiting := true
+		for waiting {
+			select {
+			case <-stop:
+				return
+			case <-ticker.C:
+				if refreshAgreement(src, key, cache) {
+					notify()
+				}
+			case <-reconnect:
+				waiting = false
+			}
 		}
 		backoff = min(backoff*2, watchReconnectMax)
 	}

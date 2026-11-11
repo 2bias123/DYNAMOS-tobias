@@ -6,3 +6,7 @@ branchNameTag: "latest"
 dockerArtifactAccount: "tamjiyan"
 
 localDev: "true"
+
+# Tag of the images the agent puts into a job (chain services, sidecar,
+# gateway). Empty leaves the agent on its default, "latest".
+chainImageTag: ""

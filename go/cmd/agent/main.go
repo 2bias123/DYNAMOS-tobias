@@ -62,6 +62,7 @@ func main() {
 	}
 
 	clientSet = getKubeClient()
+	go superviseSteward(context.Background())
 
 	_, err := lib.InitTracer(serviceName)
 	if err != nil {
