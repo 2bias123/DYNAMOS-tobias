@@ -271,6 +271,7 @@ do_growth() {
 
 	local status
 	status=$(wait_done "$rid") || exit 1
+	must_have_gateway "${STEWARD_NS[@]}"
 	local sampler_log
 	sampler_log=$(mktemp)
 	kubectl logs -n server "$SAMPLER" 2>/dev/null > "$sampler_log"
@@ -423,6 +424,7 @@ do_flip() {
 	status=$(wait_done "$rid") || exit 1
 	local t_run1_done
 	t_run1_done=$(date +%s)
+	must_have_gateway "${STEWARD_NS[@]}"
 	r2_series "$status"
 	local n_r2
 	n_r2=$(echo "$status" | python3 -c "import sys, json; print(len(json.load(sys.stdin)['results']))")
@@ -501,6 +503,7 @@ for line in sys.stdin:
 	local rid2 status2
 	rid2=$(trigger "$CYCLES_RESUME") || exit 1
 	status2=$(wait_done "$rid2") || exit 1
+	must_have_gateway "${STEWARD_NS[@]}"
 	echo "$status2" | python3 -m json.tool
 
 	local aud2 ms2 cms2

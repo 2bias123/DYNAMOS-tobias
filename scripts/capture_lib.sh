@@ -105,6 +105,27 @@ must_not_grep() {
 	echo "OK: absent as expected: $desc"
 }
 
+# After a run that expects a gateway: fail the capture when the job in one of
+# the given steward namespaces ran without one. Three lines show it: the
+# job's gateway did not get the state lock, the agent could not stop the idle
+# gateway before the deploy, or a service went on without a gateway.
+must_have_gateway() { # $@ = steward namespaces
+	local ns pod pod_log agent_log
+	for ns in "$@"; do
+		pod=$(steward_pod "$ns")
+		[ -n "$pod" ] || fail "no chain pod in $ns"
+		pod_log=$(kubectl logs -n "$ns" "$pod" --all-containers 2>&1) || fail "cannot read the log of $ns/$pod"
+		agent_log=$(kubectl logs -n "$ns" -l type=agent -c "$ns" --tail=-1 2>&1) || fail "cannot read the log of the agent in $ns"
+		echo "$pod_log" | grep -q STATE_LOCK_NOT_ACQUIRED \
+			&& fail "the job in $ns ran without a gateway: its gateway did not get the state lock (STATE_LOCK_NOT_ACQUIRED)"
+		echo "$agent_log" | grep -q IDLE_GATEWAY_NOT_STOPPED \
+			&& fail "the job in $ns ran without a gateway: the agent did not stop the idle gateway before the deploy (IDLE_GATEWAY_NOT_STOPPED)"
+		echo "$pod_log" | grep -q "No policy gateway reachable" \
+			&& fail "the job in $ns ran without a gateway: a service went on without one (No policy gateway reachable)"
+	done
+	echo "OK: a gateway served the job in: $*"
+}
+
 # One number per line on stdin -> the campaign summary line. $1 = unit label.
 summarize_series() {
 	python3 -c "

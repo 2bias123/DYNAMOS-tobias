@@ -2,6 +2,8 @@ package main
 
 import (
 	"encoding/json"
+	"os"
+	"slices"
 	"testing"
 	"time"
 
@@ -154,4 +156,28 @@ func TestCanonicalHashIgnoresFormatting(t *testing.T) {
 	hc, err := canonicalHash(&changed)
 	assert.NilError(t, err)
 	assert.Assert(t, ha != hc)
+}
+
+// The launch file is what the orchestrator stores at every start, before any
+// seeding. For the four VFL stewards it must deny state, readably, under the
+// request type the directives are looked up by.
+func TestLaunchFileDeniesStateForVFLStewards(t *testing.T) {
+	raw, err := os.ReadFile("../../../configuration/etcd_launch_files/agreements.json")
+	assert.NilError(t, err)
+	var agreements []api.Agreement
+	assert.NilError(t, json.Unmarshal(raw, &agreements))
+
+	for _, steward := range []string{"server", "clientone", "clienttwo", "clientthree"} {
+		t.Run(steward, func(t *testing.T) {
+			i := slices.IndexFunc(agreements, func(a api.Agreement) bool { return a.Name == steward })
+			assert.Assert(t, i >= 0, "no agreement for %s", steward)
+
+			sd, relationID, reason := directivesFor(&agreements[i], "jake.jongejans@student.uva.nl", "vflTrainModelRequest")
+			assert.Equal(t, reason, "")
+			assert.Equal(t, relationID, "GUID")
+			assert.Assert(t, sd != nil)
+			assert.DeepEqual(t, *sd, api.StateDirectives{Allowed: false, RetentionSeconds: 900, ResumeAllowed: false, OnRevocation: ""})
+			assert.NilError(t, validateDirectives(sd))
+		})
+	}
 }

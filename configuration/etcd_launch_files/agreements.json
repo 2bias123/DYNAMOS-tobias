@@ -167,7 +167,8 @@
             "ID": "GUID",
             "requestTypes": ["vflTrainModelRequest"],
             "allowedArchetypes": ["computeToData"],
-            "allowedComputeProviders": ["server"]
+            "allowedComputeProviders": ["server"],
+            "stateDirectives": {"allowed": false, "retentionSeconds": 900, "resumeAllowed": false, "onRevocation": ""}
         }
         },
         "computeProviders": ["server"],
@@ -178,9 +179,10 @@
         "relations": {
         "jake.jongejans@student.uva.nl": {
             "ID": "GUID",
-            "requestTypes": ["vflTrainRequest"],
+            "requestTypes": ["vflTrainRequest", "vflTrainModelRequest"],
             "allowedArchetypes": ["computeToData"],
-            "allowedComputeProviders": ["clientone"]
+            "allowedComputeProviders": ["clientone"],
+            "stateDirectives": {"allowed": false, "retentionSeconds": 900, "resumeAllowed": false, "onRevocation": ""}
         }
         },
         "computeProviders": ["clientone"],
@@ -191,9 +193,10 @@
         "relations": {
         "jake.jongejans@student.uva.nl": {
             "ID": "GUID",
-            "requestTypes": ["vflTrainRequest"],
+            "requestTypes": ["vflTrainRequest", "vflTrainModelRequest"],
             "allowedArchetypes": ["computeToData"],
-            "allowedComputeProviders": ["clienttwo"]
+            "allowedComputeProviders": ["clienttwo"],
+            "stateDirectives": {"allowed": false, "retentionSeconds": 900, "resumeAllowed": false, "onRevocation": ""}
         }
         },
         "computeProviders": ["clienttwo"],
@@ -204,9 +207,10 @@
         "relations": {
         "jake.jongejans@student.uva.nl": {
             "ID": "GUID",
-            "requestTypes": ["vflTrainRequest"],
+            "requestTypes": ["vflTrainRequest", "vflTrainModelRequest"],
             "allowedArchetypes": ["computeToData"],
-            "allowedComputeProviders": ["clientthree"]
+            "allowedComputeProviders": ["clientthree"],
+            "stateDirectives": {"allowed": false, "retentionSeconds": 900, "resumeAllowed": false, "onRevocation": ""}
         }
         },
         "computeProviders": ["clientthree"],

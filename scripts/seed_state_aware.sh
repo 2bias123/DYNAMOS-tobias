@@ -51,14 +51,32 @@ for f in "${FILES[@]}"; do
 	fi
 done
 
-echo "[seed] verifying stateDirectives present in etcd"
+# An agreement on stdin -> one line with each relation's ID and its four
+# state fields. The launch file carries stateDirectives too, so their mere
+# presence in etcd does not show that the seed landed.
+state_terms() {
+	python3 -c "
+import sys, json
+a = json.load(sys.stdin)
+terms = {}
+for user, rel in a['relations'].items():
+    sd = rel.get('stateDirectives') or {}
+    terms[user] = {'ID': rel.get('ID'), **{f: sd.get(f) for f in ('allowed', 'retentionSeconds', 'resumeAllowed', 'onRevocation')}}
+print(json.dumps(terms, sort_keys=True))" 2>/dev/null
+}
+
+echo "[seed] comparing relation IDs and state fields in etcd with the seed"
 for s in server clientone clienttwo clientthree; do
-	if kubectl exec -n core etcd-0 -c etcd -- sh -c \
+	want=$(state_terms < "${cfg_dir}/state_aware_${s}.json")
+	got=$(kubectl exec -n core etcd-0 -c etcd -- sh -c \
 		"ETCDCTL_API=3 /usr/local/bin/etcdctl --endpoints=localhost:2379 get /policyEnforcer/agreements/${s} --print-value-only" \
-		| grep -q stateDirectives; then
-		echo "[seed] ${s}: stateDirectives in etcd"
+		| state_terms)
+	if [ -n "$want" ] && [ "$got" = "$want" ]; then
+		echo "[seed] ${s}: etcd equals the seed"
 	else
-		echo "[seed] ${s}: stateDirectives MISSING"
+		echo "[seed] ${s}: etcd DIFFERS from the seed"
+		echo "[seed]   etcd: ${got:-unreadable}"
+		echo "[seed]   seed: ${want:-unreadable}"
 		fail=$((fail + 1))
 	fi
 done

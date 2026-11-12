@@ -44,7 +44,10 @@ set -u
 # MS containers on all four stewards, and the policy-checkpoint-gateway
 # container where the config has one), then the per-round table. Sidecar and
 # idle test-MS containers are excluded. Config c adds the payload sizes read
-# off the server state PVC through a throwaway inspector pod.
+# off the server state PVC through a throwaway inspector pod. Configs b, c and
+# h also record how long each agent's hand-over at deploy took and, for c,
+# how long after the job's gateway ended an idle gateway was started; config
+# a notes that it has neither.
 #
 # Run order across sessions is a, then b, then c: config a needs the gateway
 # absent, and its etcd flip is ephemeral (the orchestrator re-applies the
@@ -524,6 +527,55 @@ measure_rounds() {
 	round_latency_table "$CYCLES" "$round_lines" "$ckpt_lines" "$span_lines" "$rspan_lines" "$mst_lines" || fail "round marker parse failed"
 }
 
+# What the agents add around the job, recorded and never failed: how long
+# each hand-over at deploy took (the agent's own log line) and, where the
+# agents start an idle gateway after the job, how long after the job's
+# gateway ended it was started (the two pods' container timestamps, whole
+# seconds). Needs the chain pods and the agents as the run left them.
+# $1 = idle | no-idle | no-gateway.
+handover_and_idle_gap() {
+	local mode="$1" ns pvc line ended started i
+	step "agent hand-over at deploy, and the idle gateway after the job ($mode)"
+	for ns in "${STEWARD_NS[@]}"; do
+		if [ "$mode" = no-gateway ]; then
+			echo "[$ns] no gateway in the job: no hand-over, no idle gateway"
+			continue
+		fi
+		pvc=$(state_pvc_of "$ns")
+		line=$(kubectl logs -n "$ns" -l type=agent -c "$ns" --tail=-1 2>/dev/null \
+			| grep -F -e "No idle gateway left on PVC $pvc " -e "Deploying on PVC $pvc anyway" | tail -1)
+		case "$line" in
+			*"No idle gateway left on PVC"*) echo "[$ns] hand-over at deploy: ${line##* after }" ;;
+			"") echo "note: [$ns] no hand-over line in the agent's log" ;;
+			*) echo "note: [$ns] the agent did not stop the idle gateway: ${line#*Deploying on PVC }" ;;
+		esac
+		if [ "$mode" = no-idle ]; then
+			echo "[$ns] idle Jobs: $(kubectl get jobs -n "$ns" -l dynamos/gateway=idle -o name 2>/dev/null | grep -c .) (the agents start none in this config)"
+			continue
+		fi
+		ended=""
+		for i in $(seq 1 60); do
+			ended=$(kubectl get pod "$(steward_pod "$ns")" -n "$ns" \
+				-o jsonpath='{.status.containerStatuses[?(@.name=="policy-checkpoint-gateway")].state.terminated.finishedAt}' 2>/dev/null)
+			[ -n "$ended" ] && break
+			sleep 2
+		done
+		started=""
+		for i in $(seq 1 90); do
+			[ -n "$ended" ] || break
+			started=$(kubectl get pods -n "$ns" -l "job-name=idle-$pvc" \
+				-o jsonpath='{.items[0].status.containerStatuses[0].state.running.startedAt}{.items[0].status.containerStatuses[0].state.terminated.startedAt}' 2>/dev/null)
+			[ -n "$started" ] && break
+			sleep 1
+		done
+		if [ -n "$started" ]; then
+			echo "[$ns] job's gateway ended $ended, idle gateway started $started: gap $(( $(date -d "$started" +%s) - $(date -d "$ended" +%s) ))s"
+		else
+			echo "note: [$ns] no idle gateway seen; job's gateway ended: ${ended:-not within 120s}"
+		fi
+	done
+}
+
 # Pair each restore's payload sha and state fingerprint with the write that
 # produced it (write round_index k -> restore round_index k). Any unmatched
 # pair means the rehydration was not faithful. $1 = MS label, $2 = its log.
@@ -673,6 +725,7 @@ do_config_a() {
 	assert_round0_without_dial_wait
 
 	measure_rounds
+	handover_and_idle_gap no-gateway
 	echo "note: the flip is ephemeral; the next reset restores requiresGateway:true"
 }
 
@@ -691,6 +744,7 @@ do_config_b() {
 	step "wait for training to finish"
 	local status
 	status=$(wait_done "$rid") || exit 1
+	must_have_gateway "${STEWARD_NS[@]}"
 	r2_series "$status"
 
 	full_logs with-gateway
@@ -711,6 +765,7 @@ do_config_b() {
 	echo "OK: $allow_n ALLOW write audit lines, one per round"
 
 	measure_rounds
+	handover_and_idle_gap no-idle
 	payload_sizes_server
 	must_grep "no state files persisted in pass-through" "$PAYLOAD_LISTING" -F "state files: 0"
 
@@ -733,6 +788,7 @@ do_config_c() {
 	step "wait for training to finish"
 	local status
 	status=$(wait_done "$rid") || exit 1
+	must_have_gateway "${STEWARD_NS[@]}"
 	r2_series "$status"
 
 	full_logs with-gateway
@@ -753,6 +809,7 @@ do_config_c() {
 	echo "OK: $allow_n ALLOW write audit lines, one per round"
 
 	measure_rounds
+	handover_and_idle_gap idle
 	payload_sizes_server
 	must_grep "persisted state files on the PVC" "$PAYLOAD_LISTING" -E "state files: [1-9]"
 }
@@ -1116,6 +1173,7 @@ do_config_h() {
 	echo "OK: server: $wspan_n write spans, all with zero decide/audit"
 
 	measure_rounds
+	handover_and_idle_gap no-idle
 	payload_sizes_server
 	must_grep "persisted state files on the PVC" "$PAYLOAD_LISTING" -E "state files: [1-9]"
 

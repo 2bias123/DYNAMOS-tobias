@@ -5,12 +5,16 @@ set -u
 # an agreement flip lands via the /policyEnforcer operator path to the first
 # enforced DENY on the aggregator's next RequestStateWrite.
 #
-# Two timestamps per trial, both on the host clock (kind shares it, so there is
-# no skew):
-#   t_flip: host time right after the PUT that sets allowed=false returns 200.
-#   t_deny: the aggregator-side time of the first write the gateway DENYs with
-#           reason "allowed = false".
-# interval = t_deny - t_flip.
+# Two timestamps per trial, in unix microseconds (kind shares one clock
+# between the host and the node, so there is no skew):
+#   t_sent_us:    when curl sends the PUT that sets allowed=false: a host stamp
+#                 taken immediately before curl plus curl's own pre-transfer
+#                 time. The body is built before the stamp.
+#   t_decided_us: the decision time (decidedUnixMicros) of the gateway's first
+#                 DENY record of the probe class at or after t_sent_us.
+# interval = t_decided_us - t_sent_us. The PUT's return is stamped too
+# (t_put_returned_us): a denial decided before it fell inside the PUT's round
+# trip and is kept.
 #
 # The aggregator's writes are driven by a small persistent-channel writer run
 # INSIDE the server pod's vfl-train-model-demo container: it reads the same
@@ -85,19 +89,24 @@ start_orch_forward() {
 	sleep 3
 }
 
-# PUT the server agreement with allowed=$1 (true|false). Echoes the HTTP code.
+# PUT the server agreement with allowed=$1 (true|false). Echoes the HTTP code
+# and when the request was sent, in unix microseconds: a host stamp taken
+# immediately before curl plus curl's own pre-transfer time. The body is
+# built before the stamp.
 flip_server() {
-	local want="$1" tmp code
+	local want="$1" tmp t0 out pre
 	tmp=$(mktemp)
 	python3 -c "
 import json
 a = json.load(open('$cfg_server'))
 a['relations']['$USER_NAME']['stateDirectives']['allowed'] = ('$want' == 'true')
 print(json.dumps(a))" > "$tmp" || { rm -f "$tmp"; fail "flip json build failed"; }
-	code=$(curl -s -o /dev/null -w '%{http_code}' -X PUT "http://localhost:${ORCHPORT}/api/v1/policyEnforcer" \
+	t0=$(date +%s%6N)
+	out=$(curl -s -o /dev/null -w '%{http_code} %{time_pretransfer}' -X PUT "http://localhost:${ORCHPORT}/api/v1/policyEnforcer" \
 		-H 'Content-Type: application/json' --data-binary @"$tmp")
 	rm -f "$tmp"
-	echo "$code"
+	pre=${out#* }
+	echo "${out% *} $(( t0 + 10#${pre/./} ))"
 }
 
 # ---- writer + parsing ----------------------------------------------------
@@ -169,6 +178,33 @@ wait_for() { # $1 decision, $2 tmin, $3 timeout -> echoes epoch or fails
 	return 1
 }
 
+# decidedUnixMicros of the gateway's first DENY write record of the probe
+# class decided at or after $2 (unix microseconds). Empty if there is none
+# yet. The whole log is read, not the part past a line mark: the decision
+# time alone selects the record, and a rotated log would void a mark.
+denial_record_since() { # $1 pod, $2 sent
+	kubectl logs -n "$NS" "$1" -c policy-checkpoint-gateway 2>/dev/null | python3 -c "
+import sys, json
+for l in sys.stdin:
+    if not l.startswith('{'):
+        continue
+    r = json.loads(l)
+    if (r.get('op') == 'write' and r.get('decision') == 'DENY'
+            and r.get('stateClass') == 'e2_probe' and r['decidedUnixMicros'] >= $2):
+        print(r['decidedUnixMicros'])
+        break"
+}
+
+wait_for_denial() { # $1 pod, $2 sent, $3 timeout -> decidedUnixMicros or fails
+	local i hit
+	for i in $(seq 1 $(( $3 * 5 ))); do
+		hit=$(denial_record_since "$1" "$2")
+		[ -n "$hit" ] && { echo "$hit"; return 0; }
+		sleep 0.2
+	done
+	return 1
+}
+
 # ---- measurement ---------------------------------------------------------
 
 do_e2() {
@@ -189,14 +225,14 @@ do_e2() {
 	echo "writer steady: ALLOW flowing"
 
 	echo
-	echo "trial,t_reenable,t_allow_confirmed,t_flip,t_deny,interval_ms,observe_ms,enforce_ms"
-	local k code tput tflip ttrue tallow tdeny ms gwmark denyline tobs obs_ms enf_ms
+	echo "trial,t_reenable,t_allow_confirmed,t_sent_us,t_put_returned_us,t_decided_us,interval_ms,observe_ms,enforce_ms"
+	local k code tsent tret ttrue tallow tdecided ms gwmark denyline tobs obs_ms enf_ms
 	local intervals=() observes=()
 	for k in $(seq 1 "$TRIALS"); do
 		# Independence: re-enable (PUT allowed=true) and wait for a confirmed ALLOW
 		# from the writer before this trial's flip. Trial 1 is already at true.
 		ttrue=$(date +%s.%N)
-		code=$(flip_server true)
+		read -r code _ <<< "$(flip_server true)"
 		[ "$code" = 200 ] || fail "re-enable PUT returned $code (trial $k)"
 		tallow=$(wait_for ALLOW "$ttrue" "$ALLOW_TIMEOUT") || fail "no confirmed ALLOW after re-enable (trial $k)"
 		sleep 1
@@ -204,29 +240,28 @@ do_e2() {
 		# Mark the gateway audit stream so we can pull this trial's DENY record.
 		gwmark=$(kubectl logs -n "$NS" "$pod" -c policy-checkpoint-gateway 2>/dev/null | wc -l)
 
-		# Flip to allowed=false; t_flip is the moment the PUT lands. The watch
-		# can deliver before the PUT returns, so the observation lookup below
-		# thresholds at PUT initiation instead of t_flip.
-		tput=$(date +%s.%N)
-		code=$(flip_server false)
-		tflip=$(date +%s.%N)
+		# Flip to allowed=false. The watch can deliver before the PUT returns,
+		# so every lookup below thresholds at the moment the request was sent,
+		# not at the PUT's return.
+		read -r code tsent <<< "$(flip_server false)"
+		tret=$(date +%s%6N)
 		[ "$code" = 200 ] || fail "flip PUT returned $code (trial $k)"
 
-		tdeny=$(wait_for DENY "$tflip" "$DENY_TIMEOUT") || fail "no enforced DENY within ${DENY_TIMEOUT}s (trial $k)"
-		ms=$(python3 -c "print('%.1f' % (($tdeny - $tflip) * 1000))")
+		tdecided=$(wait_for_denial "$pod" "$tsent" "$DENY_TIMEOUT") || fail "no DENY record of the probe class within ${DENY_TIMEOUT}s (trial $k)"
+		ms=$(python3 -c "print('%.1f' % (($tdecided - $tsent) / 1000))")
 
 		# Split the interval at the gateway's own observation of the flip (the
 		# zap "Agreement changed" line, epoch-stamped on the shared host clock).
 		tobs=$(kubectl logs -n "$NS" "$pod" -c policy-checkpoint-gateway 2>/dev/null \
 			| tail -n +$((gwmark + 1)) | grep "Agreement changed" \
-			| awk -v t="$tput" '$1 >= t {print $1; exit}')
+			| awk -v t="$tsent" '$1 * 1000000 >= t {print $1; exit}')
 		obs_ms=""; enf_ms=""
 		if [ -n "$tobs" ]; then
-			obs_ms=$(python3 -c "print('%.1f' % (($tobs - $tflip) * 1000))")
-			enf_ms=$(python3 -c "print('%.1f' % (($tdeny - $tobs) * 1000))")
+			obs_ms=$(python3 -c "print('%.1f' % (($tobs * 1000000 - $tsent) / 1000))")
+			enf_ms=$(python3 -c "print('%.1f' % (($tdecided - $tobs * 1000000) / 1000))")
 			observes+=("$obs_ms")
 		fi
-		echo "$k,$ttrue,$tallow,$tflip,$tdeny,$ms,$obs_ms,$enf_ms"
+		echo "$k,$ttrue,$tallow,$tsent,$tret,$tdecided,$ms,$obs_ms,$enf_ms"
 		intervals+=("$ms")
 
 		# Raw gateway decision record for this trial's first probe DENY: the audit
@@ -240,17 +275,20 @@ do_e2() {
 	# Leave the agreement enabled.
 	flip_server true >/dev/null
 
+	must_have_gateway "$NS"
+
 	echo
-	echo "flip -> first enforced DENY:"
+	echo "request sent -> first DENY record:"
 	printf '%s\n' "${intervals[@]}" | summarize_series ms
 	if [ "${#observes[@]}" -gt 0 ]; then
-		echo "flip -> watch-observed (Agreement changed line), ${#observes[@]}/${TRIALS} trials:"
+		echo "request sent -> watch-observed (Agreement changed line), ${#observes[@]}/${TRIALS} trials:"
 		printf '%s\n' "${observes[@]}" | summarize_series ms
 	fi
 	echo "regime: watch-delivered (gateway watch on /policyEnforcer/agreements/server active)"
 	echo "note: writer cadence 10ms bounds the resolution; state_class=e2_probe does not touch vfl_server_model"
-	echo "note: observe_ms is flip to the gateway's Agreement-changed log line; enforce_ms is that line to the first DENY"
-	echo "note: observe_ms can be negative: t_flip is stamped after the PUT returns, and the watch can deliver inside the PUT round trip"
+	echo "note: observe_ms is request sent to the gateway's Agreement-changed log line; enforce_ms is that line to the first DENY record's decision time"
+	echo "note: t_sent_us is a host stamp immediately before curl plus curl's pre-transfer time; t_decided_us is the record's decidedUnixMicros"
+	echo "note: a trial whose t_decided_us precedes t_put_returned_us had its denial inside the PUT's round trip; it is kept"
 }
 
 run_capture watch-regime flip-to-first-deny "scripts/capture_e2_latency.sh ${TRIALS}" do_e2 \

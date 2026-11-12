@@ -65,24 +65,46 @@ gw_write() {
 		"localhost:${GWPORT}" dynamos.PolicyCheckpointGateway/RequestStateWrite 2>&1
 }
 
-# PUT the server agreement with allowed=$1 (true|false). Echoes the HTTP code.
+# PUT the server agreement with allowed=$1 (true|false). Echoes the HTTP code
+# and when the request was sent, in unix microseconds: a host stamp taken
+# immediately before curl plus curl's own pre-transfer time. The body is
+# built before the stamp.
 flip_server() {
-	local want="$1" tmp code
+	local want="$1" tmp t0 out pre
 	tmp=$(mktemp)
 	python3 -c "
 import json
 a = json.load(open('$cfg_server'))
 a['relations']['$USER_NAME']['stateDirectives']['allowed'] = ('$want' == 'true')
 print(json.dumps(a))" > "$tmp" || { rm -f "$tmp"; fail "flip json build failed"; }
-	code=$(curl -s -o /dev/null -w '%{http_code}' -X PUT "http://localhost:${ORCHPORT}/api/v1/policyEnforcer" \
+	t0=$(date +%s%6N)
+	out=$(curl -s -o /dev/null -w '%{http_code} %{time_pretransfer}' -X PUT "http://localhost:${ORCHPORT}/api/v1/policyEnforcer" \
 		-H 'Content-Type: application/json' --data-binary @"$tmp")
 	rm -f "$tmp"
-	echo "$code"
+	pre=${out#* }
+	echo "${out% *} $(( t0 + 10#${pre/./} ))"
+}
+
+# decidedUnixMicros of the first DENY write record of the probe class decided
+# at or after $1 (unix microseconds), from the audit records on stdin. Empty
+# if there is none.
+first_denial_record() {
+	python3 -c "
+import sys, json
+for l in sys.stdin:
+    if not l.startswith('{'):
+        continue
+    r = json.loads(l)
+    if (r.get('op') == 'write' and r.get('decision') == 'DENY'
+            and r.get('stateClass') == 'e2_probe' and r['decidedUnixMicros'] >= $1):
+        print(r['decidedUnixMicros'])
+        break"
 }
 
 do_pollcheck() {
 	scratch=$(mktemp -d /tmp/e2-pollcheck.XXXXXX)
 	local gw_bin="$scratch/gw" state_dir="$scratch/state" gw_log="$scratch/gw.log"
+	local audit="$state_dir/audit/audit.log"
 	mkdir -p "$state_dir"
 
 	step "pre-flight: local gateway port ${GWPORT} must be free"
@@ -102,7 +124,7 @@ do_pollcheck() {
 	sleep 4
 
 	step "seed the server agreement allowed=true via /policyEnforcer"
-	[ "$(flip_server true)" = 200 ] || fail "seed PUT failed"
+	[ "$(flip_server true | cut -d' ' -f1)" = 200 ] || fail "seed PUT failed"
 
 	step "run the local gateway with the watch disabled (poll interval ${POLL_INTERVAL}s)"
 	DATA_STEWARD_NAME=SERVER REQUEST_USER="$USER_NAME" REQUEST_TYPE=vflTrainModelRequest \
@@ -123,14 +145,17 @@ do_pollcheck() {
 	echo "$base" | grep -q '"allowed": true' || { echo "$base"; fail "baseline write did not ALLOW"; }
 	echo "baseline: ALLOW"
 
+	# A trial starts when curl sends the flip (t_sent_us) and ends at the
+	# decision time of the first DENY record of the probe class at or after
+	# that (t_decided_us, from the gateway's audit log).
 	step "${TRIALS} trials: flip allowed=false, time the first enforced DENY under the ${POLL_INTERVAL}s poll bound"
-	echo "trial,t_reenable,t_allow,t_flip,t_deny,interval_ms,observe_ms"
-	local k code ttrue tallow tput tflip tdeny out ms gwmark tobs obs_ms
+	echo "trial,t_reenable,t_allow,t_sent_us,t_put_returned_us,t_decided_us,interval_ms,observe_ms"
+	local k code ttrue tallow tsent tret tdecided out ms gwmark tobs obs_ms
 	local intervals=() observes=()
 	for k in $(seq 1 "$TRIALS"); do
 		# Independence: re-enable and wait for a poll tick to redeliver ALLOW.
 		ttrue=$(date +%s.%N)
-		[ "$(flip_server true)" = 200 ] || fail "re-enable PUT failed (trial $k)"
+		[ "$(flip_server true | cut -d' ' -f1)" = 200 ] || fail "re-enable PUT failed (trial $k)"
 		while :; do
 			out=$(gw_write)
 			echo "$out" | grep -q '"allowed": true' && break
@@ -141,51 +166,48 @@ do_pollcheck() {
 		tallow=$(date +%s.%N)
 
 		gwmark=$(wc -l < "$gw_log")
-		tput=$(date +%s.%N)
-		code=$(flip_server false)
-		tflip=$(date +%s.%N)
+		read -r code tsent <<< "$(flip_server false)"
+		tret=$(date +%s%6N)
 		[ "$code" = 200 ] || fail "flip PUT returned $code (trial $k)"
-		tdeny=""
 		while :; do
 			out=$(gw_write)
-			if echo "$out" | grep -q 'allowed = false'; then
-				tdeny=$(date +%s.%N)
-				break
-			fi
-			python3 -c "import sys; sys.exit(0 if ($(date +%s.%N) - $tflip) > $DENY_TIMEOUT else 1)" \
+			echo "$out" | grep -q 'allowed = false' && break
+			python3 -c "import sys; sys.exit(0 if ($(date +%s%6N) - $tsent) > $DENY_TIMEOUT * 1000000 else 1)" \
 				&& fail "no enforced DENY within ${DENY_TIMEOUT}s (trial $k: the poll did not pick up the flip)"
 			sleep 1
 		done
-		ms=$(python3 -c "print('%.1f' % (($tdeny - $tflip) * 1000))")
+		tdecided=$(first_denial_record "$tsent" < "$audit")
+		[ -n "$tdecided" ] || fail "no DENY record of the probe class at or after the request (trial $k)"
+		ms=$(python3 -c "print('%.1f' % (($tdecided - $tsent) / 1000))")
 		# The writer's probe cadence rides on top of the tick phase, so the
 		# interval check carries probe slack; the gateway-side observation
 		# below is the strict bound.
 		python3 -c "import sys; sys.exit(0 if $ms <= $POLL_INTERVAL * 1000 + 2000 else 1)" \
 			|| fail "DENY outside the poll bound plus probe slack (trial $k: ${ms} ms)"
 		tobs=$(tail -n +$((gwmark + 1)) "$gw_log" | grep "Agreement changed" \
-			| awk -v t="$tput" '$1 >= t {print $1; exit}')
+			| awk -v t="$tsent" '$1 * 1000000 >= t {print $1; exit}')
 		obs_ms=""
 		if [ -n "$tobs" ]; then
-			obs_ms=$(python3 -c "print('%.1f' % (($tobs - $tflip) * 1000))")
+			obs_ms=$(python3 -c "print('%.1f' % (($tobs * 1000000 - $tsent) / 1000))")
 			python3 -c "import sys; sys.exit(0 if $obs_ms <= $POLL_INTERVAL * 1000 + 2500 else 1)" \
 				|| fail "gateway observed the flip outside the poll bound (trial $k: ${obs_ms} ms)"
 			observes+=("$obs_ms")
 		fi
-		echo "$k,$ttrue,$tallow,$tflip,$tdeny,$ms,$obs_ms"
+		echo "$k,$ttrue,$tallow,$tsent,$tret,$tdecided,$ms,$obs_ms"
 		intervals+=("$ms")
 	done
 
 	echo
-	echo "flip -> first enforced DENY (bound ${POLL_INTERVAL}s + 1s probe cadence):"
+	echo "request sent -> first DENY record (bound ${POLL_INTERVAL}s + 1s probe cadence):"
 	printf '%s\n' "${intervals[@]}" | summarize_series ms
 	if [ "${#observes[@]}" -gt 0 ]; then
-		echo "flip -> poll-observed (Agreement changed line, strict bound), ${#observes[@]}/${TRIALS} trials:"
+		echo "request sent -> poll-observed (Agreement changed line, strict bound), ${#observes[@]}/${TRIALS} trials:"
 		printf '%s\n' "${observes[@]}" | summarize_series ms
 	fi
 	echo "regime: poll-only (watch disabled); the interval is the phase of the ${POLL_INTERVAL}s tick plus probe lag"
+	echo "note: t_sent_us is a host stamp immediately before curl plus curl's pre-transfer time; t_decided_us is the record's decidedUnixMicros"
 
 	step "raw gateway decision records (audit leg on the local state volume)"
-	local audit="$state_dir/audit/audit.log"
 	echo "-- every e2_probe write decision, raw (per-trial ALLOW probes then the DENY; cacheAgeMs climbs toward the poll interval) --"
 	grep '"op":"write"' "$audit" 2>/dev/null | grep '"stateClass":"e2_probe"'
 

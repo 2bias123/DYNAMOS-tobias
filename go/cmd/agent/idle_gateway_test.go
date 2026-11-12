@@ -715,6 +715,27 @@ func TestSuperviseStatePVCs(t *testing.T) {
 	completeIdleJob := jobOnPVC("idle-"+pvcName, pvcName, batchv1.JobComplete)
 	failedIdleJob := jobOnPVC("idle-"+pvcName, pvcName, batchv1.JobFailed)
 
+	// The complete idle job with its completion time, as the job controller
+	// leaves it, and with the time on its condition only.
+	completed := metav1.NewTime(time.Date(2026, time.November, 12, 10, 0, 0, 0, time.UTC))
+	timedIdleJob := jobOnPVC("idle-"+pvcName, pvcName, batchv1.JobComplete)
+	timedIdleJob.Status.CompletionTime = &completed
+	conditionTimedIdleJob := jobOnPVC("idle-"+pvcName, pvcName, batchv1.JobComplete)
+	conditionTimedIdleJob.Status.Conditions[0].LastTransitionTime = completed
+	createdAt := func(pod v1.Pod, at time.Time) v1.Pod {
+		pod.CreationTimestamp = metav1.NewTime(at)
+		return pod
+	}
+
+	aged := func(job batchv1.Job, age time.Duration) batchv1.Job {
+		job.CreationTimestamp = metav1.NewTime(time.Now().Add(-age))
+		return job
+	}
+	pullBackOff := v1.ContainerState{Waiting: &v1.ContainerStateWaiting{Reason: "ImagePullBackOff"}}
+	pendingIdlePod := withPhase(idlePod, v1.PodPending)
+	restartedIdlePod := withState(pendingIdlePod, gateway, v1.ContainerState{Waiting: &v1.ContainerStateWaiting{Reason: "CrashLoopBackOff"}})
+	restartedIdlePod.Status.ContainerStatuses[0].RestartCount = 1
+
 	boom := errors.New("apiserver unreachable")
 
 	tests := []struct {
@@ -764,10 +785,97 @@ func TestSuperviseStatePVCs(t *testing.T) {
 			pods: []v1.Pod{withState(idlePod, gateway, exited)},
 		},
 		{
+			name:    "the idle job is 121 s old and has no pod: the marked error, the job is deleted and none is created",
+			pvcs:    []v1.PersistentVolumeClaim{pvc},
+			jobs:    []batchv1.Job{aged(idleJob, 121*time.Second)},
+			deleted: []string{"idle-" + pvcName},
+			wantErr: errIdleGatewayNotRunning,
+		},
+		{
+			name:    "the idle job is 121 s old and its pod is pending with no container status: the marked error, and the job is deleted",
+			pvcs:    []v1.PersistentVolumeClaim{pvc},
+			jobs:    []batchv1.Job{aged(idleJob, 121*time.Second)},
+			pods:    []v1.Pod{pendingIdlePod},
+			deleted: []string{"idle-" + pvcName},
+			wantErr: errIdleGatewayNotRunning,
+		},
+		{
+			name:    "the idle job is 121 s old and its gateway waits for its image: the marked error, and the job is deleted",
+			pvcs:    []v1.PersistentVolumeClaim{pvc},
+			jobs:    []batchv1.Job{aged(idleJob, 121*time.Second)},
+			pods:    []v1.Pod{withState(pendingIdlePod, gateway, pullBackOff)},
+			deleted: []string{"idle-" + pvcName},
+			wantErr: errIdleGatewayNotRunning,
+		},
+		{
+			name: "the idle job is 60 s old and its gateway waits for its image: nothing",
+			pvcs: []v1.PersistentVolumeClaim{pvc},
+			jobs: []batchv1.Job{aged(idleJob, 60*time.Second)},
+			pods: []v1.Pod{withState(pendingIdlePod, gateway, pullBackOff)},
+		},
+		{
+			name: "the idle job is 121 s old and its gateway waits after one restart: nothing",
+			pvcs: []v1.PersistentVolumeClaim{pvc},
+			jobs: []batchv1.Job{aged(idleJob, 121*time.Second)},
+			pods: []v1.Pod{restartedIdlePod},
+		},
+		{
 			name: "the idle job is complete: nothing",
 			pvcs: []v1.PersistentVolumeClaim{pvc},
 			jobs: []batchv1.Job{completeIdleJob},
 			pods: []v1.Pod{withPhase(withState(idlePod, gateway, exited), v1.PodSucceeded)},
+		},
+		{
+			name:    "the idle job is complete and a chain pod was created a minute later, its gateway exited: the idle job is deleted and none is created",
+			pvcs:    []v1.PersistentVolumeClaim{pvc},
+			jobs:    []batchv1.Job{timedIdleJob, chainJob},
+			pods:    []v1.Pod{createdAt(withState(chainPod, gateway, exited), completed.Add(time.Minute))},
+			deleted: []string{"idle-" + pvcName},
+		},
+		{
+			name:    "the idle job is complete and a chain pod was created a minute later, its gateway running: the idle job is deleted and none is created",
+			pvcs:    []v1.PersistentVolumeClaim{pvc},
+			jobs:    []batchv1.Job{timedIdleJob, chainJob},
+			pods:    []v1.Pod{createdAt(withState(chainPod, gateway, running), completed.Add(time.Minute))},
+			deleted: []string{"idle-" + pvcName},
+		},
+		{
+			name:    "the idle job is complete and a chain pod was created in the same second: the idle job is deleted",
+			pvcs:    []v1.PersistentVolumeClaim{pvc},
+			jobs:    []batchv1.Job{timedIdleJob, chainJob},
+			pods:    []v1.Pod{createdAt(withState(chainPod, gateway, exited), completed.Time)},
+			deleted: []string{"idle-" + pvcName},
+		},
+		{
+			name:    "the idle job is complete with no completion time, beside a chain pod: the idle job is deleted",
+			pvcs:    []v1.PersistentVolumeClaim{pvc},
+			jobs:    []batchv1.Job{completeIdleJob, chainJob},
+			pods:    []v1.Pod{withState(chainPod, gateway, exited)},
+			deleted: []string{"idle-" + pvcName},
+		},
+		{
+			name: "the idle job is complete and the chain pod was created a minute before: nothing",
+			pvcs: []v1.PersistentVolumeClaim{pvc},
+			jobs: []batchv1.Job{timedIdleJob, chainJob},
+			pods: []v1.Pod{createdAt(withState(chainPod, gateway, exited), completed.Add(-time.Minute))},
+		},
+		{
+			name: "only the condition of the complete idle job has a time, and the chain pod was created a minute before it: nothing",
+			pvcs: []v1.PersistentVolumeClaim{pvc},
+			jobs: []batchv1.Job{conditionTimedIdleJob, chainJob},
+			pods: []v1.Pod{createdAt(withState(chainPod, gateway, exited), completed.Add(-time.Minute))},
+		},
+		{
+			name: "the idle job is complete and a pod without a gateway container was created a minute later: nothing",
+			pvcs: []v1.PersistentVolumeClaim{pvc},
+			jobs: []batchv1.Job{timedIdleJob},
+			pods: []v1.Pod{createdAt(podOnPVC("state-inspector", pvcName, "inspector"), completed.Add(time.Minute))},
+		},
+		{
+			name: "the idle job is complete and a chain pod was created a minute later on another PVC: nothing",
+			pvcs: []v1.PersistentVolumeClaim{pvc},
+			jobs: []batchv1.Job{timedIdleJob},
+			pods: []v1.Pod{createdAt(withState(podOnPVC("someone-else-5e6f7a8b1-k3m9d", otherName, "vfl-train-model-demo", "sidecar", gateway), gateway, running), completed.Add(time.Minute))},
 		},
 		{
 			name:    "the idle job has failed: it is deleted and none is created in the same pass",
@@ -919,6 +1027,36 @@ func TestSuperviseStatePVCs(t *testing.T) {
 			assert.Equal(t, len(tt.jobs.created), 0)
 			assert.Equal(t, len(tt.jobs.deleted), 0)
 			assert.Assert(t, !idleGatewayMutexHeld())
+		})
+	}
+
+	// The delete fails, so a second pass finds the same job.
+	neverRan := []struct {
+		name  string
+		pods  []v1.Pod
+		shows string
+	}{
+		{name: "no pod", shows: "no pod"},
+		{name: "a pending pod with no container status", pods: []v1.Pod{pendingIdlePod}, shows: "pod Pending"},
+		{name: "a gateway that waits for its image", pods: []v1.Pod{withState(pendingIdlePod, gateway, pullBackOff)}, shows: "ImagePullBackOff"},
+	}
+	for _, tt := range neverRan {
+		t.Run("the idle job is 121 s old with "+tt.name+" and cannot be deleted: the marked error says so, beside the delete error, on every pass", func(t *testing.T) {
+			pvcs := &fakePVCLister{pvcs: []v1.PersistentVolumeClaim{pvc}}
+			jobs := newFakeJobClient(aged(idleJob, 121*time.Second))
+			jobs.deleteErr = boom
+			pods := &fakePodLister{pods: tt.pods}
+
+			for range 2 {
+				err := superviseStatePVCs(ctx, pvcs, jobs, pods, "server")
+
+				assert.Assert(t, errors.Is(err, errIdleGatewayNotRunning), "got: %v", err)
+				assert.Assert(t, errors.Is(err, boom), "got: %v", err)
+				assert.ErrorContains(t, err, pvcName)
+				assert.ErrorContains(t, err, tt.shows)
+			}
+			assert.DeepEqual(t, jobs.deleted, []string{"idle-" + pvcName, "idle-" + pvcName})
+			assert.Equal(t, len(jobs.created), 0)
 		})
 	}
 

@@ -32,6 +32,9 @@ set -u
 # while idle carry no job fields. After every job they also assert that an
 # idle gateway is up within 60s of the job's gateway ending.
 #
+# Every block ends with a table of the decision rows it exercised, read from
+# the audit logs on the four state PVCs.
+#
 # Usage: capture_e1_live.sh [allow-resume|resume-disabled|expired|adversarial|
 #                            idle-nothing-due|idle-handover|idle-revocation|idle-expiry|idle|all]
 # Default is all; idle runs the four idle blocks in order. A block takes a few
@@ -161,13 +164,14 @@ for l in sys.stdin:
               r.get('policySource', '-'), r.get('stateClass', '') + '/' + r.get('stateKey', ''))"
 }
 
-# PUT a variant of $1's agreement as seed_agreements does, and print the host
-# time in unix microseconds taken immediately before curl sends the request.
+# PUT a variant of $1's agreement as seed_agreements does, and print when curl
+# sent the request, in unix microseconds: a host stamp taken immediately
+# before curl plus curl's own pre-transfer time.
 # $2 is the python statement applied to each relation's stateDirectives. The
 # stamp is compared with the gateway's decision time, so the host and the
 # node must share a clock, as they do on kind.
 put_agreement_stamped() {
-	local f tmp sent code
+	local f tmp sent out pre
 	f="$root/configuration/etcd_launch_files/state_aware_$1.json"
 	tmp=$(mktemp)
 	python3 -c "
@@ -180,16 +184,61 @@ for rel in a['relations'].values():
     $2
 print(json.dumps(a))" > "$tmp" || return 1
 	sent=$(date +%s%6N)
-	code=$(curl -s -o /dev/null -w '%{http_code}' -X PUT "${ORCH_BASE}/api/v1/policyEnforcer" \
+	out=$(curl -s -o /dev/null -w '%{http_code} %{time_pretransfer}' -X PUT "${ORCH_BASE}/api/v1/policyEnforcer" \
 		-H 'Content-Type: application/json' --data-binary @"$tmp")
 	rm -f "$tmp"
-	[ "$code" = "200" ] || return 1
-	echo "$sent"
+	[ "${out% *}" = "200" ] || return 1
+	pre=${out#* }
+	echo "$(( sent + 10#${pre/./} ))"
+}
+
+# The decision rows a block exercised: the audit records on the four state
+# PVCs decided at or after $1, counted per op, decision, reason, policy source
+# and form. A record without job fields was written while idle. The start is
+# a host stamp and the decision times are the node's, so the two must share a
+# clock, as they do on kind. The table reports and asserts nothing: a PVC
+# that cannot be read is a note.
+decision_rows() { # $1 = the block's start, unix microseconds
+	local ns snap recs=""
+	step "decision rows exercised: audit records on the four state PVCs decided since $1"
+	for ns in "${STEWARD_NS[@]}"; do
+		if ! snap=$(claim_snapshot "$ns"); then
+			echo "note: [$ns] state PVC not readable; its records are missing from the table"
+			continue
+		fi
+		recs+=$(echo "$snap" | grep '^{' | sed "s/^/$ns /")$'\n'
+	done
+	echo "$recs" | python3 -c "
+import sys, json
+rows = {}
+for l in sys.stdin:
+    ns, _, rec = l.partition(' ')
+    if not rec.startswith('{'):
+        continue
+    try:
+        r = json.loads(rec)
+    except ValueError:
+        continue
+    if r['decidedUnixMicros'] < $1:
+        continue
+    i = r['identity']
+    key = (r['op'], r.get('decision', '-'), r.get('reason', '-'), r.get('policySource', '-'),
+           'job' if i.get('jobId') or i.get('localJobName') else 'idle')
+    n, stewards = rows.get(key, (0, []))
+    rows[key] = (n + 1, stewards if ns in stewards else stewards + [ns])
+fmt = '%-18s %-10s %-38s %-12s %-5s %7s  %s'
+print(fmt % ('op', 'decision', 'reason', 'policySource', 'form', 'records', 'stewards'))
+for key in sorted(rows):
+    print(fmt % (key + (rows[key][0], ' '.join(rows[key][1]))))
+print('%d rows, %d records' % (len(rows), sum(n for n, _ in rows.values())))" \
+		|| echo "note: the audit records could not be tabulated"
 }
 
 # --- blocks ---------------------------------------------------------------
 
 do_allow_resume() {
+	local from
+	from=$(date +%s%6N)
 	step "clean slate: reset, then delete the four state PVCs"
 	reset_cluster
 	delete_state_pvcs
@@ -203,6 +252,7 @@ do_allow_resume() {
 	local id1 status1
 	id1=$(trigger "$CYCLES_SHORT") || fail "trigger 1 failed"
 	status1=$(wait_done "$id1" "$POLL_MAX")
+	must_have_gateway "${STEWARD_NS[@]}"
 	echo "$status1"
 
 	local aud1
@@ -233,6 +283,7 @@ do_allow_resume() {
 	local id2 status2
 	id2=$(trigger "$CYCLES_SHORT") || fail "trigger 2 failed"
 	status2=$(wait_done "$id2" "$POLL_MAX")
+	must_have_gateway "${STEWARD_NS[@]}"
 	echo "$status2"
 
 	local aud2
@@ -260,6 +311,8 @@ do_allow_resume() {
 		echo "[$ns]"
 		audit_log "$ns" | grep -E '"op":"(read|write)"'
 	done
+
+	decision_rows "$from"
 }
 
 block_allow_resume() {
@@ -268,6 +321,8 @@ block_allow_resume() {
 }
 
 do_resume_disabled() {
+	local from
+	from=$(date +%s%6N)
 	step "reset + seed variant resumeAllowed=false"
 	reset_cluster
 	seed_agreements "sd['resumeAllowed'] = False"
@@ -277,6 +332,7 @@ do_resume_disabled() {
 	local id st aud ms wcount
 	id=$(trigger "$CYCLES_SHORT") || fail "trigger failed"
 	st=$(wait_done "$id" "$POLL_MAX")
+	must_have_gateway "${STEWARD_NS[@]}"
 	echo "$st"
 
 	aud=$(audit_log server)
@@ -291,6 +347,8 @@ do_resume_disabled() {
 	echo; echo "--- server MS lines ---"; echo "$ms"
 	must_not_grep "no resume under resumeAllowed=false" "$ms" -e "Resumed server model"
 	must_grep "fresh model still checkpoints round_index=1" "$ms" -e "Checkpoint write allowed: round_index=1"
+
+	decision_rows "$from"
 }
 
 block_resume_disabled() {
@@ -302,6 +360,8 @@ block_resume_disabled() {
 # on an empty PVC there would be nothing for the idle gateway to destroy and
 # the "not found" DENY would not be the retention row.
 do_expired() {
+	local from
+	from=$(date +%s%6N)
 	step "reset + seed variant retentionSeconds=${RETENTION_SHORT}"
 	reset_cluster
 	local t0
@@ -335,6 +395,7 @@ do_expired() {
 	local id st aud ms wcount
 	id=$(trigger "$CYCLES_SHORT") || fail "trigger failed"
 	st=$(wait_done "$id" "$POLL_MAX")
+	must_have_gateway "${STEWARD_NS[@]}"
 	echo "$st"
 
 	aud=$(audit_log server)
@@ -348,6 +409,8 @@ do_expired() {
 	ms=$(ms_log server vfl-train-model-demo | grep -iE "resum|checkpoint")
 	echo; echo "--- server MS lines ---"; echo "$ms"
 	must_not_grep "no resume from expired state" "$ms" -e "Resumed server model"
+
+	decision_rows "$from"
 }
 
 block_expired() {
@@ -362,6 +425,8 @@ gw_rpc() { # $1 = identity json, $2 = state_key; writes payload AQID to class "a
 }
 
 do_adversarial() {
+	local from
+	from=$(date +%s%6N)
 	step "reset + canonical seed + long chain (cycles=${CYCLES_LONG}) so the gateway outlives the battery"
 	reset_cluster
 	seed_agreements ""
@@ -458,6 +523,7 @@ print(json.dumps({
 	step "wait for the long chain to finish"
 	local st
 	st=$(wait_done "$id" "$POLL_MAX_LONG")
+	must_have_gateway "${STEWARD_NS[@]}"
 	echo "$st" | python3 -c "
 import sys, json
 d = json.load(sys.stdin)
@@ -465,6 +531,8 @@ rs = d.get('results', [])
 print('status:', d.get('status'), 'rounds:', len(rs))
 if rs:
     print('first r2:', rs[0]['accuracy'], 'last r2:', rs[-1]['accuracy'])"
+
+	decision_rows "$from"
 }
 
 block_adversarial() {
@@ -473,6 +541,8 @@ block_adversarial() {
 }
 
 do_idle_nothing_due() {
+	local from
+	from=$(date +%s%6N)
 	step "clean slate: reset, then delete the four state PVCs"
 	reset_cluster
 	delete_state_pvcs
@@ -483,6 +553,7 @@ do_idle_nothing_due() {
 	local id st ns
 	id=$(trigger "$CYCLES_SHORT") || fail "trigger failed"
 	st=$(wait_done "$id" "$POLL_MAX") || fail "the run did not reach done"
+	must_have_gateway "${STEWARD_NS[@]}"
 	echo "$st"
 
 	step "after the job: an idle gateway on each state PVC"
@@ -508,6 +579,8 @@ do_idle_nothing_due() {
 		[ "$restarts" = 0 ] || fail "$ns: the idle gateway was restarted ${restarts:-an unknown number of} times"
 		echo "OK: $ns: $(echo "$after" | grep -c '^{') audit records and $(echo "$after" | grep -vc '^{') state files, unchanged; ${pod[$ns]} still holds the state"
 	done
+
+	decision_rows "$from"
 }
 
 block_idle_nothing_due() {
@@ -519,6 +592,8 @@ block_idle_nothing_due() {
 # leaves state): on an empty PVC an idle gateway exits at once and there is
 # nothing to hand over.
 do_idle_handover() {
+	local from
+	from=$(date +%s%6N)
 	step "reset + canonical seed; the agents put an idle gateway back on each state PVC"
 	reset_cluster
 	seed_agreements ""
@@ -540,6 +615,7 @@ do_idle_handover() {
 	local id st
 	id=$(trigger "$CYCLES_SHORT") || fail "trigger failed"
 	st=$(wait_done "$id" "$POLL_MAX") || fail "the run did not reach done"
+	must_have_gateway "${STEWARD_NS[@]}"
 	echo "$st"
 
 	step "hand-over: each agent stopped its idle gateway before the job's gateway started"
@@ -585,6 +661,8 @@ do_idle_handover() {
 	for ns in "${STEWARD_NS[@]}"; do
 		idle_follows_job "$ns"
 	done
+
+	decision_rows "$from"
 }
 
 block_idle_handover() {
@@ -595,13 +673,15 @@ block_idle_handover() {
 # Requires state and idle gateways on the PVCs, as idle-nothing-due and
 # idle-handover leave them.
 do_idle_revocation() {
+	local from
+	from=$(date +%s%6N)
 	step "the idle gateways hold the state"
 	local ns
 	for ns in "${STEWARD_NS[@]}"; do
 		idle_pod "$ns" 90 >/dev/null || fail "no idle gateway holds the state PVC in $ns; this block needs state left by an earlier block"
 	done
 
-	step "revocation (allowed=false) sent to each steward, host stamp immediately before the request"
+	step "revocation (allowed=false) sent to each steward, stamped when curl sends the request"
 	ensure_orch_base
 	local -A sent
 	for ns in "${STEWARD_NS[@]}"; do
@@ -628,6 +708,8 @@ do_idle_revocation() {
 		[ "$n" -ge 1 ] || fail "$ns: no purge record on the state PVC after the revocation"
 		echo "$snap" | grep '"op":"purge"' | tail -n "$n" | sed 's/^/    /'
 	done
+
+	decision_rows "$from"
 }
 
 block_idle_revocation() {
@@ -636,6 +718,8 @@ block_idle_revocation() {
 }
 
 do_idle_expiry() {
+	local from
+	from=$(date +%s%6N)
 	step "reset + seed variant retentionSeconds=${RETENTION_IDLE}"
 	reset_cluster
 	seed_agreements "sd['retentionSeconds'] = ${RETENTION_IDLE}"
@@ -646,6 +730,7 @@ do_idle_expiry() {
 	t0=$(date +%s%6N)
 	id=$(trigger "$CYCLES_SHORT") || fail "trigger failed"
 	st=$(wait_done "$id" "$POLL_MAX") || fail "the run did not reach done"
+	must_have_gateway "${STEWARD_NS[@]}"
 	echo "$st"
 	local -A last
 	for ns in "${STEWARD_NS[@]}"; do
@@ -678,6 +763,8 @@ do_idle_expiry() {
 		[ "$n" -ge 1 ] || fail "$ns: no expiry record on the state PVC after the run's last write"
 		echo "$snap" | grep '"op":"expired"' | tail -n "$n" | sed 's/^/    /'
 	done
+
+	decision_rows "$from"
 }
 
 block_idle_expiry() {

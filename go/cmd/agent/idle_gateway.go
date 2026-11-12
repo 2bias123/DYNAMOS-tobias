@@ -33,6 +33,15 @@ const idleGatewayNotStoppedMarker = "IDLE_GATEWAY_NOT_STOPPED"
 
 var errIdleGatewayNotStopped = errors.New(idleGatewayNotStoppedMarker)
 
+// idleGatewayNotRunningMarker is the fixed text in the line the agent logs
+// when it deletes an idle job whose gateway has never run.
+const idleGatewayNotRunningMarker = "IDLE_GATEWAY_NOT_RUNNING"
+
+var errIdleGatewayNotRunning = errors.New(idleGatewayNotRunningMarker)
+
+// An idle job this old whose gateway has never run is deleted.
+const idleNotRunningAfter = 120 * time.Second
+
 const (
 	handOverWait     = 30 * time.Second
 	handOverInterval = 500 * time.Millisecond
@@ -289,6 +298,59 @@ func jobFailed(job batchv1.Job) bool {
 	})
 }
 
+// idleJobStale reports whether a gateway may have written on the PVC since
+// the completed idle job marked it as empty: a pod that is not the job's own
+// mounts the PVC, has a gateway container, and was created at or after the
+// completion. The times have whole seconds, so the same second counts; with
+// no completion time every such pod does.
+func idleJobStale(job batchv1.Job, pvcName string, pods []v1.Pod) bool {
+	i := slices.IndexFunc(job.Status.Conditions, func(condition batchv1.JobCondition) bool {
+		return condition.Type == batchv1.JobComplete && condition.Status == v1.ConditionTrue
+	})
+	if i < 0 {
+		return false
+	}
+	completed := job.Status.Conditions[i].LastTransitionTime
+	if job.Status.CompletionTime != nil {
+		completed = *job.Status.CompletionTime
+	}
+	return slices.ContainsFunc(pods, func(pod v1.Pod) bool {
+		return !metav1.IsControlledBy(&pod, &job) && mountsPVC(pod.Spec, pvcName) &&
+			slices.ContainsFunc(pod.Spec.Containers, func(container v1.Container) bool { return container.Name == gatewayContainerName }) &&
+			!pod.CreationTimestamp.Time.Before(completed.Time)
+	})
+}
+
+// idleJobNotRunning returns the marked error for an unfinished idle job that
+// is idleNotRunningAfter old and whose gateway has never run: it has no pod,
+// or no pod of it has a gateway container that runs, has exited or was
+// restarted. A gateway that runs and fails is the failed job's case.
+func idleJobNotRunning(job batchv1.Job, pvcName string, pods []v1.Pod) error {
+	age := time.Since(job.CreationTimestamp.Time)
+	if jobFinished(job) || age < idleNotRunningAfter {
+		return nil
+	}
+	shows := "no pod"
+	for _, pod := range pods {
+		if !metav1.IsControlledBy(&pod, &job) {
+			continue
+		}
+		shows = "pod " + string(pod.Status.Phase)
+		for _, status := range pod.Status.ContainerStatuses {
+			if status.Name != gatewayContainerName {
+				continue
+			}
+			if status.State.Running != nil || status.State.Terminated != nil || status.RestartCount > 0 {
+				return nil
+			}
+			if status.State.Waiting != nil {
+				shows = "container waiting, " + status.State.Waiting.Reason
+			}
+		}
+	}
+	return fmt.Errorf("%w: job %s on PVC %s is %s old: %s", errIdleGatewayNotRunning, job.Name, pvcName, age.Round(time.Second), shows)
+}
+
 // gatewayEnforces reports whether the agent deploys its gateways in the
 // enforcing mode. Under passthrough or store-only a PVC gets no idle job.
 func gatewayEnforces() bool {
@@ -297,9 +359,11 @@ func gatewayEnforces() bool {
 
 // superviseStatePVCs is one supervision pass over the steward's state PVCs.
 // A PVC with no gateway alive and no idle job gets an idle job. A completed
-// idle job stays: it marks the PVC as empty. A failed one is deleted, and a
-// later pass replaces it. A PVC that is being deleted loses its idle job and
-// gets none. Nothing is changed unless all three lists succeed.
+// idle job stays: it marks the PVC as empty. It is deleted once a gateway
+// has used the PVC after it. A failed one is deleted, and a later pass
+// replaces it; so is one whose gateway has never run, with the marked
+// error. A PVC that is being deleted loses its idle job and gets none.
+// Nothing is changed unless all three lists succeed.
 func superviseStatePVCs(ctx context.Context, pvcs statePVCLister, jobs supervisionJobClient, pods podLister, dataStewardName string) error {
 	idleGatewayMutex.Lock()
 	defer idleGatewayMutex.Unlock()
@@ -336,11 +400,17 @@ func superviseStatePVCs(ctx context.Context, pvcs statePVCLister, jobs supervisi
 		i := slices.IndexFunc(jobList.Items, func(job batchv1.Job) bool { return job.Name == name })
 		if i >= 0 {
 			var reason string
+			notRunning := idleJobNotRunning(jobList.Items[i], pvc.Name, podList.Items)
 			switch {
 			case pvc.DeletionTimestamp != nil:
 				reason = "its PVC is being deleted"
 			case jobFailed(jobList.Items[i]):
 				reason = "it failed"
+			case idleJobStale(jobList.Items[i], pvc.Name, podList.Items):
+				reason = "an enforcement point used the PVC after it completed"
+			case notRunning != nil:
+				failed(notRunning)
+				reason = "its gateway never ran"
 			default:
 				continue
 			}

@@ -1,9 +1,11 @@
 #!/usr/bin/env bash
 set -u
 
-# Runs the E1 unit tests (the bufconn half of E1) and saves the raw go test
-# output under results/campaign-n50/e1-decision-correctness/bufconn/, adding a line to that
-# experiment's captures.md. Covers the write/read decision tables, identity
+# Runs every unit test of the gateway package (the bufconn half of E1) and
+# saves the raw go test output under
+# results/campaign-n50/e1-decision-correctness/bufconn/, adding a line to that
+# experiment's captures.md. The artifact ends with how many test functions
+# ran. Among them: the write/read decision tables, identity
 # checks (mismatch + registration latch), the write- and read-refused-when-
 # audit-unavailable rows, the audit-before-rename invariant, the lock-conflict
 # row, and the destroy rows (revocation purge, deferral, regrant-cancel,
@@ -20,8 +22,7 @@ out_dir="$results_dir/bufconn"
 ts="$(date +%Y%m%d-%H%M%S)"
 out="$out_dir/${ts}_go-test-bufconn-oracle.txt"
 
-tests='^(TestDecideWrite|TestDecideRead|TestRequestStateWriteAllowsAndPersists|TestValidateStateReadExistingAndMissing|TestReadDenialHidesFileExistence|TestWriteDeniedWhenCacheStale|TestWriteDeniedAfterPolicyFlip|TestIdentityMismatchDeniedAndAudited|TestUnregisteredIdentityDenied|TestAcquireLockConflict|TestWriteProducesLineBeforeFileInvariantHolds|TestWriteRefusedWhenAuditUnavailable|TestCrashBetweenAuditAndRenameLeavesLineNoFile|TestReadRefusedWhenAuditUnavailable|TestSweepPurgesRevokedStateAfterConfirm|TestSweepDefersWhenConfirmFails|TestSweepCancelsOnRegrant|TestSweepRetainsWithoutPurgeDirective|TestSweepInvalidDirectivesAuditedNoPurge|TestBootIntoRevokedPurgesAtStartup|TestPurgeEventReachesSubscriber|TestSweepDeletesExpiredAfterConfirm|TestSweepRetainsExpiredWhenConfirmFails)$'
-cmd="go test -v -count=1 -run '$tests' ./cmd/policy-checkpoint-gateway/"
+cmd="go test -v -count=1 ./cmd/policy-checkpoint-gateway/"
 
 run() {
 	echo "\$ date"
@@ -37,15 +38,23 @@ run() {
 	go version
 	echo
 	echo "\$ cd go && $cmd"
-	(cd "$root/go" && go test -v -count=1 -run "$tests" ./cmd/policy-checkpoint-gateway/)
+	(cd "$root/go" && go test -v -count=1 ./cmd/policy-checkpoint-gateway/)
 }
 
 mkdir -p "$out_dir"
 run 2>&1 | tee "$out"
 rc=${PIPESTATUS[0]}
 
+# go test -v prints one unindented result line per test function; a
+# subtest's is indented.
+n=$(grep -cE '^--- (PASS|FAIL|SKIP): ' "$out")
+{
+	echo
+	echo "tests run: $n test functions ($(grep -c '^--- PASS: ' "$out") passed, $(grep -c '^--- FAIL: ' "$out") failed, $(grep -c '^--- SKIP: ' "$out") skipped), $(grep -cE '^ +--- (PASS|FAIL|SKIP): ' "$out") subtests"
+} | tee -a "$out"
+
 commit="$(git -C "$root" rev-parse --short HEAD)"
-note="E1 bufconn oracle run"
+note="E1 bufconn oracle run, whole package: $n test functions"
 [ "$rc" -ne 0 ] && note="$note; FAILED (exit=$rc)"
 echo "\`$(basename "$results_dir")/bufconn/${ts}_go-test-bufconn-oracle.txt | $ts | (cd go && $cmd) | $commit | $note\`" \
 	>> "$results_dir/captures.md"
