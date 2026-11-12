@@ -87,10 +87,6 @@
               {
                 "name": "LOCAL_JOB_NAME",
                 "value": "<request>server1"
-              },
-              {
-                "name": "GATEWAY_PORT",
-                "value": "50050"
               }
             ],
             "image": "tamjiyan/anonymize-test:<tag>",
@@ -155,10 +151,6 @@
               {
                 "name": "LOCAL_JOB_NAME",
                 "value": "<request>server1"
-              },
-              {
-                "name": "GATEWAY_PORT",
-                "value": "50050"
               }
             ],
             "image": "tamjiyan/differential-p-test:<tag>",
@@ -223,10 +215,6 @@
               {
                 "name": "LOCAL_JOB_NAME",
                 "value": "<request>server1"
-              },
-              {
-                "name": "GATEWAY_PORT",
-                "value": "50050"
               }
             ],
             "image": "tamjiyan/vfl-train-model-demo:<tag>",
@@ -291,10 +279,6 @@
               {
                 "name": "LOCAL_JOB_NAME",
                 "value": "<request>server1"
-              },
-              {
-                "name": "GATEWAY_PORT",
-                "value": "50050"
               }
             ],
             "image": "tamjiyan/vfl-train-demo:<tag>",

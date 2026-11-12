@@ -161,6 +161,11 @@ func startTraining(protoRequest *pb.RequestApproval, dataRequestInterface map[st
 	defer func() {
 		if rec := recover(); rec != nil {
 			logger.Sugar().Errorf("startTraining panic recovered for request %s: %v", requestID, rec)
+			activeJobLock.Lock()
+			if activeJobID == requestID {
+				activeJobID = ""
+			}
+			activeJobLock.Unlock()
 		}
 	}()
 

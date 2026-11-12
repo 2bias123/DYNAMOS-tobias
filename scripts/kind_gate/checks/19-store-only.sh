@@ -57,9 +57,11 @@ agent_log() { # $1 = steward namespace
 
 idle_jobs() { kubectl -n "$1" get jobs -l dynamos/gateway=idle -o name 2>/dev/null; }
 
-store_only_set() { # $1 = steward namespace; whether its agent's deployment carries the variable
-	kubectl -n "$1" get deployment "$1" -o json \
-		| jq -e '[.spec.template.spec.containers[].env[]? | select(.name == "GATEWAY_STORE_ONLY")] | length == 1' >/dev/null
+store_only_set() { # $1 = steward namespace; whether the agent's container in its deployment carries the variable
+	local deployment
+	deployment=$(kubectl -n "$1" get deployment "$1" -o json) || fail "cannot read the agent's deployment in $1"
+	echo "$deployment" \
+		| jq -e --arg c "$1" '[.spec.template.spec.containers[] | select(.name == $c) | .env[]? | select(.name == "GATEWAY_STORE_ONLY")] | length == 1' >/dev/null
 }
 
 # Wait until the enforcement point of a chain pod has ended; prints when.

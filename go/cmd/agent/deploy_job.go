@@ -198,8 +198,6 @@ func deployJob(ctx context.Context, msChain []mschain.MicroserviceMetadata, jobN
 				{Name: "REQUEST_USER", Value: compositionRequest.GetUser().GetUserName()},
 				{Name: "REQUEST_TYPE", Value: compositionRequest.RequestType},
 				{Name: "LOCAL_JOB_NAME", Value: jobName},
-				// Port scheme: sidecar = firstPortMicroservice - 1, policy gateway = firstPortMicroservice - 2. Verify no collaborator/helper port collision before merge.
-				{Name: "GATEWAY_PORT", Value: strconv.Itoa(firstPortMicroservice - 2)},
 			},
 			VolumeMounts: []v1.VolumeMount{
 				{
@@ -245,6 +243,11 @@ func deployJob(ctx context.Context, msChain []mschain.MicroserviceMetadata, jobN
 		}
 		release := handOverStatePVC(ctx, clientSet.BatchV1().Jobs(dataStewardName), clientSet.CoreV1().Pods(dataStewardName), pvcName)
 		defer release()
+		// The chain's services are the first containers. Only a job with a gateway gives them its port; without it they do not dial.
+		// Port scheme: sidecar = firstPortMicroservice - 1, policy gateway = firstPortMicroservice - 2. Verify no collaborator/helper port collision before merge.
+		for i := range msChain {
+			job.Spec.Template.Spec.Containers[i].Env = append(job.Spec.Template.Spec.Containers[i].Env, v1.EnvVar{Name: "GATEWAY_PORT", Value: strconv.Itoa(firstPortMicroservice - 2)})
+		}
 		job.Spec.Template.Spec.Volumes = append(job.Spec.Template.Spec.Volumes, v1.Volume{
 			Name: "gateway-state",
 			VolumeSource: v1.VolumeSource{
