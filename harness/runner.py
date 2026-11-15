@@ -33,6 +33,10 @@ DONE = ("pass", "expected failure seen")
 EXPECTED = "expected_failure"
 VOID_EXIT = 3
 START_RACE = "void R9: start race"
+IN_A_ROW = 3
+FULL_SHAPE = "quad-01"
+ELSEWHERE = "counted-elsewhere.csv"
+ELSEWHERE_COLUMNS = ("unit", "run", "harness_commit")
 HEX40 = re.compile(r"[0-9a-f]{40}")
 LIMITS = {"HARNESS_FREE_GB": 20, "HARNESS_WAITING_MAX": 2, "HARNESS_PAUSE_S": 60, "HARNESS_DISK_STOP_S": 900}
 
@@ -367,9 +371,27 @@ def report(folder, state):
         f"- state: {state}", "",
         "| unit | experiment | host | attempts | outcome | reason | minutes |", "|---|---|---|---|---|---|---|",
     ]
+    if meta["counted"] == "no (pilot)":
+        try:
+            shape = full_shape(meta["queue"])
+        except (Refused, OSError, csv.Error, ValueError):
+            shape = None
+        if shape is not None:
+            lines[-3:-3] = [f"- {FULL_SHAPE} runs with its row of queue.csv: {shape['arguments']} "
+                            f"({shape['expected_minutes']} expected minutes), not with its row of this queue"]
+    try:
+        elsewhere = (counted_elsewhere(meta["queue"], read_queue(folder / "queue.csv")) if meta["counted"] == "yes"
+                     else {})
+    except (Refused, OSError, csv.Error, ValueError):
+        elsewhere = {}
     for unit in read_queue(folder / "queue.csv"):
         mine = [row for row in rows if row["unit"] == unit["unit"]]
         ended = [row for row in mine if row["outcome"] != "started"]
+        if not mine and unit["unit"] in elsewhere:
+            where = elsewhere[unit["unit"]]
+            lines.append(f"| {unit['unit']} | {unit['experiment']} | {unit['host']} | 0 | counted in {where['run']} at "
+                         f"{where['harness_commit'][:7]} ({ELSEWHERE}), not started here | | |")
+            continue
         if not mine:
             lines.append(f"| {unit['unit']} | {unit['experiment']} | {unit['host']} | 0 | not started | | |")
             continue
@@ -468,17 +490,74 @@ def stopped(folder, state, code, units=None, mode="kind", why=None):
     return code
 
 
+def full_shape(queue_path):
+    counted = pathlib.Path(queue_path).with_name("queue.csv")
+    pilot = {unit["unit"]: unit for unit in read_queue(queue_path)}
+    if FULL_SHAPE not in pilot:
+        return None
+    row = next((unit for unit in read_queue(counted) if unit["unit"] == FULL_SHAPE), None)
+    if row is None or row["experiment"] != pilot[FULL_SHAPE]["experiment"]:
+        raise Refused(f"{counted} has no {pilot[FULL_SHAPE]['experiment']} row {FULL_SHAPE} for the pilot's counted shape")
+    return row
+
+
+def counted_elsewhere(queue_path, units):
+    path = pathlib.Path(queue_path).with_name(ELSEWHERE)
+    if not path.is_file():
+        return {}
+    reader = csv.DictReader(path.read_text().splitlines())
+    if tuple(reader.fieldnames or ()) != ELSEWHERE_COLUMNS:
+        raise Refused(f"{path}: header {','.join(reader.fieldnames or ())}, not {','.join(ELSEWHERE_COLUMNS)}")
+    names = {unit["unit"] for unit in units}
+    found = {}
+    for number, row in enumerate(reader, start=1):
+        if None in row or any(value is None for value in row.values()):
+            raise Refused(f"{path}: row {number} has not {len(ELSEWHERE_COLUMNS)} fields")
+        problems = [
+            *([f"unit {row['unit']!r} not in the queue"] if row["unit"] not in names else []),
+            *([f"unit {row['unit']!r} twice"] if row["unit"] in found else []),
+            *([f"run {row['run']!r} empty or a path"] if not row["run"] or "/" in row["run"] else []),
+            *([f"harness commit {row['harness_commit']!r} not 40 hex"]
+              if not HEX40.fullmatch(row["harness_commit"] or "") else []),
+        ]
+        if problems:
+            raise Refused(f"{path}: row {number}: {'; '.join(problems)}")
+        found[row["unit"]] = row
+    return found
+
+
+def in_a_row(folder, units, mode, streak):
+    if len(streak) < IN_A_ROW:
+        return None
+    why = f"three units in a row failed: {', '.join(streak[-IN_A_ROW:])}"
+    return stopped(folder, why, 1, units, mode, why)
+
+
 def execute(folder, units, mode, queue_path):
-    counted = json.loads((folder / "run.json").read_text())["counted"] == "yes"
+    meta = json.loads((folder / "run.json").read_text())
+    counted = meta["counted"] == "yes"
+    try:
+        full = full_shape(queue_path) if meta["counted"] == "no (pilot)" else None
+        elsewhere = counted_elsewhere(queue_path, units) if counted else {}
+    except (Refused, OSError, csv.Error, ValueError) as error:
+        return stopped(folder, f"stopped before the first unit: refused: {error}", 1, units, mode, f"refused: {error}")
     rows = journal_rows(folder)
-    lost = []
+    lost, streak = [], []
     for unit in units:
+        if unit["unit"] in elsewhere:
+            print(f"{unit['unit']}: counted in {elsewhere[unit['unit']]['run']} at "
+                  f"{elsewhere[unit['unit']]['harness_commit']}, not started here", flush=True)
+            continue
         mine = [row for row in rows if row["unit"] == unit["unit"] and row["outcome"] != "started"]
         if any(row["outcome"] in DONE for row in mine):
+            streak = []
             continue
         failed = [row for row in mine if row["outcome"] == "fail"]
         if failed and counted:
             lost.append((unit["unit"], failed[-1]["reason"]))
+            streak.append(unit["unit"])
+            if (code := in_a_row(folder, units, mode, streak)) is not None:
+                return code
             continue
         if failed:
             return stopped(folder, f"stopped at {unit['unit']}: it failed in attempt {failed[-1]['attempt']}, "
@@ -491,6 +570,9 @@ def execute(folder, units, mode, queue_path):
             if voided >= int(unit["attempts"]) and counted:
                 last = next(row["reason"] for row in reversed(mine) if row["outcome"] == "void")
                 lost.append((unit["unit"], f"all {voided} attempts void (last: {last})"))
+                streak.append(unit["unit"])
+                if (code := in_a_row(folder, units, mode, streak)) is not None:
+                    return code
                 break
             if voided >= int(unit["attempts"]):
                 return stopped(folder, f"stopped at {unit['unit']}: {voided} of {unit['attempts']} attempts void", 1,
@@ -513,14 +595,22 @@ def execute(folder, units, mode, queue_path):
                     if checks.whole(path.name[1:])]
             number = max((int(row["attempt"]) for row in mine), default=0) + 1
             number = max(number, max(made, default=0) + 1)
-            outcome, reason = attempt(folder, unit, number, mode)
+            shaped = unit
+            if full is not None and unit["unit"] == FULL_SHAPE:
+                shaped = {**unit, "arguments": full["arguments"], "expected_minutes": full["expected_minutes"]}
+                print(f"{FULL_SHAPE} runs with its row of queue.csv: {full['arguments']}", flush=True)
+            outcome, reason = attempt(folder, shaped, number, mode)
             mine.append({"attempt": str(number), "outcome": outcome, "reason": reason})
             print(f"{unit['unit']} attempt {number}: {outcome}{': ' + reason if reason else ''}", flush=True)
             status(folder, units, "running", mode=mode)
             if outcome in DONE:
+                streak = []
                 break
             if outcome != "void" and counted:
                 lost.append((unit["unit"], reason))
+                streak.append(unit["unit"])
+                if (code := in_a_row(folder, units, mode, streak)) is not None:
+                    return code
                 break
             if outcome != "void":
                 return stopped(folder, f"stopped at {unit['unit']}: {reason}", 1, units, mode)
@@ -531,11 +621,14 @@ def execute(folder, units, mode, queue_path):
         return stopped(folder, f"{'the queue went through' if lost else 'every unit passed'}, but the run's own "
                                f"files fail: {problems[0]} "
                                f"({len(problems)} in all)", 1, units, mode)
+    besides = (f"; {len(elsewhere)} units counted in another run ({ELSEWHERE}), not started here" if elsewhere
+               else "")
     if lost:
-        report(folder, f"finished: {len(lost)} failed: " + "; ".join(f"{name}: {why}" for name, why in lost))
+        report(folder, f"finished: {len(lost)} failed: " + "; ".join(f"{name}: {why}" for name, why in lost) + besides)
         close(folder, units, mode, f"done:{len(lost)} failed")
         return 1
-    report(folder, "finished: every unit passed")
+    report(folder, ("finished: every unit that was to run passed" if elsewhere else "finished: every unit passed")
+           + besides)
     close(folder, units, mode, "done")
     return 0
 

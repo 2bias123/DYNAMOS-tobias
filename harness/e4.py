@@ -19,6 +19,7 @@ RESUME_ROUNDS = 3
 POLL_S = 0.1
 EXPIRY_MARGIN_S = 10
 IDLE_SEEN_S = 180
+SAMPLED_S = 30
 NOT_FOUND = "not found"
 REVOKED = "allowed = false"
 SAMPLING = """import os, time
@@ -239,6 +240,26 @@ def start_sampler(mode, events):
     events.add("sampler created, waits for the server claim", "server", 0, f"pod/{collect.SAMPLER} on {claim_name('server')}")
 
 
+def keep_sampler(mode, events):
+    cluster.until("server: the job's enforcement point ended", e1.FINISHED_S, lambda: e1.gateway_ended("server"))
+    node, finished = e1.gateway_ended("server")
+    placed = kjson("-n", "server", "get", "pod", collect.SAMPLER)["spec"].get("nodeName", "")
+    if mode == "fabric" and placed != node:
+        raise Failed(f"pod/{collect.SAMPLER} on {placed}, the job's enforcement point on {node}: two clocks")
+    wanted = finished + 1_000_000
+
+    def last_sample():
+        stamps = [int(line.split()[0]) for line in kubectl("-n", "server", "logs", collect.SAMPLER).splitlines()
+                  if len(line.split()) == 4 and all(part.isdigit() for part in line.split())]
+        return stamps[-1] if stamps and stamps[-1] >= wanted else None
+
+    sampled = cluster.until(f"pod/{collect.SAMPLER}: a sample after the job's enforcement point ended", SAMPLED_S,
+                            last_sample, every=1)
+    events.add("sampler kept to a sample after the job's end", "server", sampled - finished,
+               f"enforcement point ended at {finished} (kubelet, whole seconds) on {node}; sample at {sampled}",
+               at=finished, clock=f"kubelet@{node}" if node else "kubelet")
+
+
 def stop_sampler(out):
     try:
         (out / "raw" / "sampler.log").write_text(kubectl("-n", "server", "logs", collect.SAMPLER))
@@ -271,7 +292,10 @@ def growth(args, out):
                 reset.wait_done(api, request, RUN_DEADLINE_S[mode])
                 events.add("run done", "api-gateway", reset.micros() - begun, f"request {request}")
                 rounds = results(api, request, args.rounds)
-                stop_sampler(out)
+                try:
+                    keep_sampler(mode, events)
+                finally:
+                    stop_sampler(out)
             found = read_claims(unit, out)
     finally:
         try:

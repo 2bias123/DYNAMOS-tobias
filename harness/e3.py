@@ -1,11 +1,13 @@
 #!/usr/bin/env python3
 import argparse
 import decimal
+import gzip
 import json
 import pathlib
 import re
 import sys
 import time
+import zlib
 
 import checks
 import cluster
@@ -184,8 +186,41 @@ def spans(view, steward, quad, position, config):
     return rows
 
 
-def handover(steward, claim, since, events, config):
-    node, text = e1.agent_log(steward, since)
+def harvested_log(folder, since_us):
+    since = since_us // 1_000_000 * 1_000_000
+    seen = set()
+    for path in sorted(pathlib.Path(folder).iterdir()):
+        if not path.is_file() or path.name.endswith(".tmp"):
+            continue
+        data = path.read_bytes()
+        if path.name.endswith(".gz"):
+            try:
+                data = gzip.decompress(data)
+            except (OSError, EOFError, zlib.error) as error:
+                raise Failed(f"{path}: not a whole gzip file: {error}")
+        seen.update(line for line in data.decode(errors="replace").split("\n")[:-1] if line)
+    stamped = [(checks.cri_us(line), line) for line in seen]
+    return "\n".join(line for at, line in sorted(item for item in stamped if item[0] is not None) if at >= since)
+
+
+def whole_agent_log(unit, steward, since_us):
+    pods = [pod for pod in kjson("-n", steward, "get", "pods", "-l", "type=agent")["items"]
+            if not pod["metadata"].get("deletionTimestamp")]
+    if not pods:
+        raise Failed(f"{steward}: no agent pod")
+    pod = max(pods, key=lambda pod: pod["metadata"]["creationTimestamp"])
+    node = pod["spec"].get("nodeName", "")
+    unit.harvest()
+    folder = (unit.out / "raw" / "pods" / node / f"{steward}_{pod['metadata']['name']}_{pod['metadata']['uid']}"
+              / steward)
+    with unit.lock:
+        if not folder.is_dir():
+            raise Failed(f"{steward}: the agent {pod['metadata']['name']}'s log is not in the harvest at {folder}")
+        return node, harvested_log(folder, since_us)
+
+
+def handover(unit, steward, claim, since, events, config):
+    node, text = whole_agent_log(unit, steward, since)
     lines = [line for line in text.splitlines() if (hit := e1.HANDED.search(line)) and hit.group(1) == claim]
     if len(lines) != 1:
         return f"{len(lines)} hand-over lines for {claim}, not 1"
@@ -326,7 +361,7 @@ def configuration(args, out, unit, events, position, config):
     if config != "a":
         for steward in STEWARDS:
             claim = e1.only_claim(steward)["metadata"]["name"]
-            problem = handover(steward, claim, since, events, config)
+            problem = handover(unit, steward, claim, since, events, config)
             if not problem and config == "c":
                 problem = idle_gap(steward, claim, views[steward]["ended"], events, config)
             if problem:
