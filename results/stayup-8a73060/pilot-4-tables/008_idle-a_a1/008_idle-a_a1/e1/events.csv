@@ -1,0 +1,20 @@
+clock,at_us,event,subject,duration_us,detail
+host@control,1794670715767590,clean start,all,216235559,jobs of the four stewards deleted together in 33.3 s; agent mode none; agents switched: none; with the seven rollouts;every check holds
+host@control,1794670722602308,deploy gap: chain jobs deleted,server,0,none standing
+host@control,1794670722758598,deploy gap: chain jobs deleted,clientone,0,none standing
+host@control,1794670722901980,deploy gap: chain jobs deleted,clienttwo,0,none standing
+host@control,1794670723052695,deploy gap: chain jobs deleted,clientthree,0,none standing
+host@control,1794670723276477,deploy gap: chain pods gone,server,155373,
+host@control,1794670723276599,deploy gap: held,server,0,30 s after the harness's deletion at 1794670504023609
+host@control,1794670723465029,deploy gap: chain pods gone,clientone,188355,
+host@control,1794670723465167,deploy gap: held,clientone,0,30 s after the harness's deletion at 1794670504132410
+host@control,1794670723609804,deploy gap: chain pods gone,clienttwo,144532,
+host@control,1794670723610103,deploy gap: held,clienttwo,0,30 s after the harness's deletion at 1794670504239353
+host@control,1794670723811553,deploy gap: chain pods gone,clientthree,201371,
+host@control,1794670723811682,deploy gap: held,clientthree,0,30 s after the harness's deletion at 1794670504372127
+host@control,1794670723811704,trigger,api-gateway,2529,"request e11f5c40-c691-4c2c-af23-e65221efef81, 3 rounds; time is the send"
+host@control,1794670748829580,run done,api-gateway,28561751,request e11f5c40-c691-4c2c-af23-e65221efef81
+sender@server,1794670780568163,(a) revocation sent,server,0,"http 200; sent from server's VM, time is the send there"
+sender@clientone,1794670781091673,(a) revocation sent,clientone,0,"http 200; sent from clientone's VM, time is the send there"
+sender@clienttwo,1794670781599541,(a) revocation sent,clienttwo,0,"http 200; sent from clienttwo's VM, time is the send there"
+sender@clientthree,1794670782073207,(a) revocation sent,clientthree,0,"http 200; sent from clientthree's VM, time is the send there"

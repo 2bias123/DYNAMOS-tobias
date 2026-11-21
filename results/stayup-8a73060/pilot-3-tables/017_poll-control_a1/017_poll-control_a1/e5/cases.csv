@@ -1,0 +1,5 @@
+row,case,steward,expected,observed,result
+poll,trial 1,server,"the end record decided at or after the send, http 200, send and record on one machine",purge/PURGED 4930.0 ms after the send; clocks one: server,pass
+poll,trial 2,server,"the end record decided at or after the send, http 200, send and record on one machine",purge/PURGED 3172.8 ms after the send; clocks one: server,pass
+complete log,trial 1,server,the end record read from the gateway's stdout is the first such record on the complete audit log,"first on the audit log 1794644714394826, from stdout 1794644714394826",pass
+complete log,trial 2,server,the end record read from the gateway's stdout is the first such record on the complete audit log,"first on the audit log 1794644724394698, from stdout 1794644724394698",pass

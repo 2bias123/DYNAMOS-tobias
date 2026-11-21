@@ -1,0 +1,3 @@
+trial,pod,reenable_us,allowed_us,sent_clock,sent_us,returned_us,end_clock,end_us,value_us,rtt_us,end_op,end_decision,end_reason,policy_source,relation_id,purge_records,machines,result
+1,harness-standalone,1794627560346641,1794627560462045,sender@server,1794627561928748,1794627561960768,gateway@server,1794627587528953,25600205,32020,write,DENY,allowed = false,cached,GUID-state-aware,1,one: server,pass
+2,harness-standalone,1794627588245712,1794627617585365,sender@server,1794627619169739,1794627619202763,gateway@server,1794627647649460,28479721,33024,write,DENY,allowed = false,cached,GUID-state-aware,1,one: server,pass

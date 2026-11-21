@@ -1,0 +1,5 @@
+steward,claim,state_files,write_allow,unaudited,result
+server,state-server-ad751c18-vfltrainmodelrequest,1,3,,pass
+clientone,state-clientone-ad751c18-vfltrainmodelrequest,1,3,,pass
+clienttwo,state-clienttwo-ad751c18-vfltrainmodelrequest,1,3,,pass
+clientthree,state-clientthree-ad751c18-vfltrainmodelrequest,1,3,,pass

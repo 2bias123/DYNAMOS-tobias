@@ -1,0 +1,10 @@
+steward,clock,sent_us,returned_us,operation,identity,state_class,state_key,expected_op,expected_decision,answer,records,result
+server,sender@server,1794717456976296,1794717456979756,write,tampered,adversarial,mismatch-probe,identity_mismatch,,PERMISSION_DENIED,1,pass
+server,sender@server,1794717456982014,1794717456986751,write,own,adversarial,concurrent-slot,write,ALLOW,ALLOW,8,pass
+server,sender@server,1794717456982971,1794717456991982,write,own,adversarial,concurrent-slot,write,ALLOW,ALLOW,8,pass
+server,sender@server,1794717456987589,1794717456992115,write,own,adversarial,concurrent-slot,write,ALLOW,ALLOW,8,pass
+server,sender@server,1794717456985069,1794717456992570,write,own,adversarial,concurrent-slot,write,ALLOW,ALLOW,8,pass
+server,sender@server,1794717456986793,1794717456992634,write,own,adversarial,concurrent-slot,write,ALLOW,ALLOW,8,pass
+server,sender@server,1794717456989148,1794717456995298,write,own,adversarial,concurrent-slot,write,ALLOW,ALLOW,8,pass
+server,sender@server,1794717456988691,1794717456996220,write,own,adversarial,concurrent-slot,write,ALLOW,ALLOW,8,pass
+server,sender@server,1794717456987888,1794717456996433,write,own,adversarial,concurrent-slot,write,ALLOW,ALLOW,8,pass

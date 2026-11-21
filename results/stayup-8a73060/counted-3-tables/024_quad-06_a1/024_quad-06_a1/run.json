@@ -1,0 +1,8 @@
+{
+ "queue": "/home/ubuntu/stayup/harness-56af179/harness/queue.csv",
+ "queue_sha256": "663e3ae2528630c3d4990dc2204a502273a10a203d0213af07f6aec6787c4f2e",
+ "units": 50,
+ "mode": "fabric",
+ "counted": "yes",
+ "started_us": 1794715401407590
+}

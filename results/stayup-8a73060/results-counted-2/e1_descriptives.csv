@@ -1,0 +1,5 @@
+experiment,unit,quantity,n,min_us,median_us,max_us,min_ms,median_ms,max_ms
+e1,idle-a,(a) revocation: PURGED decided minus the revocation's send,4,32439,33708.5,35150,32.4,33.7,35.2
+e1,idle-b,(b) expiry: DELETED decided minus the file's last write ALLOW,4,120728781,120891479.5,121120939,120728.8,120891.5,121120.9
+e1,idle-c,hand-over: duration logged by the agent,4,523351,943832.5,1066755,523.4,943.8,1066.8
+e1,idle-a idle-b idle-c idle-d,"idle-up, which is the gap after a job: chain gateway finishedAt to the idle process's 'Agreement loaded'",20,5243374,16512211.5,29401875,5243.4,16512.2,29401.9

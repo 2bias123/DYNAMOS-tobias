@@ -1,0 +1,361 @@
+steward,clock,decided_us,op,decision,reason,state_class,state_key,policy_source,relation_id,job_id
+server,gateway@server,1794723384302910,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723384805040,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723385307321,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723385809677,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723386312015,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723386813889,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723387308304,purge,PURGED,revoked; onRevocation=purge,e5_probe,probe,fresh,GUID-state-aware,e5-latency
+server,gateway@server,1794723387315779,write,DENY,allowed = false,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723387818199,write,DENY,allowed = false,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723388320046,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723388822450,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723389325155,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723389827278,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723390185878,purge,PURGED,revoked; onRevocation=purge,e5_probe,probe,fresh,GUID-state-aware,e5-latency
+server,gateway@server,1794723390329982,write,DENY,allowed = false,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723390832072,write,DENY,allowed = false,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723391334013,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723391836193,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723392338474,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723392841104,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723392976295,purge,PURGED,revoked; onRevocation=purge,e5_probe,probe,fresh,GUID-state-aware,e5-latency
+server,gateway@server,1794723393343405,write,DENY,allowed = false,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723393845403,write,DENY,allowed = false,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723394347179,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723394849066,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723395351356,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723395853538,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723396332043,purge,PURGED,revoked; onRevocation=purge,e5_probe,probe,fresh,GUID-state-aware,e5-latency
+server,gateway@server,1794723396355880,write,DENY,allowed = false,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723396857994,write,DENY,allowed = false,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723397360228,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723397862432,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723398364681,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723398868067,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723399159441,purge,PURGED,revoked; onRevocation=purge,e5_probe,probe,fresh,GUID-state-aware,e5-latency
+server,gateway@server,1794723399370040,write,DENY,allowed = false,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723399872108,write,DENY,allowed = false,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723400374174,write,DENY,allowed = false,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723400876378,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723401378752,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723401880979,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723402382868,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723402514535,purge,PURGED,revoked; onRevocation=purge,e5_probe,probe,fresh,GUID-state-aware,e5-latency
+server,gateway@server,1794723402884884,write,DENY,allowed = false,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723403386646,write,DENY,allowed = false,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723403888974,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723404391177,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723404893395,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723405395807,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723405898508,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723405940922,purge,PURGED,revoked; onRevocation=purge,e5_probe,probe,fresh,GUID-state-aware,e5-latency
+server,gateway@server,1794723406400781,write,DENY,allowed = false,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723406902820,write,DENY,allowed = false,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723407404675,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723407906943,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723408409361,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723408911404,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723409273468,purge,PURGED,revoked; onRevocation=purge,e5_probe,probe,fresh,GUID-state-aware,e5-latency
+server,gateway@server,1794723409413451,write,DENY,allowed = false,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723409915385,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723410417356,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723410919316,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723411421910,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723411529179,purge,PURGED,revoked; onRevocation=purge,e5_probe,probe,fresh,GUID-state-aware,e5-latency
+server,gateway@server,1794723411924141,write,DENY,allowed = false,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723412428136,write,DENY,allowed = false,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723412930223,write,DENY,allowed = false,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723413432291,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723413934183,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723414436343,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723414938497,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723415275390,purge,PURGED,revoked; onRevocation=purge,e5_probe,probe,fresh,GUID-state-aware,e5-latency
+server,gateway@server,1794723415441336,write,DENY,allowed = false,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723415945066,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723416448124,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723416950313,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723417452679,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723417503268,purge,PURGED,revoked; onRevocation=purge,e5_probe,probe,fresh,GUID-state-aware,e5-latency
+server,gateway@server,1794723417957513,write,DENY,allowed = false,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723418459812,write,DENY,allowed = false,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723418961781,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723419464156,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723419966711,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723420468845,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723420914193,purge,PURGED,revoked; onRevocation=purge,e5_probe,probe,fresh,GUID-state-aware,e5-latency
+server,gateway@server,1794723420971323,write,DENY,allowed = false,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723421473962,write,DENY,allowed = false,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723421976288,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723422478770,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723422982374,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723423484574,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723423737720,purge,PURGED,revoked; onRevocation=purge,e5_probe,probe,fresh,GUID-state-aware,e5-latency
+server,gateway@server,1794723423987380,write,DENY,allowed = false,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723424489553,write,DENY,allowed = false,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723424991176,write,DENY,allowed = false,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723425493189,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723425995415,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723426497677,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723427000559,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723427211873,purge,PURGED,revoked; onRevocation=purge,e5_probe,probe,fresh,GUID-state-aware,e5-latency
+server,gateway@server,1794723427503857,write,DENY,allowed = false,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723428008172,write,DENY,allowed = false,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723428510742,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723429013181,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723429515674,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723430017963,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723430068426,purge,PURGED,revoked; onRevocation=purge,e5_probe,probe,fresh,GUID-state-aware,e5-latency
+server,gateway@server,1794723430520897,write,DENY,allowed = false,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723431022852,write,DENY,allowed = false,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723431526083,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723432028247,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723432530834,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723433033240,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723433533985,purge,PURGED,revoked; onRevocation=purge,e5_probe,probe,fresh,GUID-state-aware,e5-latency
+server,gateway@server,1794723433535803,write,DENY,allowed = false,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723434037761,write,DENY,allowed = false,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723434539967,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723435041968,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723435544056,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723436046432,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723436390926,purge,PURGED,revoked; onRevocation=purge,e5_probe,probe,fresh,GUID-state-aware,e5-latency
+server,gateway@server,1794723436549359,write,DENY,allowed = false,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723437051544,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723437553641,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723438055800,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723438558040,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723438604762,purge,PURGED,revoked; onRevocation=purge,e5_probe,probe,fresh,GUID-state-aware,e5-latency
+server,gateway@server,1794723439061197,write,DENY,allowed = false,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723439563423,write,DENY,allowed = false,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723440065181,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723440566980,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723441069222,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723441571458,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723442033712,purge,PURGED,revoked; onRevocation=purge,e5_probe,probe,fresh,GUID-state-aware,e5-latency
+server,gateway@server,1794723442074376,write,DENY,allowed = false,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723442576299,write,DENY,allowed = false,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723443079020,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723443581349,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723444083854,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723444587102,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723444967393,purge,PURGED,revoked; onRevocation=purge,e5_probe,probe,fresh,GUID-state-aware,e5-latency
+server,gateway@server,1794723445089373,write,DENY,allowed = false,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723445591298,write,DENY,allowed = false,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723446093350,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723446595383,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723447097390,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723447599963,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723447974959,purge,PURGED,revoked; onRevocation=purge,e5_probe,probe,fresh,GUID-state-aware,e5-latency
+server,gateway@server,1794723448102209,write,DENY,allowed = false,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723448603964,write,DENY,allowed = false,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723449106418,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723449608432,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723450110606,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723450612994,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723450929475,purge,PURGED,revoked; onRevocation=purge,e5_probe,probe,fresh,GUID-state-aware,e5-latency
+server,gateway@server,1794723451115370,write,DENY,allowed = false,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723451617288,write,DENY,allowed = false,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723452119107,write,DENY,allowed = false,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723452621034,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723453123256,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723453625224,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723454127565,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723454311957,purge,PURGED,revoked; onRevocation=purge,e5_probe,probe,fresh,GUID-state-aware,e5-latency
+server,gateway@server,1794723454629885,write,DENY,allowed = false,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723455131638,write,DENY,allowed = false,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723455633408,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723456135566,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723456637806,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723457139834,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723457167675,purge,PURGED,revoked; onRevocation=purge,e5_probe,probe,fresh,GUID-state-aware,e5-latency
+server,gateway@server,1794723457641913,write,DENY,allowed = false,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723458143878,write,DENY,allowed = false,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723458645678,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723459147705,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723459649877,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723460152066,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723460619291,purge,PURGED,revoked; onRevocation=purge,e5_probe,probe,fresh,GUID-state-aware,e5-latency
+server,gateway@server,1794723460654172,write,DENY,allowed = false,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723461155801,write,DENY,allowed = false,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723461657688,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723462159648,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723462661873,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723463163763,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723463437919,purge,PURGED,revoked; onRevocation=purge,e5_probe,probe,fresh,GUID-state-aware,e5-latency
+server,gateway@server,1794723463666175,write,DENY,allowed = false,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723464168368,write,DENY,allowed = false,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723464670381,write,DENY,allowed = false,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723465172558,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723465674921,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723466177055,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723466679167,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723466883928,purge,PURGED,revoked; onRevocation=purge,e5_probe,probe,fresh,GUID-state-aware,e5-latency
+server,gateway@server,1794723467183000,write,DENY,allowed = false,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723467685034,write,DENY,allowed = false,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723468186898,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723468688913,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723469191262,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723469676363,purge,PURGED,revoked; onRevocation=purge,e5_probe,probe,fresh,GUID-state-aware,e5-latency
+server,gateway@server,1794723469693422,write,DENY,allowed = false,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723470195981,write,DENY,allowed = false,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723470698146,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723471200199,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723471702731,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723472204991,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723472491143,purge,PURGED,revoked; onRevocation=purge,e5_probe,probe,fresh,GUID-state-aware,e5-latency
+server,gateway@server,1794723472707716,write,DENY,allowed = false,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723473210744,write,DENY,allowed = false,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723473713302,write,DENY,allowed = false,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723474215243,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723474717474,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723475219837,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723475721822,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723475917283,purge,PURGED,revoked; onRevocation=purge,e5_probe,probe,fresh,GUID-state-aware,e5-latency
+server,gateway@server,1794723476223952,write,DENY,allowed = false,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723476725605,write,DENY,allowed = false,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723477227393,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723477729534,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723478231579,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723478734471,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723479237848,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723479309049,purge,PURGED,revoked; onRevocation=purge,e5_probe,probe,fresh,GUID-state-aware,e5-latency
+server,gateway@server,1794723479740265,write,DENY,allowed = false,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723480242743,write,DENY,allowed = false,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723480744589,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723481247064,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723481749657,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723482252044,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723482754518,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723482801657,purge,PURGED,revoked; onRevocation=purge,e5_probe,probe,fresh,GUID-state-aware,e5-latency
+server,gateway@server,1794723483257840,write,DENY,allowed = false,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723483760584,write,DENY,allowed = false,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723484264525,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723484766600,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723485268802,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723485772196,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723486196803,purge,PURGED,revoked; onRevocation=purge,e5_probe,probe,fresh,GUID-state-aware,e5-latency
+server,gateway@server,1794723486274368,write,DENY,allowed = false,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723486776245,write,DENY,allowed = false,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723487278506,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723487780811,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723488282828,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723488785169,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723489288666,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723489298618,purge,PURGED,revoked; onRevocation=purge,e5_probe,probe,fresh,GUID-state-aware,e5-latency
+server,gateway@server,1794723489790787,write,DENY,allowed = false,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723490292522,write,DENY,allowed = false,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723490794560,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723491296906,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723491799400,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723492301708,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723492686953,purge,PURGED,revoked; onRevocation=purge,e5_probe,probe,fresh,GUID-state-aware,e5-latency
+server,gateway@server,1794723492803861,write,DENY,allowed = false,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723493306163,write,DENY,allowed = false,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723493808100,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723494310222,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723494812276,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723495316754,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723495559188,purge,PURGED,revoked; onRevocation=purge,e5_probe,probe,fresh,GUID-state-aware,e5-latency
+server,gateway@server,1794723495819086,write,DENY,allowed = false,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723496320857,write,DENY,allowed = false,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723496822813,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723497324835,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723497826884,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723498328840,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723498383838,purge,PURGED,revoked; onRevocation=purge,e5_probe,probe,fresh,GUID-state-aware,e5-latency
+server,gateway@server,1794723498831327,write,DENY,allowed = false,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723499333242,write,DENY,allowed = false,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723499835036,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723500336980,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723500839373,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723501341604,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723501750215,purge,PURGED,revoked; onRevocation=purge,e5_probe,probe,fresh,GUID-state-aware,e5-latency
+server,gateway@server,1794723501843832,write,DENY,allowed = false,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723502345794,write,DENY,allowed = false,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723502848028,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723503352187,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723503855791,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723504359192,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723504618130,purge,PURGED,revoked; onRevocation=purge,e5_probe,probe,fresh,GUID-state-aware,e5-latency
+server,gateway@server,1794723504862159,write,DENY,allowed = false,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723505364192,write,DENY,allowed = false,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723505866457,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723506368863,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723506871081,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723507373203,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723507414063,purge,PURGED,revoked; onRevocation=purge,e5_probe,probe,fresh,GUID-state-aware,e5-latency
+server,gateway@server,1794723507875790,write,DENY,allowed = false,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723508377550,write,DENY,allowed = false,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723508879746,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723509382266,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723509884545,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723510386727,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723510886255,purge,PURGED,revoked; onRevocation=purge,e5_probe,probe,fresh,GUID-state-aware,e5-latency
+server,gateway@server,1794723510889184,write,DENY,allowed = false,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723511392365,write,DENY,allowed = false,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723511897672,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723512400391,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723512903418,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723513407115,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723513779773,purge,PURGED,revoked; onRevocation=purge,e5_probe,probe,fresh,GUID-state-aware,e5-latency
+server,gateway@server,1794723513912649,write,DENY,allowed = false,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723514414816,write,DENY,allowed = false,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723514917185,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723515419978,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723515922617,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723516425114,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723516603609,purge,PURGED,revoked; onRevocation=purge,e5_probe,probe,fresh,GUID-state-aware,e5-latency
+server,gateway@server,1794723516927509,write,DENY,allowed = false,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723517429248,write,DENY,allowed = false,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723517931422,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723518434187,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723518936459,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723519438464,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723519463278,purge,PURGED,revoked; onRevocation=purge,e5_probe,probe,fresh,GUID-state-aware,e5-latency
+server,gateway@server,1794723519940648,write,DENY,allowed = false,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723520443349,write,DENY,allowed = false,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723520945540,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723521448077,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723521950192,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723522452712,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723522952430,purge,PURGED,revoked; onRevocation=purge,e5_probe,probe,fresh,GUID-state-aware,e5-latency
+server,gateway@server,1794723522955603,write,DENY,allowed = false,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723523457411,write,DENY,allowed = false,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723523959616,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723524461712,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723524964560,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723525467651,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723525831723,purge,PURGED,revoked; onRevocation=purge,e5_probe,probe,fresh,GUID-state-aware,e5-latency
+server,gateway@server,1794723525970039,write,DENY,allowed = false,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723526472021,write,DENY,allowed = false,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723526974085,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723527476185,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723527978992,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723528482378,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723528642122,purge,PURGED,revoked; onRevocation=purge,e5_probe,probe,fresh,GUID-state-aware,e5-latency
+server,gateway@server,1794723528985097,write,DENY,allowed = false,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723529487273,write,DENY,allowed = false,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723529989349,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723530491548,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723530993640,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723531496201,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723531998407,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723532076758,purge,PURGED,revoked; onRevocation=purge,e5_probe,probe,fresh,GUID-state-aware,e5-latency
+server,gateway@server,1794723532500739,write,DENY,allowed = false,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723533003098,write,DENY,allowed = false,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723533505823,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723534008528,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723534510962,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723535013001,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723535471558,purge,PURGED,revoked; onRevocation=purge,e5_probe,probe,fresh,GUID-state-aware,e5-latency
+server,gateway@server,1794723535515050,write,DENY,allowed = false,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723536016965,write,DENY,allowed = false,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723536518921,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723537021012,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723537522966,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723538025146,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723538259958,purge,PURGED,revoked; onRevocation=purge,e5_probe,probe,fresh,GUID-state-aware,e5-latency
+server,gateway@server,1794723538527311,write,DENY,allowed = false,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723539029035,write,DENY,allowed = false,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794723539530998,write,DENY,allowed = false,e5_probe,probe,cached,GUID-state-aware,e5-latency

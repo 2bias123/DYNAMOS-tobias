@@ -1,0 +1,6 @@
+row,case,steward,expected,observed,result
+staleness,episode 1,local,"a stale write DENY in the outage, nothing destroyed through it, one PURGED on a fresh view after the recovery, no blob left","PURGED 14047.4 ms after the recovery stamp, fresh; blobs 1 after the hold, 0 after the purge",pass
+staleness,episode 2,local,"a stale write DENY in the outage, nothing destroyed through it, one PURGED on a fresh view after the recovery, no blob left","PURGED 13973.6 ms after the recovery stamp, fresh; blobs 1 after the hold, 0 after the purge",pass
+staleness,episode 3,local,"a stale write DENY in the outage, nothing destroyed through it, one PURGED on a fresh view after the recovery, no blob left","PURGED 18969.1 ms after the recovery stamp, fresh; blobs 1 after the hold, 0 after the purge",pass
+staleness,episode 4,local,"a stale write DENY in the outage, nothing destroyed through it, one PURGED on a fresh view after the recovery, no blob left","PURGED 14026.0 ms after the recovery stamp, fresh; blobs 1 after the hold, 0 after the purge",pass
+staleness,episode 5,local,"a stale write DENY in the outage, nothing destroyed through it, one PURGED on a fresh view after the recovery, no blob left","PURGED 15235.1 ms after the recovery stamp, fresh; blobs 1 after the hold, 0 after the purge",pass

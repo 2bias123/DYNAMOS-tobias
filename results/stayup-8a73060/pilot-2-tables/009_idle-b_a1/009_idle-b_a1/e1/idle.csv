@@ -1,0 +1,5 @@
+case,check,steward,start_clock,start_us,end_clock,end_us,value_us,bound_us,machines,result
+run,idle up after the job,server,kubelet@server,1794625472000000,log@server,1794625499943103,27943103,60000000,one: server,pass
+run,idle up after the job,clientone,kubelet@clientone,1794625472000000,log@clientone,1794625500864058,28864058,60000000,one: clientone,pass
+run,idle up after the job,clienttwo,kubelet@clienttwo,1794625472000000,log@clienttwo,1794625500597955,28597955,60000000,one: clienttwo,pass
+run,idle up after the job,clientthree,kubelet@clientthree,1794625472000000,log@clientthree,1794625501120180,29120180,60000000,one: clientthree,pass

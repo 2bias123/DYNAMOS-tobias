@@ -1,0 +1,72 @@
+{
+    "metadata": {
+        "policy_reintroduction": -1,
+        "policy_removal": -1,
+        "total_rounds": 10,
+        "training_backtrack": 0
+    },
+    "request_id": "759a188f-e997-4216-9ee4-06c11244af71",
+    "results": [
+        {
+            "accuracy": -2.1121182441711426,
+            "clients": 3,
+            "timestamp": "2026-11-14T08:35:10Z",
+            "train_round": 0
+        },
+        {
+            "accuracy": -2.1113765239715576,
+            "clients": 3,
+            "timestamp": "2026-11-14T08:35:10Z",
+            "train_round": 1
+        },
+        {
+            "accuracy": -2.107285976409912,
+            "clients": 3,
+            "timestamp": "2026-11-14T08:35:10Z",
+            "train_round": 2
+        },
+        {
+            "accuracy": -2.095133066177368,
+            "clients": 3,
+            "timestamp": "2026-11-14T08:35:11Z",
+            "train_round": 3
+        },
+        {
+            "accuracy": -2.063990831375122,
+            "clients": 3,
+            "timestamp": "2026-11-14T08:35:11Z",
+            "train_round": 4
+        },
+        {
+            "accuracy": -1.9987423419952393,
+            "clients": 3,
+            "timestamp": "2026-11-14T08:35:11Z",
+            "train_round": 5
+        },
+        {
+            "accuracy": -1.8777570724487305,
+            "clients": 3,
+            "timestamp": "2026-11-14T08:35:12Z",
+            "train_round": 6
+        },
+        {
+            "accuracy": -1.6662662029266357,
+            "clients": 3,
+            "timestamp": "2026-11-14T08:35:12Z",
+            "train_round": 7
+        },
+        {
+            "accuracy": -1.3399653434753418,
+            "clients": 3,
+            "timestamp": "2026-11-14T08:35:12Z",
+            "train_round": 8
+        },
+        {
+            "accuracy": -0.8858257532119751,
+            "clients": 3,
+            "timestamp": "2026-11-14T08:35:12Z",
+            "train_round": 9
+        }
+    ],
+    "status": "done"
+}

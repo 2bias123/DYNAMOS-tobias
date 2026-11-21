@@ -1,0 +1,312 @@
+{
+    "metadata": {
+        "policy_reintroduction": -1,
+        "policy_removal": -1,
+        "total_rounds": 50,
+        "training_backtrack": 0
+    },
+    "request_id": "5bc828c7-a66c-4037-9ba0-82cda74e89c3",
+    "results": [
+        {
+            "accuracy": -2.1116349697113037,
+            "clients": 3,
+            "timestamp": "2026-11-15T23:53:26Z",
+            "train_round": 0
+        },
+        {
+            "accuracy": -2.1091737747192383,
+            "clients": 3,
+            "timestamp": "2026-11-15T23:53:26Z",
+            "train_round": 1
+        },
+        {
+            "accuracy": -2.0958895683288574,
+            "clients": 3,
+            "timestamp": "2026-11-15T23:53:27Z",
+            "train_round": 2
+        },
+        {
+            "accuracy": -2.0580172538757324,
+            "clients": 3,
+            "timestamp": "2026-11-15T23:53:27Z",
+            "train_round": 3
+        },
+        {
+            "accuracy": -1.9724993705749512,
+            "clients": 3,
+            "timestamp": "2026-11-15T23:53:27Z",
+            "train_round": 4
+        },
+        {
+            "accuracy": -1.8080039024353027,
+            "clients": 3,
+            "timestamp": "2026-11-15T23:53:28Z",
+            "train_round": 5
+        },
+        {
+            "accuracy": -1.5311071872711182,
+            "clients": 3,
+            "timestamp": "2026-11-15T23:53:28Z",
+            "train_round": 6
+        },
+        {
+            "accuracy": -1.113689661026001,
+            "clients": 3,
+            "timestamp": "2026-11-15T23:53:28Z",
+            "train_round": 7
+        },
+        {
+            "accuracy": -0.5752850770950317,
+            "clients": 3,
+            "timestamp": "2026-11-15T23:53:28Z",
+            "train_round": 8
+        },
+        {
+            "accuracy": -0.03946185111999512,
+            "clients": 3,
+            "timestamp": "2026-11-15T23:53:29Z",
+            "train_round": 9
+        },
+        {
+            "accuracy": 0.12960195541381836,
+            "clients": 3,
+            "timestamp": "2026-11-15T23:53:29Z",
+            "train_round": 10
+        },
+        {
+            "accuracy": -0.10110318660736084,
+            "clients": 3,
+            "timestamp": "2026-11-15T23:53:29Z",
+            "train_round": 11
+        },
+        {
+            "accuracy": -0.07971978187561035,
+            "clients": 3,
+            "timestamp": "2026-11-15T23:53:29Z",
+            "train_round": 12
+        },
+        {
+            "accuracy": 0.21847182512283325,
+            "clients": 3,
+            "timestamp": "2026-11-15T23:53:30Z",
+            "train_round": 13
+        },
+        {
+            "accuracy": 0.43423014879226685,
+            "clients": 3,
+            "timestamp": "2026-11-15T23:53:30Z",
+            "train_round": 14
+        },
+        {
+            "accuracy": 0.4868244528770447,
+            "clients": 3,
+            "timestamp": "2026-11-15T23:53:30Z",
+            "train_round": 15
+        },
+        {
+            "accuracy": 0.436318576335907,
+            "clients": 3,
+            "timestamp": "2026-11-15T23:53:31Z",
+            "train_round": 16
+        },
+        {
+            "accuracy": 0.3654828667640686,
+            "clients": 3,
+            "timestamp": "2026-11-15T23:53:31Z",
+            "train_round": 17
+        },
+        {
+            "accuracy": 0.35385215282440186,
+            "clients": 3,
+            "timestamp": "2026-11-15T23:53:31Z",
+            "train_round": 18
+        },
+        {
+            "accuracy": 0.3926326036453247,
+            "clients": 3,
+            "timestamp": "2026-11-15T23:53:32Z",
+            "train_round": 19
+        },
+        {
+            "accuracy": 0.4526336193084717,
+            "clients": 3,
+            "timestamp": "2026-11-15T23:53:32Z",
+            "train_round": 20
+        },
+        {
+            "accuracy": 0.5205079913139343,
+            "clients": 3,
+            "timestamp": "2026-11-15T23:53:33Z",
+            "train_round": 21
+        },
+        {
+            "accuracy": 0.539749026298523,
+            "clients": 3,
+            "timestamp": "2026-11-15T23:53:33Z",
+            "train_round": 22
+        },
+        {
+            "accuracy": 0.5096032023429871,
+            "clients": 3,
+            "timestamp": "2026-11-15T23:53:33Z",
+            "train_round": 23
+        },
+        {
+            "accuracy": 0.48735153675079346,
+            "clients": 3,
+            "timestamp": "2026-11-15T23:53:34Z",
+            "train_round": 24
+        },
+        {
+            "accuracy": 0.4977427124977112,
+            "clients": 3,
+            "timestamp": "2026-11-15T23:53:34Z",
+            "train_round": 25
+        },
+        {
+            "accuracy": 0.5436125993728638,
+            "clients": 3,
+            "timestamp": "2026-11-15T23:53:35Z",
+            "train_round": 26
+        },
+        {
+            "accuracy": 0.5879898071289062,
+            "clients": 3,
+            "timestamp": "2026-11-15T23:53:35Z",
+            "train_round": 27
+        },
+        {
+            "accuracy": 0.5990414619445801,
+            "clients": 3,
+            "timestamp": "2026-11-15T23:53:35Z",
+            "train_round": 28
+        },
+        {
+            "accuracy": 0.6023457646369934,
+            "clients": 3,
+            "timestamp": "2026-11-15T23:53:36Z",
+            "train_round": 29
+        },
+        {
+            "accuracy": 0.5852344632148743,
+            "clients": 3,
+            "timestamp": "2026-11-15T23:53:36Z",
+            "train_round": 30
+        },
+        {
+            "accuracy": 0.5913445949554443,
+            "clients": 3,
+            "timestamp": "2026-11-15T23:53:37Z",
+            "train_round": 31
+        },
+        {
+            "accuracy": 0.6061517000198364,
+            "clients": 3,
+            "timestamp": "2026-11-15T23:53:37Z",
+            "train_round": 32
+        },
+        {
+            "accuracy": 0.6140310168266296,
+            "clients": 3,
+            "timestamp": "2026-11-15T23:53:37Z",
+            "train_round": 33
+        },
+        {
+            "accuracy": 0.627249002456665,
+            "clients": 3,
+            "timestamp": "2026-11-15T23:53:38Z",
+            "train_round": 34
+        },
+        {
+            "accuracy": 0.6230842471122742,
+            "clients": 3,
+            "timestamp": "2026-11-15T23:53:38Z",
+            "train_round": 35
+        },
+        {
+            "accuracy": 0.6215342283248901,
+            "clients": 3,
+            "timestamp": "2026-11-15T23:53:39Z",
+            "train_round": 36
+        },
+        {
+            "accuracy": 0.616949737071991,
+            "clients": 3,
+            "timestamp": "2026-11-15T23:53:39Z",
+            "train_round": 37
+        },
+        {
+            "accuracy": 0.6273012161254883,
+            "clients": 3,
+            "timestamp": "2026-11-15T23:53:39Z",
+            "train_round": 38
+        },
+        {
+            "accuracy": 0.6466387510299683,
+            "clients": 3,
+            "timestamp": "2026-11-15T23:53:40Z",
+            "train_round": 39
+        },
+        {
+            "accuracy": 0.6525686979293823,
+            "clients": 3,
+            "timestamp": "2026-11-15T23:53:40Z",
+            "train_round": 40
+        },
+        {
+            "accuracy": 0.6590678691864014,
+            "clients": 3,
+            "timestamp": "2026-11-15T23:53:41Z",
+            "train_round": 41
+        },
+        {
+            "accuracy": 0.6571396589279175,
+            "clients": 3,
+            "timestamp": "2026-11-15T23:53:41Z",
+            "train_round": 42
+        },
+        {
+            "accuracy": 0.6495671272277832,
+            "clients": 3,
+            "timestamp": "2026-11-15T23:53:42Z",
+            "train_round": 43
+        },
+        {
+            "accuracy": 0.6639431118965149,
+            "clients": 3,
+            "timestamp": "2026-11-15T23:53:42Z",
+            "train_round": 44
+        },
+        {
+            "accuracy": 0.6616808176040649,
+            "clients": 3,
+            "timestamp": "2026-11-15T23:53:42Z",
+            "train_round": 45
+        },
+        {
+            "accuracy": 0.665563702583313,
+            "clients": 3,
+            "timestamp": "2026-11-15T23:53:43Z",
+            "train_round": 46
+        },
+        {
+            "accuracy": 0.6678851842880249,
+            "clients": 3,
+            "timestamp": "2026-11-15T23:53:43Z",
+            "train_round": 47
+        },
+        {
+            "accuracy": 0.6631504893302917,
+            "clients": 3,
+            "timestamp": "2026-11-15T23:53:44Z",
+            "train_round": 48
+        },
+        {
+            "accuracy": 0.6672787666320801,
+            "clients": 3,
+            "timestamp": "2026-11-15T23:53:44Z",
+            "train_round": 49
+        }
+    ],
+    "status": "done"
+}

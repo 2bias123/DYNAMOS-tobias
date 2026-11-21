@@ -1,0 +1,3 @@
+experiment,unit,host,attempt,pgid,clock,start_us,end_us,outcome,reason
+e4,growth,control,1,3044979,host@control,1794761528603804,,started,
+e4,growth,control,1,3044979,host@control,1794761528603804,1794761828432149,pass,

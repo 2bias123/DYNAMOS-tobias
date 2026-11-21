@@ -1,0 +1,147 @@
+steward,clock,decided_us,op,decision,reason,state_class,state_key,policy_source,relation_id,job_id
+server,gateway@server,1794707240772845,subscribe,,subscription established,,,cached,,jake-jongejans-9389f76eserver1
+server,gateway@server,1794707241230800,subscribe,,subscription established,,,cached,,jake-jongejans-9389f76eserver1
+server,gateway@server,1794707241232182,read,DENY,not found,vfl_server_model,latest,cached,GUID-state-aware,jake-jongejans-9389f76eserver1
+server,gateway@server,1794707245935695,write,ALLOW,,vfl_server_model,latest,cached,GUID-state-aware,jake-jongejans-9389f76eserver1
+server,gateway@server,1794707247405926,write,ALLOW,,vfl_server_model,latest,cached,GUID-state-aware,jake-jongejans-9389f76eserver1
+server,gateway@server,1794707247705504,write,ALLOW,,vfl_server_model,latest,cached,GUID-state-aware,jake-jongejans-9389f76eserver1
+server,gateway@server,1794707247980454,write,ALLOW,,vfl_server_model,latest,cached,GUID-state-aware,jake-jongejans-9389f76eserver1
+server,gateway@server,1794707248234331,write,ALLOW,,vfl_server_model,latest,cached,GUID-state-aware,jake-jongejans-9389f76eserver1
+server,gateway@server,1794707248525387,write,ALLOW,,vfl_server_model,latest,cached,GUID-state-aware,jake-jongejans-9389f76eserver1
+server,gateway@server,1794707248883800,write,ALLOW,,vfl_server_model,latest,cached,GUID-state-aware,jake-jongejans-9389f76eserver1
+server,gateway@server,1794707248983983,purge,PURGED,revoked; onRevocation=purge,vfl_server_model,latest,fresh,GUID-state-aware,jake-jongejans-9389f76eserver1
+server,gateway@server,1794707249207012,write,DENY,allowed = false,vfl_server_model,latest,cached,GUID-state-aware,jake-jongejans-9389f76eserver1
+server,gateway@server,1794707249477142,write,DENY,allowed = false,vfl_server_model,latest,cached,GUID-state-aware,jake-jongejans-9389f76eserver1
+server,gateway@server,1794707249758886,write,DENY,allowed = false,vfl_server_model,latest,cached,GUID-state-aware,jake-jongejans-9389f76eserver1
+server,gateway@server,1794707250038180,write,DENY,allowed = false,vfl_server_model,latest,cached,GUID-state-aware,jake-jongejans-9389f76eserver1
+server,gateway@server,1794707250320707,write,DENY,allowed = false,vfl_server_model,latest,cached,GUID-state-aware,jake-jongejans-9389f76eserver1
+server,gateway@server,1794707250586786,write,DENY,allowed = false,vfl_server_model,latest,cached,GUID-state-aware,jake-jongejans-9389f76eserver1
+server,gateway@server,1794707250837943,write,DENY,allowed = false,vfl_server_model,latest,cached,GUID-state-aware,jake-jongejans-9389f76eserver1
+server,gateway@server,1794707251103774,write,DENY,allowed = false,vfl_server_model,latest,cached,GUID-state-aware,jake-jongejans-9389f76eserver1
+server,gateway@server,1794707251404747,write,DENY,allowed = false,vfl_server_model,latest,cached,GUID-state-aware,jake-jongejans-9389f76eserver1
+server,gateway@server,1794707251785829,write,DENY,allowed = false,vfl_server_model,latest,cached,GUID-state-aware,jake-jongejans-9389f76eserver1
+server,gateway@server,1794707252183158,write,DENY,allowed = false,vfl_server_model,latest,cached,GUID-state-aware,jake-jongejans-9389f76eserver1
+server,gateway@server,1794707252595466,write,DENY,allowed = false,vfl_server_model,latest,cached,GUID-state-aware,jake-jongejans-9389f76eserver1
+server,gateway@server,1794707252977375,write,DENY,allowed = false,vfl_server_model,latest,cached,GUID-state-aware,jake-jongejans-9389f76eserver1
+server,gateway@server,1794707253404287,write,DENY,allowed = false,vfl_server_model,latest,cached,GUID-state-aware,jake-jongejans-9389f76eserver1
+server,gateway@server,1794707253785779,write,DENY,allowed = false,vfl_server_model,latest,cached,GUID-state-aware,jake-jongejans-9389f76eserver1
+server,gateway@server,1794707254181134,write,DENY,allowed = false,vfl_server_model,latest,cached,GUID-state-aware,jake-jongejans-9389f76eserver1
+server,gateway@server,1794707254593782,write,DENY,allowed = false,vfl_server_model,latest,cached,GUID-state-aware,jake-jongejans-9389f76eserver1
+server,gateway@server,1794707254992918,write,DENY,allowed = false,vfl_server_model,latest,cached,GUID-state-aware,jake-jongejans-9389f76eserver1
+server,gateway@server,1794707255382946,write,DENY,allowed = false,vfl_server_model,latest,cached,GUID-state-aware,jake-jongejans-9389f76eserver1
+server,gateway@server,1794707255811395,write,DENY,allowed = false,vfl_server_model,latest,cached,GUID-state-aware,jake-jongejans-9389f76eserver1
+server,gateway@server,1794707256190855,write,DENY,allowed = false,vfl_server_model,latest,cached,GUID-state-aware,jake-jongejans-9389f76eserver1
+server,gateway@server,1794707256585578,write,DENY,allowed = false,vfl_server_model,latest,cached,GUID-state-aware,jake-jongejans-9389f76eserver1
+server,gateway@server,1794707256999797,write,DENY,allowed = false,vfl_server_model,latest,cached,GUID-state-aware,jake-jongejans-9389f76eserver1
+server,gateway@server,1794707257139516,shutdown,,ms_exit,,,,,jake-jongejans-9389f76eserver1
+clientone,gateway@clientone,1794707243207339,subscribe,,subscription established,,,cached,,jake-jongejans-9389f76eclientone1
+clientone,gateway@clientone,1794707244149402,subscribe,,subscription established,,,cached,,jake-jongejans-9389f76eclientone1
+clientone,gateway@clientone,1794707245328996,read,DENY,not found,vfl_client_model,latest,cached,GUID-state-aware,jake-jongejans-9389f76eclientone1
+clientone,gateway@clientone,1794707247104616,write,ALLOW,,vfl_client_model,latest,cached,GUID-state-aware,jake-jongejans-9389f76eclientone1
+clientone,gateway@clientone,1794707247490256,write,ALLOW,,vfl_client_model,latest,cached,GUID-state-aware,jake-jongejans-9389f76eclientone1
+clientone,gateway@clientone,1794707247791141,write,ALLOW,,vfl_client_model,latest,cached,GUID-state-aware,jake-jongejans-9389f76eclientone1
+clientone,gateway@clientone,1794707248068197,write,ALLOW,,vfl_client_model,latest,cached,GUID-state-aware,jake-jongejans-9389f76eclientone1
+clientone,gateway@clientone,1794707248323747,write,ALLOW,,vfl_client_model,latest,cached,GUID-state-aware,jake-jongejans-9389f76eclientone1
+clientone,gateway@clientone,1794707248607350,write,ALLOW,,vfl_client_model,latest,cached,GUID-state-aware,jake-jongejans-9389f76eclientone1
+clientone,gateway@clientone,1794707248967181,write,ALLOW,,vfl_client_model,latest,cached,GUID-state-aware,jake-jongejans-9389f76eclientone1
+clientone,gateway@clientone,1794707248988103,purge,PURGED,revoked; onRevocation=purge,vfl_client_model,latest,fresh,GUID-state-aware,jake-jongejans-9389f76eclientone1
+clientone,gateway@clientone,1794707249091124,read,DENY,allowed = false,vfl_client_model,latest,cached,GUID-state-aware,jake-jongejans-9389f76eclientone1
+clientone,gateway@clientone,1794707249298666,write,DENY,allowed = false,vfl_client_model,latest,cached,GUID-state-aware,jake-jongejans-9389f76eclientone1
+clientone,gateway@clientone,1794707249561353,write,DENY,allowed = false,vfl_client_model,latest,cached,GUID-state-aware,jake-jongejans-9389f76eclientone1
+clientone,gateway@clientone,1794707249836092,write,DENY,allowed = false,vfl_client_model,latest,cached,GUID-state-aware,jake-jongejans-9389f76eclientone1
+clientone,gateway@clientone,1794707250132713,write,DENY,allowed = false,vfl_client_model,latest,cached,GUID-state-aware,jake-jongejans-9389f76eclientone1
+clientone,gateway@clientone,1794707250401317,write,DENY,allowed = false,vfl_client_model,latest,cached,GUID-state-aware,jake-jongejans-9389f76eclientone1
+clientone,gateway@clientone,1794707250658189,write,DENY,allowed = false,vfl_client_model,latest,cached,GUID-state-aware,jake-jongejans-9389f76eclientone1
+clientone,gateway@clientone,1794707250930619,write,DENY,allowed = false,vfl_client_model,latest,cached,GUID-state-aware,jake-jongejans-9389f76eclientone1
+clientone,gateway@clientone,1794707251174035,write,DENY,allowed = false,vfl_client_model,latest,cached,GUID-state-aware,jake-jongejans-9389f76eclientone1
+clientone,gateway@clientone,1794707251502833,write,DENY,allowed = false,vfl_client_model,latest,cached,GUID-state-aware,jake-jongejans-9389f76eclientone1
+clientone,gateway@clientone,1794707251886865,write,DENY,allowed = false,vfl_client_model,latest,cached,GUID-state-aware,jake-jongejans-9389f76eclientone1
+clientone,gateway@clientone,1794707252288554,write,DENY,allowed = false,vfl_client_model,latest,cached,GUID-state-aware,jake-jongejans-9389f76eclientone1
+clientone,gateway@clientone,1794707252693428,write,DENY,allowed = false,vfl_client_model,latest,cached,GUID-state-aware,jake-jongejans-9389f76eclientone1
+clientone,gateway@clientone,1794707253093719,write,DENY,allowed = false,vfl_client_model,latest,cached,GUID-state-aware,jake-jongejans-9389f76eclientone1
+clientone,gateway@clientone,1794707253488842,write,DENY,allowed = false,vfl_client_model,latest,cached,GUID-state-aware,jake-jongejans-9389f76eclientone1
+clientone,gateway@clientone,1794707253954298,write,DENY,allowed = false,vfl_client_model,latest,cached,GUID-state-aware,jake-jongejans-9389f76eclientone1
+clientone,gateway@clientone,1794707254289494,write,DENY,allowed = false,vfl_client_model,latest,cached,GUID-state-aware,jake-jongejans-9389f76eclientone1
+clientone,gateway@clientone,1794707254688902,write,DENY,allowed = false,vfl_client_model,latest,cached,GUID-state-aware,jake-jongejans-9389f76eclientone1
+clientone,gateway@clientone,1794707255087319,write,DENY,allowed = false,vfl_client_model,latest,cached,GUID-state-aware,jake-jongejans-9389f76eclientone1
+clientone,gateway@clientone,1794707255490975,write,DENY,allowed = false,vfl_client_model,latest,cached,GUID-state-aware,jake-jongejans-9389f76eclientone1
+clientone,gateway@clientone,1794707255907119,write,DENY,allowed = false,vfl_client_model,latest,cached,GUID-state-aware,jake-jongejans-9389f76eclientone1
+clientone,gateway@clientone,1794707256288476,write,DENY,allowed = false,vfl_client_model,latest,cached,GUID-state-aware,jake-jongejans-9389f76eclientone1
+clientone,gateway@clientone,1794707256688027,write,DENY,allowed = false,vfl_client_model,latest,cached,GUID-state-aware,jake-jongejans-9389f76eclientone1
+clientone,gateway@clientone,1794707257090972,write,DENY,allowed = false,vfl_client_model,latest,cached,GUID-state-aware,jake-jongejans-9389f76eclientone1
+clientone,gateway@clientone,1794707257277083,shutdown,,ms_exit,,,,,jake-jongejans-9389f76eclientone1
+clientone,gateway@clientone,1794707257278437,shutdown,,ms_exit,,,,,jake-jongejans-9389f76eclientone1
+clienttwo,gateway@clienttwo,1794707243640264,subscribe,,subscription established,,,cached,,jake-jongejans-9389f76eclienttwo1
+clienttwo,gateway@clienttwo,1794707244553532,subscribe,,subscription established,,,cached,,jake-jongejans-9389f76eclienttwo1
+clienttwo,gateway@clienttwo,1794707245765061,read,DENY,not found,vfl_client_model,latest,cached,GUID-state-aware,jake-jongejans-9389f76eclienttwo1
+clienttwo,gateway@clienttwo,1794707247200219,write,ALLOW,,vfl_client_model,latest,cached,GUID-state-aware,jake-jongejans-9389f76eclienttwo1
+clienttwo,gateway@clienttwo,1794707247510738,write,ALLOW,,vfl_client_model,latest,cached,GUID-state-aware,jake-jongejans-9389f76eclienttwo1
+clienttwo,gateway@clienttwo,1794707247794962,write,ALLOW,,vfl_client_model,latest,cached,GUID-state-aware,jake-jongejans-9389f76eclienttwo1
+clienttwo,gateway@clienttwo,1794707248063273,write,ALLOW,,vfl_client_model,latest,cached,GUID-state-aware,jake-jongejans-9389f76eclienttwo1
+clienttwo,gateway@clienttwo,1794707248316255,write,ALLOW,,vfl_client_model,latest,cached,GUID-state-aware,jake-jongejans-9389f76eclienttwo1
+clienttwo,gateway@clienttwo,1794707248630298,write,ALLOW,,vfl_client_model,latest,cached,GUID-state-aware,jake-jongejans-9389f76eclienttwo1
+clienttwo,gateway@clienttwo,1794707248991980,write,ALLOW,,vfl_client_model,latest,cached,GUID-state-aware,jake-jongejans-9389f76eclienttwo1
+clienttwo,gateway@clienttwo,1794707248996994,purge,PURGED,revoked; onRevocation=purge,vfl_client_model,latest,fresh,GUID-state-aware,jake-jongejans-9389f76eclienttwo1
+clienttwo,gateway@clienttwo,1794707249093903,read,DENY,allowed = false,vfl_client_model,latest,cached,GUID-state-aware,jake-jongejans-9389f76eclienttwo1
+clienttwo,gateway@clienttwo,1794707249300374,write,DENY,allowed = false,vfl_client_model,latest,cached,GUID-state-aware,jake-jongejans-9389f76eclienttwo1
+clienttwo,gateway@clienttwo,1794707249556723,write,DENY,allowed = false,vfl_client_model,latest,cached,GUID-state-aware,jake-jongejans-9389f76eclienttwo1
+clienttwo,gateway@clienttwo,1794707249838753,write,DENY,allowed = false,vfl_client_model,latest,cached,GUID-state-aware,jake-jongejans-9389f76eclienttwo1
+clienttwo,gateway@clienttwo,1794707250142514,write,DENY,allowed = false,vfl_client_model,latest,cached,GUID-state-aware,jake-jongejans-9389f76eclienttwo1
+clienttwo,gateway@clienttwo,1794707250400107,write,DENY,allowed = false,vfl_client_model,latest,cached,GUID-state-aware,jake-jongejans-9389f76eclienttwo1
+clienttwo,gateway@clienttwo,1794707250676905,write,DENY,allowed = false,vfl_client_model,latest,cached,GUID-state-aware,jake-jongejans-9389f76eclienttwo1
+clienttwo,gateway@clienttwo,1794707250935094,write,DENY,allowed = false,vfl_client_model,latest,cached,GUID-state-aware,jake-jongejans-9389f76eclienttwo1
+clienttwo,gateway@clienttwo,1794707251179087,write,DENY,allowed = false,vfl_client_model,latest,cached,GUID-state-aware,jake-jongejans-9389f76eclienttwo1
+clienttwo,gateway@clienttwo,1794707251489080,write,DENY,allowed = false,vfl_client_model,latest,cached,GUID-state-aware,jake-jongejans-9389f76eclienttwo1
+clienttwo,gateway@clienttwo,1794707251891324,write,DENY,allowed = false,vfl_client_model,latest,cached,GUID-state-aware,jake-jongejans-9389f76eclienttwo1
+clienttwo,gateway@clienttwo,1794707252296056,write,DENY,allowed = false,vfl_client_model,latest,cached,GUID-state-aware,jake-jongejans-9389f76eclienttwo1
+clienttwo,gateway@clienttwo,1794707252689819,write,DENY,allowed = false,vfl_client_model,latest,cached,GUID-state-aware,jake-jongejans-9389f76eclienttwo1
+clienttwo,gateway@clienttwo,1794707253093481,write,DENY,allowed = false,vfl_client_model,latest,cached,GUID-state-aware,jake-jongejans-9389f76eclienttwo1
+clienttwo,gateway@clienttwo,1794707253524573,write,DENY,allowed = false,vfl_client_model,latest,cached,GUID-state-aware,jake-jongejans-9389f76eclienttwo1
+clienttwo,gateway@clienttwo,1794707253911064,write,DENY,allowed = false,vfl_client_model,latest,cached,GUID-state-aware,jake-jongejans-9389f76eclienttwo1
+clienttwo,gateway@clienttwo,1794707254294271,write,DENY,allowed = false,vfl_client_model,latest,cached,GUID-state-aware,jake-jongejans-9389f76eclienttwo1
+clienttwo,gateway@clienttwo,1794707254691702,write,DENY,allowed = false,vfl_client_model,latest,cached,GUID-state-aware,jake-jongejans-9389f76eclienttwo1
+clienttwo,gateway@clienttwo,1794707255095372,write,DENY,allowed = false,vfl_client_model,latest,cached,GUID-state-aware,jake-jongejans-9389f76eclienttwo1
+clienttwo,gateway@clienttwo,1794707255492260,write,DENY,allowed = false,vfl_client_model,latest,cached,GUID-state-aware,jake-jongejans-9389f76eclienttwo1
+clienttwo,gateway@clienttwo,1794707255906514,write,DENY,allowed = false,vfl_client_model,latest,cached,GUID-state-aware,jake-jongejans-9389f76eclienttwo1
+clienttwo,gateway@clienttwo,1794707256291476,write,DENY,allowed = false,vfl_client_model,latest,cached,GUID-state-aware,jake-jongejans-9389f76eclienttwo1
+clienttwo,gateway@clienttwo,1794707256693155,write,DENY,allowed = false,vfl_client_model,latest,cached,GUID-state-aware,jake-jongejans-9389f76eclienttwo1
+clienttwo,gateway@clienttwo,1794707257106143,write,DENY,allowed = false,vfl_client_model,latest,cached,GUID-state-aware,jake-jongejans-9389f76eclienttwo1
+clienttwo,gateway@clienttwo,1794707257284758,shutdown,,ms_exit,,,,,jake-jongejans-9389f76eclienttwo1
+clienttwo,gateway@clienttwo,1794707257285807,shutdown,,ms_exit,,,,,jake-jongejans-9389f76eclienttwo1
+clientthree,gateway@clientthree,1794707239298085,subscribe,,subscription established,,,cached,,jake-jongejans-9389f76eclientthree1
+clientthree,gateway@clientthree,1794707240175820,subscribe,,subscription established,,,cached,,jake-jongejans-9389f76eclientthree1
+clientthree,gateway@clientthree,1794707241388888,read,DENY,not found,vfl_client_model,latest,cached,GUID-state-aware,jake-jongejans-9389f76eclientthree1
+clientthree,gateway@clientthree,1794707247136744,write,ALLOW,,vfl_client_model,latest,cached,GUID-state-aware,jake-jongejans-9389f76eclientthree1
+clientthree,gateway@clientthree,1794707247492672,write,ALLOW,,vfl_client_model,latest,cached,GUID-state-aware,jake-jongejans-9389f76eclientthree1
+clientthree,gateway@clientthree,1794707247793684,write,ALLOW,,vfl_client_model,latest,cached,GUID-state-aware,jake-jongejans-9389f76eclientthree1
+clientthree,gateway@clientthree,1794707248063380,write,ALLOW,,vfl_client_model,latest,cached,GUID-state-aware,jake-jongejans-9389f76eclientthree1
+clientthree,gateway@clientthree,1794707248318484,write,ALLOW,,vfl_client_model,latest,cached,GUID-state-aware,jake-jongejans-9389f76eclientthree1
+clientthree,gateway@clientthree,1794707248607040,write,ALLOW,,vfl_client_model,latest,cached,GUID-state-aware,jake-jongejans-9389f76eclientthree1
+clientthree,gateway@clientthree,1794707248981429,write,ALLOW,,vfl_client_model,latest,cached,GUID-state-aware,jake-jongejans-9389f76eclientthree1
+clientthree,gateway@clientthree,1794707249003142,purge,PURGED,revoked; onRevocation=purge,vfl_client_model,latest,fresh,GUID-state-aware,jake-jongejans-9389f76eclientthree1
+clientthree,gateway@clientthree,1794707249089455,read,DENY,allowed = false,vfl_client_model,latest,cached,GUID-state-aware,jake-jongejans-9389f76eclientthree1
+clientthree,gateway@clientthree,1794707249296650,write,DENY,allowed = false,vfl_client_model,latest,cached,GUID-state-aware,jake-jongejans-9389f76eclientthree1
+clientthree,gateway@clientthree,1794707249569946,write,DENY,allowed = false,vfl_client_model,latest,cached,GUID-state-aware,jake-jongejans-9389f76eclientthree1
+clientthree,gateway@clientthree,1794707249838524,write,DENY,allowed = false,vfl_client_model,latest,cached,GUID-state-aware,jake-jongejans-9389f76eclientthree1
+clientthree,gateway@clientthree,1794707250134044,write,DENY,allowed = false,vfl_client_model,latest,cached,GUID-state-aware,jake-jongejans-9389f76eclientthree1
+clientthree,gateway@clientthree,1794707250403070,write,DENY,allowed = false,vfl_client_model,latest,cached,GUID-state-aware,jake-jongejans-9389f76eclientthree1
+clientthree,gateway@clientthree,1794707250661727,write,DENY,allowed = false,vfl_client_model,latest,cached,GUID-state-aware,jake-jongejans-9389f76eclientthree1
+clientthree,gateway@clientthree,1794707250938448,write,DENY,allowed = false,vfl_client_model,latest,cached,GUID-state-aware,jake-jongejans-9389f76eclientthree1
+clientthree,gateway@clientthree,1794707251180083,write,DENY,allowed = false,vfl_client_model,latest,cached,GUID-state-aware,jake-jongejans-9389f76eclientthree1
+clientthree,gateway@clientthree,1794707251493791,write,DENY,allowed = false,vfl_client_model,latest,cached,GUID-state-aware,jake-jongejans-9389f76eclientthree1
+clientthree,gateway@clientthree,1794707251904822,write,DENY,allowed = false,vfl_client_model,latest,cached,GUID-state-aware,jake-jongejans-9389f76eclientthree1
+clientthree,gateway@clientthree,1794707252302029,write,DENY,allowed = false,vfl_client_model,latest,cached,GUID-state-aware,jake-jongejans-9389f76eclientthree1
+clientthree,gateway@clientthree,1794707252697641,write,DENY,allowed = false,vfl_client_model,latest,cached,GUID-state-aware,jake-jongejans-9389f76eclientthree1
+clientthree,gateway@clientthree,1794707253093596,write,DENY,allowed = false,vfl_client_model,latest,cached,GUID-state-aware,jake-jongejans-9389f76eclientthree1
+clientthree,gateway@clientthree,1794707253492088,write,DENY,allowed = false,vfl_client_model,latest,cached,GUID-state-aware,jake-jongejans-9389f76eclientthree1
+clientthree,gateway@clientthree,1794707253910629,write,DENY,allowed = false,vfl_client_model,latest,cached,GUID-state-aware,jake-jongejans-9389f76eclientthree1
+clientthree,gateway@clientthree,1794707254292349,write,DENY,allowed = false,vfl_client_model,latest,cached,GUID-state-aware,jake-jongejans-9389f76eclientthree1
+clientthree,gateway@clientthree,1794707254694161,write,DENY,allowed = false,vfl_client_model,latest,cached,GUID-state-aware,jake-jongejans-9389f76eclientthree1
+clientthree,gateway@clientthree,1794707255094166,write,DENY,allowed = false,vfl_client_model,latest,cached,GUID-state-aware,jake-jongejans-9389f76eclientthree1
+clientthree,gateway@clientthree,1794707255494196,write,DENY,allowed = false,vfl_client_model,latest,cached,GUID-state-aware,jake-jongejans-9389f76eclientthree1
+clientthree,gateway@clientthree,1794707255905243,write,DENY,allowed = false,vfl_client_model,latest,cached,GUID-state-aware,jake-jongejans-9389f76eclientthree1
+clientthree,gateway@clientthree,1794707256295712,write,DENY,allowed = false,vfl_client_model,latest,cached,GUID-state-aware,jake-jongejans-9389f76eclientthree1
+clientthree,gateway@clientthree,1794707256691642,write,DENY,allowed = false,vfl_client_model,latest,cached,GUID-state-aware,jake-jongejans-9389f76eclientthree1
+clientthree,gateway@clientthree,1794707257090020,write,DENY,allowed = false,vfl_client_model,latest,cached,GUID-state-aware,jake-jongejans-9389f76eclientthree1
+clientthree,gateway@clientthree,1794707257281845,shutdown,,ms_exit,,,,,jake-jongejans-9389f76eclientthree1
+clientthree,gateway@clientthree,1794707257282973,shutdown,,ms_exit,,,,,jake-jongejans-9389f76eclientthree1

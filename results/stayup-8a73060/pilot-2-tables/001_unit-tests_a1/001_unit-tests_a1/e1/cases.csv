@@ -1,0 +1,2 @@
+row,case,steward,expected,observed,result
+unit,the gateway package's tests,control,"68 test functions (the set's source), every one PASS, exit 0","68 run: 68 PASS, 0 FAIL, 0 SKIP, exit 0, 2.4 s",pass

@@ -1,0 +1,2 @@
+head,go_tree,set_commit,set_go_tree,command,go_version,tests,agreements_sha256,sha256
+089433019d26f2584ef529cdf2035a31d1788694,c70c6b11a0c35571358fa682b15047895193c278,8a73060e8cf653546bd02ac48821781cdc4ab11d,c70c6b11a0c35571358fa682b15047895193c278,CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go test -c -trimpath -o gateway.test ./cmd/policy-checkpoint-gateway,go version go1.23.8 linux/amd64,68,b945a070f084b2b38c9976e84ed5449e6f09a2dc0af6062ec43ad1bbe826d0f3,1248e21f95bc2e5a01827f31724e17ea9e74ec9b284ea5fcf8ab1a5c986a8fec

@@ -1,0 +1,1 @@
+e1 adversarial: Failed: kubectl exec -n server jake-jongejans-9ba65192server1-lm4cm -c policy-checkpoint-gateway -- rm /state/data/adversarial/rogue.bin: exit 1: error: Internal error occurred: unable to upgrade connection: container not found ("policy-checkpoint-gateway")

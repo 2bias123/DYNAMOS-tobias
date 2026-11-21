@@ -1,0 +1,4 @@
+round,clock,closed_us,accuracy,write_clock,write_us,decision,records_cum,bytes_cum,sample_clock,sample_us,data_bytes,audit_bytes,state_files
+0,api-gateway,1794754826000000,-2.1119773387908936,gateway@server,1794754825647809,ALLOW,4,1991,sampler@server,1794754825822132,8115,1991,1
+1,api-gateway,1794754827000000,-2.110158681869507,gateway@server,1794754827128788,ALLOW,5,2597,sampler@server,1794754827822775,8115,3474,1
+2,api-gateway,1794754827000000,-2.100851058959961,gateway@server,1794754827415524,ALLOW,6,3203,sampler@server,1794754827822775,8115,3474,1

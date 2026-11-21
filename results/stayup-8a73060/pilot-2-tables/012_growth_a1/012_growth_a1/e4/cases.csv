@@ -1,0 +1,12 @@
+row,case,steward,expected,observed,result
+persisted every round,persisted every round,server,"3 write ALLOW records by the run's job, nothing else","3 write records, 3 ALLOW",pass
+no destruction,no destruction,server,no PURGED or DELETED record,0 PURGED or DELETED records,pass
+persisted every round,persisted every round,clientone,"3 write ALLOW records by the run's job, nothing else","3 write records, 3 ALLOW",pass
+no destruction,no destruction,clientone,no PURGED or DELETED record,0 PURGED or DELETED records,pass
+persisted every round,persisted every round,clienttwo,"3 write ALLOW records by the run's job, nothing else","3 write records, 3 ALLOW",pass
+no destruction,no destruction,clienttwo,no PURGED or DELETED record,0 PURGED or DELETED records,pass
+persisted every round,persisted every round,clientthree,"3 write ALLOW records by the run's job, nothing else","3 write records, 3 ALLOW",pass
+no destruction,no destruction,clientthree,no PURGED or DELETED record,0 PURGED or DELETED records,pass
+clean-slate read,clean-slate read,server,the first read record DENY 'not found',DENY 'not found',pass
+sampler covers the run,sampler covers the run,server,"a sample at or before round 0's write and one at or after the last round's write, same VM clock","samples 1794626649834276 to 1794626665840184, writes 1794626663806932 to 1794626665580258, 17 samples",pass
+state persisted,state persisted,server,at least one state file on the claim at the end,1 state files,pass

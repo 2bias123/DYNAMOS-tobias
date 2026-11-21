@@ -1,0 +1,213 @@
+# e2 watch, attempt 1
+
+- outcome: pass
+
+## What ran
+
+- cases.csv: 100 rows
+- claims.csv: 4 rows
+- env/clocks.csv: 14 rows
+- env/gates.csv: 68 rows
+- events.csv: 117 rows
+- markers.csv: 4 rows
+- pods.csv: 30 rows
+- records.csv: 10918 rows
+- trials-watch.csv: 50 rows
+- verdict.csv: 144 rows
+
+## Checks
+
+- check missing values: pass
+- check cases.csv watch · trial 1 · server: pass
+- check cases.csv watch · trial 2 · server: pass
+- check cases.csv watch · trial 3 · server: pass
+- check cases.csv watch · trial 4 · server: pass
+- check cases.csv watch · trial 5 · server: pass
+- check cases.csv watch · trial 6 · server: pass
+- check cases.csv watch · trial 7 · server: pass
+- check cases.csv watch · trial 8 · server: pass
+- check cases.csv watch · trial 9 · server: pass
+- check cases.csv watch · trial 10 · server: pass
+- check cases.csv watch · trial 11 · server: pass
+- check cases.csv watch · trial 12 · server: pass
+- check cases.csv watch · trial 13 · server: pass
+- check cases.csv watch · trial 14 · server: pass
+- check cases.csv watch · trial 15 · server: pass
+- check cases.csv watch · trial 16 · server: pass
+- check cases.csv watch · trial 17 · server: pass
+- check cases.csv watch · trial 18 · server: pass
+- check cases.csv watch · trial 19 · server: pass
+- check cases.csv watch · trial 20 · server: pass
+- check cases.csv watch · trial 21 · server: pass
+- check cases.csv watch · trial 22 · server: pass
+- check cases.csv watch · trial 23 · server: pass
+- check cases.csv watch · trial 24 · server: pass
+- check cases.csv watch · trial 25 · server: pass
+- check cases.csv watch · trial 26 · server: pass
+- check cases.csv watch · trial 27 · server: pass
+- check cases.csv watch · trial 28 · server: pass
+- check cases.csv watch · trial 29 · server: pass
+- check cases.csv watch · trial 30 · server: pass
+- check cases.csv watch · trial 31 · server: pass
+- check cases.csv watch · trial 32 · server: pass
+- check cases.csv watch · trial 33 · server: pass
+- check cases.csv watch · trial 34 · server: pass
+- check cases.csv watch · trial 35 · server: pass
+- check cases.csv watch · trial 36 · server: pass
+- check cases.csv watch · trial 37 · server: pass
+- check cases.csv watch · trial 38 · server: pass
+- check cases.csv watch · trial 39 · server: pass
+- check cases.csv watch · trial 40 · server: pass
+- check cases.csv watch · trial 41 · server: pass
+- check cases.csv watch · trial 42 · server: pass
+- check cases.csv watch · trial 43 · server: pass
+- check cases.csv watch · trial 44 · server: pass
+- check cases.csv watch · trial 45 · server: pass
+- check cases.csv watch · trial 46 · server: pass
+- check cases.csv watch · trial 47 · server: pass
+- check cases.csv watch · trial 48 · server: pass
+- check cases.csv watch · trial 49 · server: pass
+- check cases.csv watch · trial 50 · server: pass
+- check cases.csv complete log · trial 1 · server: pass
+- check cases.csv complete log · trial 2 · server: pass
+- check cases.csv complete log · trial 3 · server: pass
+- check cases.csv complete log · trial 4 · server: pass
+- check cases.csv complete log · trial 5 · server: pass
+- check cases.csv complete log · trial 6 · server: pass
+- check cases.csv complete log · trial 7 · server: pass
+- check cases.csv complete log · trial 8 · server: pass
+- check cases.csv complete log · trial 9 · server: pass
+- check cases.csv complete log · trial 10 · server: pass
+- check cases.csv complete log · trial 11 · server: pass
+- check cases.csv complete log · trial 12 · server: pass
+- check cases.csv complete log · trial 13 · server: pass
+- check cases.csv complete log · trial 14 · server: pass
+- check cases.csv complete log · trial 15 · server: pass
+- check cases.csv complete log · trial 16 · server: pass
+- check cases.csv complete log · trial 17 · server: pass
+- check cases.csv complete log · trial 18 · server: pass
+- check cases.csv complete log · trial 19 · server: pass
+- check cases.csv complete log · trial 20 · server: pass
+- check cases.csv complete log · trial 21 · server: pass
+- check cases.csv complete log · trial 22 · server: pass
+- check cases.csv complete log · trial 23 · server: pass
+- check cases.csv complete log · trial 24 · server: pass
+- check cases.csv complete log · trial 25 · server: pass
+- check cases.csv complete log · trial 26 · server: pass
+- check cases.csv complete log · trial 27 · server: pass
+- check cases.csv complete log · trial 28 · server: pass
+- check cases.csv complete log · trial 29 · server: pass
+- check cases.csv complete log · trial 30 · server: pass
+- check cases.csv complete log · trial 31 · server: pass
+- check cases.csv complete log · trial 32 · server: pass
+- check cases.csv complete log · trial 33 · server: pass
+- check cases.csv complete log · trial 34 · server: pass
+- check cases.csv complete log · trial 35 · server: pass
+- check cases.csv complete log · trial 36 · server: pass
+- check cases.csv complete log · trial 37 · server: pass
+- check cases.csv complete log · trial 38 · server: pass
+- check cases.csv complete log · trial 39 · server: pass
+- check cases.csv complete log · trial 40 · server: pass
+- check cases.csv complete log · trial 41 · server: pass
+- check cases.csv complete log · trial 42 · server: pass
+- check cases.csv complete log · trial 43 · server: pass
+- check cases.csv complete log · trial 44 · server: pass
+- check cases.csv complete log · trial 45 · server: pass
+- check cases.csv complete log · trial 46 · server: pass
+- check cases.csv complete log · trial 47 · server: pass
+- check cases.csv complete log · trial 48 · server: pass
+- check cases.csv complete log · trial 49 · server: pass
+- check cases.csv complete log · trial 50 · server: pass
+- check env/gates.csv node Ready · after the clean start: pass (6 rows, 0 failing)
+- check env/gates.csv disk free on / · after the clean start: pass (6 rows, 0 failing)
+- check env/gates.csv disk free for archives · after the clean start: pass (1 rows, 0 failing)
+- check env/gates.csv disk free for state claims · after the clean start: pass (4 rows, 0 failing)
+- check env/gates.csv lease · after the clean start: pass (1 rows, 0 failing)
+- check env/gates.csv stop date · after the clean start: pass (1 rows, 0 failing)
+- check env/gates.csv chain images on the node · after the clean start: pass (24 rows, 0 failing)
+- check env/gates.csv digest · after the clean start: pass (20 rows, 0 failing)
+- check env/gates.csv digest at the registry · after the clean start: pass (5 rows, 0 failing)
+- check marker M1 (STATE_LOCK_NOT_ACQUIRED, gateway): pass (0 hits in 16 files)
+- check marker M2 (IDLE_GATEWAY_NOT_STOPPED, agent): pass (0 hits in 118 files)
+- check marker M3 (IDLE_GATEWAY_NOT_RUNNING, agent): pass (0 hits in 118 files)
+- check marker M4 (No policy gateway reachable, service): pass (0 hits in 49 files)
+- check clocks trials-watch.csv: pass (50 intervals, each on one machine)
+- check trials-watch.csv 1: pass
+- check trials-watch.csv 2: pass
+- check trials-watch.csv 3: pass
+- check trials-watch.csv 4: pass
+- check trials-watch.csv 5: pass
+- check trials-watch.csv 6: pass
+- check trials-watch.csv 7: pass
+- check trials-watch.csv 8: pass
+- check trials-watch.csv 9: pass
+- check trials-watch.csv 10: pass
+- check trials-watch.csv 11: pass
+- check trials-watch.csv 12: pass
+- check trials-watch.csv 13: pass
+- check trials-watch.csv 14: pass
+- check trials-watch.csv 15: pass
+- check trials-watch.csv 16: pass
+- check trials-watch.csv 17: pass
+- check trials-watch.csv 18: pass
+- check trials-watch.csv 19: pass
+- check trials-watch.csv 20: pass
+- check trials-watch.csv 21: pass
+- check trials-watch.csv 22: pass
+- check trials-watch.csv 23: pass
+- check trials-watch.csv 24: pass
+- check trials-watch.csv 25: pass
+- check trials-watch.csv 26: pass
+- check trials-watch.csv 27: pass
+- check trials-watch.csv 28: pass
+- check trials-watch.csv 29: pass
+- check trials-watch.csv 30: pass
+- check trials-watch.csv 31: pass
+- check trials-watch.csv 32: pass
+- check trials-watch.csv 33: pass
+- check trials-watch.csv 34: pass
+- check trials-watch.csv 35: pass
+- check trials-watch.csv 36: pass
+- check trials-watch.csv 37: pass
+- check trials-watch.csv 38: pass
+- check trials-watch.csv 39: pass
+- check trials-watch.csv 40: pass
+- check trials-watch.csv 41: pass
+- check trials-watch.csv 42: pass
+- check trials-watch.csv 43: pass
+- check trials-watch.csv 44: pass
+- check trials-watch.csv 45: pass
+- check trials-watch.csv 46: pass
+- check trials-watch.csv 47: pass
+- check trials-watch.csv 48: pass
+- check trials-watch.csv 49: pass
+- check trials-watch.csv 50: pass
+- check verdict.csv class · request path: pass (6 rows, 0 failing)
+- check verdict.csv node · request path: pass (6 rows, 0 failing)
+- check verdict.csv digest · request path: pass (12 rows, 0 failing)
+- check verdict.csv class · agent: pass (8 rows, 0 failing)
+- check verdict.csv node · agent: pass (8 rows, 0 failing)
+- check verdict.csv digest · agent: pass (16 rows, 0 failing)
+- check verdict.csv class · idle: pass (8 rows, 0 failing)
+- check verdict.csv node · idle: pass (8 rows, 0 failing)
+- check verdict.csv digest · idle: pass (8 rows, 0 failing)
+- check verdict.csv class · chain: pass (8 rows, 0 failing)
+- check verdict.csv node · chain: pass (8 rows, 0 failing)
+- check verdict.csv digest · chain: pass (48 rows, 0 failing)
+- check verdict: pass
+
+## Values
+
+Intervals from the CSVs' µs values, in ms rounded to 0.1 ms; the median of an even n is the mean of the middle two.
+
+- events.csv duration_us (clean start): n=1, minimum 197304.6 ms, median 197304.6 ms, maximum 197304.6 ms
+- events.csv duration_us (re-enable sent): n=51, minimum 0.0 ms, median 0.0 ms, maximum 0.0 ms
+- events.csv duration_us (deploy gap: chain jobs deleted): n=4, minimum 0.0 ms, median 0.0 ms, maximum 0.0 ms
+- events.csv duration_us (deploy gap: chain pods gone): n=4, minimum 177.6 ms, median 186.0 ms, maximum 193.8 ms
+- events.csv duration_us (deploy gap: held): n=4, minimum 0.0 ms, median 0.0 ms, maximum 0.0 ms
+- events.csv duration_us (trigger): n=1, minimum 2.5 ms, median 2.5 ms, maximum 2.5 ms
+- events.csv duration_us (chain up): n=1, minimum 0.0 ms, median 0.0 ms, maximum 0.0 ms
+- events.csv duration_us (flip sent): n=50, minimum 28.6 ms, median 34.0 ms, maximum 42.4 ms
+- events.csv duration_us (chain boots): n=1, minimum 0.0 ms, median 0.0 ms, maximum 0.0 ms
+- trials-watch.csv value_us: n=50, minimum 31.5 ms, median 40.8 ms, maximum 54.0 ms
+- trials-watch.csv rtt_us: n=50, minimum 28.6 ms, median 34.0 ms, maximum 42.4 ms

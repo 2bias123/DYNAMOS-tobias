@@ -1,0 +1,8 @@
+{
+ "queue": "/home/ubuntu/stayup/harness-be9afa8/harness/queue-pilot.csv",
+ "queue_sha256": "d08d24b3426410f40fbbba3180645e4a803703b291f26e7a14af71425bbcb9d5",
+ "units": 50,
+ "mode": "fabric",
+ "counted": "no (pilot)",
+ "started_us": 1794751388304850
+}

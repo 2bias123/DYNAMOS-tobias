@@ -1,0 +1,8 @@
+clock,at_us,event,subject,duration_us,detail
+host@control,1794644699470949,clean start,all,69683305,jobs of the four stewards deleted together in 1.6 s; agent mode none; agents switched: none; with the seven rollouts;every check holds
+host@control,1794644706189836,standalone gateway up,server,0,"pod/harness-standalone, serving form as e5-poll, watch off, poll 5 s, emptyDir state, on server"
+sender@server,1794644707305080,re-enable sent,server,0,trial 1: http 200
+sender@server,1794644709464792,flip sent,server,31464,trial 1: http 200; time is the send
+sender@server,1794644715481409,re-enable sent,server,0,trial 2: http 200
+sender@server,1794644721221889,flip sent,server,30976,trial 2: http 200; time is the send
+sender@server,1794644725418102,re-enable sent,server,0,after the last trial: http 200

@@ -1,0 +1,9 @@
+row,case,steward,expected,observed,result
+adversarial,tampered identity,server,"the write refused PERMISSION_DENIED, one identity_mismatch record, no state file for it","PERMISSION_DENIED, 1 identity_mismatch records, no state file",pass
+adversarial,8 concurrent writes on one slot,server,"8 ALLOW answers, 8 write ALLOW records for the slot, one state file for it","answers ALLOW ALLOW ALLOW ALLOW ALLOW ALLOW ALLOW ALLOW, 8 records, 1 state files",pass
+adversarial,a file past the enforcement point,server,completeness on the claim names data/adversarial/rogue.bin and nothing else,without a write ALLOW record: adversarial/rogue,pass
+adversarial,one record per operation,server,"every operation the battery sent has exactly one record of its expected op and decision, decided between its send and its return, both on the steward's VM","9 operations, one record each",pass
+completeness,every state file has a write ALLOW record,server,at least one state file and one write ALLOW record; every state file data/<class>/<key>.bin with a write ALLOW record of its class and key,"2 state files, each with a write ALLOW record",pass
+completeness,every state file has a write ALLOW record,clientone,at least one state file and one write ALLOW record; every state file data/<class>/<key>.bin with a write ALLOW record of its class and key,"1 state files, each with a write ALLOW record",pass
+completeness,every state file has a write ALLOW record,clienttwo,at least one state file and one write ALLOW record; every state file data/<class>/<key>.bin with a write ALLOW record of its class and key,"1 state files, each with a write ALLOW record",pass
+completeness,every state file has a write ALLOW record,clientthree,at least one state file and one write ALLOW record; every state file data/<class>/<key>.bin with a write ALLOW record of its class and key,"1 state files, each with a write ALLOW record",pass

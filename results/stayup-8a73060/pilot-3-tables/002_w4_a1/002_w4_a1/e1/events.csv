@@ -1,0 +1,16 @@
+clock,at_us,event,subject,duration_us,detail
+host@control,1794639927261624,clean start,all,70909026,jobs of the four stewards deleted together in 1.5 s; agent mode none; agents switched: none; with the seven rollouts;every check holds
+host@control,1794639934648150,deploy gap: chain jobs deleted,server,0,none standing
+host@control,1794639934841528,deploy gap: chain jobs deleted,clientone,0,none standing
+host@control,1794639935045734,deploy gap: chain jobs deleted,clienttwo,0,none standing
+host@control,1794639935257232,deploy gap: chain jobs deleted,clientthree,0,none standing
+host@control,1794639935530791,deploy gap: chain pods gone,server,188555,
+host@control,1794639935530940,deploy gap: held,server,0,30 s after the harness's deletion at 1794639859559147
+host@control,1794639935700116,deploy gap: chain pods gone,clientone,169061,
+host@control,1794639935700260,deploy gap: held,clientone,0,30 s after the harness's deletion at 1794639859640892
+host@control,1794639935964734,deploy gap: chain pods gone,clienttwo,264330,
+host@control,1794639935964867,deploy gap: held,clienttwo,0,30 s after the harness's deletion at 1794639859715133
+host@control,1794639936142472,deploy gap: chain pods gone,clientthree,177480,
+host@control,1794639936143473,deploy gap: held,clientthree,0,30 s after the harness's deletion at 1794639859797307
+host@control,1794639936143533,trigger,api-gateway,3193,"request 94434cbc-a000-4ad5-805a-32b95605171f, 3 rounds; time is the send"
+host@control,1794639961162242,run done,api-gateway,28977448,request 94434cbc-a000-4ad5-805a-32b95605171f

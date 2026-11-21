@@ -1,0 +1,164 @@
+steward,clock,decided_us,op,decision,reason,state_class,state_key,policy_source,relation_id,job_id
+server,gateway@server,1794679021302750,subscribe,,subscription established,,,cached,,jake-jongejans-2a8a7e8aserver1
+server,gateway@server,1794679022145298,read,DENY,allowed = false,vfl_server_model,latest,cached,GUID-state-aware,jake-jongejans-2a8a7e8aserver1
+server,gateway@server,1794679022146550,subscribe,,subscription established,,,cached,,jake-jongejans-2a8a7e8aserver1
+server,gateway@server,1794679024753773,write,DENY,allowed = false,vfl_server_model,latest,cached,GUID-state-aware,jake-jongejans-2a8a7e8aserver1
+server,gateway@server,1794679026297429,write,DENY,allowed = false,vfl_server_model,latest,cached,GUID-state-aware,jake-jongejans-2a8a7e8aserver1
+server,gateway@server,1794679026609429,write,DENY,allowed = false,vfl_server_model,latest,cached,GUID-state-aware,jake-jongejans-2a8a7e8aserver1
+server,gateway@server,1794679026752948,shutdown,,ms_exit,,,,,jake-jongejans-2a8a7e8aserver1
+server,gateway@server,1794679069297746,subscribe,,subscription established,,,cached,,jake-jongejans-2a8a7e8aserver1
+server,gateway@server,1794679070175234,subscribe,,subscription established,,,cached,,jake-jongejans-2a8a7e8aserver1
+server,gateway@server,1794679070176111,read,DENY,stateDirectives absent,vfl_server_model,latest,cached,GUID-state-aware,jake-jongejans-2a8a7e8aserver1
+server,gateway@server,1794679071636359,write,DENY,stateDirectives absent,vfl_server_model,latest,cached,GUID-state-aware,jake-jongejans-2a8a7e8aserver1
+server,gateway@server,1794679073186887,write,DENY,stateDirectives absent,vfl_server_model,latest,cached,GUID-state-aware,jake-jongejans-2a8a7e8aserver1
+server,gateway@server,1794679073491613,write,DENY,stateDirectives absent,vfl_server_model,latest,cached,GUID-state-aware,jake-jongejans-2a8a7e8aserver1
+server,gateway@server,1794679073627473,shutdown,,ms_exit,,,,,jake-jongejans-2a8a7e8aserver1
+server,gateway@server,1794679114157778,invalid_directives,,"unknown onRevocation ""shred""",,,cached,GUID-state-aware,jake-jongejans-2a8a7e8aserver1
+server,gateway@server,1794679116135318,subscribe,,subscription established,,,cached,,jake-jongejans-2a8a7e8aserver1
+server,gateway@server,1794679117258666,subscribe,,subscription established,,,cached,,jake-jongejans-2a8a7e8aserver1
+server,gateway@server,1794679117259845,read,DENY,invalid stateDirectives; fail closed,vfl_server_model,latest,cached,GUID-state-aware,jake-jongejans-2a8a7e8aserver1
+server,gateway@server,1794679120348689,write,DENY,invalid stateDirectives; fail closed,vfl_server_model,latest,cached,GUID-state-aware,jake-jongejans-2a8a7e8aserver1
+server,gateway@server,1794679121789304,write,DENY,invalid stateDirectives; fail closed,vfl_server_model,latest,cached,GUID-state-aware,jake-jongejans-2a8a7e8aserver1
+server,gateway@server,1794679122095610,write,DENY,invalid stateDirectives; fail closed,vfl_server_model,latest,cached,GUID-state-aware,jake-jongejans-2a8a7e8aserver1
+server,gateway@server,1794679122236764,shutdown,,ms_exit,,,,,jake-jongejans-2a8a7e8aserver1
+server,gateway@server,1794679161918162,invalid_directives,,negative retentionSeconds -1,,,cached,GUID-state-aware,jake-jongejans-2a8a7e8aserver1
+server,gateway@server,1794679164120790,subscribe,,subscription established,,,cached,,jake-jongejans-2a8a7e8aserver1
+server,gateway@server,1794679164923436,subscribe,,subscription established,,,cached,,jake-jongejans-2a8a7e8aserver1
+server,gateway@server,1794679164924613,read,DENY,invalid stateDirectives; fail closed,vfl_server_model,latest,cached,GUID-state-aware,jake-jongejans-2a8a7e8aserver1
+server,gateway@server,1794679168101216,write,DENY,invalid stateDirectives; fail closed,vfl_server_model,latest,cached,GUID-state-aware,jake-jongejans-2a8a7e8aserver1
+server,gateway@server,1794679169643120,write,DENY,invalid stateDirectives; fail closed,vfl_server_model,latest,cached,GUID-state-aware,jake-jongejans-2a8a7e8aserver1
+server,gateway@server,1794679169926978,write,DENY,invalid stateDirectives; fail closed,vfl_server_model,latest,cached,GUID-state-aware,jake-jongejans-2a8a7e8aserver1
+server,gateway@server,1794679170074369,shutdown,,ms_exit,,,,,jake-jongejans-2a8a7e8aserver1
+server,gateway@server,1794679216267144,subscribe,,subscription established,,,cached,,jake-jongejans-2a8a7e8aserver1
+server,gateway@server,1794679217051774,subscribe,,subscription established,,,cached,,jake-jongejans-2a8a7e8aserver1
+server,gateway@server,1794679217052685,read,DENY,resume disabled,vfl_server_model,latest,cached,GUID-state-aware,jake-jongejans-2a8a7e8aserver1
+server,gateway@server,1794679220320740,write,ALLOW,,vfl_server_model,latest,cached,GUID-state-aware,jake-jongejans-2a8a7e8aserver1
+server,gateway@server,1794679221749355,write,ALLOW,,vfl_server_model,latest,cached,GUID-state-aware,jake-jongejans-2a8a7e8aserver1
+server,gateway@server,1794679222022672,write,ALLOW,,vfl_server_model,latest,cached,GUID-state-aware,jake-jongejans-2a8a7e8aserver1
+server,gateway@server,1794679222176956,shutdown,,ms_exit,,,,,jake-jongejans-2a8a7e8aserver1
+clientone,gateway@clientone,1794679022777485,subscribe,,subscription established,,,cached,,jake-jongejans-2a8a7e8aclientone1
+clientone,gateway@clientone,1794679023559720,subscribe,,subscription established,,,cached,,jake-jongejans-2a8a7e8aclientone1
+clientone,gateway@clientone,1794679024649860,read,DENY,allowed = false,vfl_client_model,latest,cached,GUID-state-aware,jake-jongejans-2a8a7e8aclientone1
+clientone,gateway@clientone,1794679026056159,write,DENY,allowed = false,vfl_client_model,latest,cached,GUID-state-aware,jake-jongejans-2a8a7e8aclientone1
+clientone,gateway@clientone,1794679026415352,write,DENY,allowed = false,vfl_client_model,latest,cached,GUID-state-aware,jake-jongejans-2a8a7e8aclientone1
+clientone,gateway@clientone,1794679026712524,write,DENY,allowed = false,vfl_client_model,latest,cached,GUID-state-aware,jake-jongejans-2a8a7e8aclientone1
+clientone,gateway@clientone,1794679026758442,shutdown,,ms_exit,,,,,jake-jongejans-2a8a7e8aclientone1
+clientone,gateway@clientone,1794679026761614,shutdown,,ms_exit,,,,,jake-jongejans-2a8a7e8aclientone1
+clientone,gateway@clientone,1794679069368316,subscribe,,subscription established,,,cached,,jake-jongejans-2a8a7e8aclientone1
+clientone,gateway@clientone,1794679070035750,subscribe,,subscription established,,,cached,,jake-jongejans-2a8a7e8aclientone1
+clientone,gateway@clientone,1794679071215288,read,DENY,stateDirectives absent,vfl_client_model,latest,cached,GUID-state-aware,jake-jongejans-2a8a7e8aclientone1
+clientone,gateway@clientone,1794679072966246,write,DENY,stateDirectives absent,vfl_client_model,latest,cached,GUID-state-aware,jake-jongejans-2a8a7e8aclientone1
+clientone,gateway@clientone,1794679073276209,write,DENY,stateDirectives absent,vfl_client_model,latest,cached,GUID-state-aware,jake-jongejans-2a8a7e8aclientone1
+clientone,gateway@clientone,1794679073577240,write,DENY,stateDirectives absent,vfl_client_model,latest,cached,GUID-state-aware,jake-jongejans-2a8a7e8aclientone1
+clientone,gateway@clientone,1794679073631561,shutdown,,ms_exit,,,,,jake-jongejans-2a8a7e8aclientone1
+clientone,gateway@clientone,1794679073632679,shutdown,,ms_exit,,,,,jake-jongejans-2a8a7e8aclientone1
+clientone,gateway@clientone,1794679114363609,invalid_directives,,"unknown onRevocation ""shred""",,,cached,GUID-state-aware,jake-jongejans-2a8a7e8aclientone1
+clientone,gateway@clientone,1794679116506387,subscribe,,subscription established,,,cached,,jake-jongejans-2a8a7e8aclientone1
+clientone,gateway@clientone,1794679117198223,subscribe,,subscription established,,,cached,,jake-jongejans-2a8a7e8aclientone1
+clientone,gateway@clientone,1794679118516168,read,DENY,invalid stateDirectives; fail closed,vfl_client_model,latest,cached,GUID-state-aware,jake-jongejans-2a8a7e8aclientone1
+clientone,gateway@clientone,1794679121515327,write,DENY,invalid stateDirectives; fail closed,vfl_client_model,latest,cached,GUID-state-aware,jake-jongejans-2a8a7e8aclientone1
+clientone,gateway@clientone,1794679121884055,write,DENY,invalid stateDirectives; fail closed,vfl_client_model,latest,cached,GUID-state-aware,jake-jongejans-2a8a7e8aclientone1
+clientone,gateway@clientone,1794679122194558,write,DENY,invalid stateDirectives; fail closed,vfl_client_model,latest,cached,GUID-state-aware,jake-jongejans-2a8a7e8aclientone1
+clientone,gateway@clientone,1794679122242244,shutdown,,ms_exit,,,,,jake-jongejans-2a8a7e8aclientone1
+clientone,gateway@clientone,1794679122244147,shutdown,,ms_exit,,,,,jake-jongejans-2a8a7e8aclientone1
+clientone,gateway@clientone,1794679162030889,invalid_directives,,negative retentionSeconds -1,,,cached,GUID-state-aware,jake-jongejans-2a8a7e8aclientone1
+clientone,gateway@clientone,1794679164204532,subscribe,,subscription established,,,cached,,jake-jongejans-2a8a7e8aclientone1
+clientone,gateway@clientone,1794679165041011,subscribe,,subscription established,,,cached,,jake-jongejans-2a8a7e8aclientone1
+clientone,gateway@clientone,1794679166226343,read,DENY,invalid stateDirectives; fail closed,vfl_client_model,latest,cached,GUID-state-aware,jake-jongejans-2a8a7e8aclientone1
+clientone,gateway@clientone,1794679169461442,write,DENY,invalid stateDirectives; fail closed,vfl_client_model,latest,cached,GUID-state-aware,jake-jongejans-2a8a7e8aclientone1
+clientone,gateway@clientone,1794679169740952,write,DENY,invalid stateDirectives; fail closed,vfl_client_model,latest,cached,GUID-state-aware,jake-jongejans-2a8a7e8aclientone1
+clientone,gateway@clientone,1794679170030334,write,DENY,invalid stateDirectives; fail closed,vfl_client_model,latest,cached,GUID-state-aware,jake-jongejans-2a8a7e8aclientone1
+clientone,gateway@clientone,1794679170079361,shutdown,,ms_exit,,,,,jake-jongejans-2a8a7e8aclientone1
+clientone,gateway@clientone,1794679170080937,shutdown,,ms_exit,,,,,jake-jongejans-2a8a7e8aclientone1
+clientone,gateway@clientone,1794679216420167,subscribe,,subscription established,,,cached,,jake-jongejans-2a8a7e8aclientone1
+clientone,gateway@clientone,1794679217292708,subscribe,,subscription established,,,cached,,jake-jongejans-2a8a7e8aclientone1
+clientone,gateway@clientone,1794679218593194,read,DENY,resume disabled,vfl_client_model,latest,cached,GUID-state-aware,jake-jongejans-2a8a7e8aclientone1
+clientone,gateway@clientone,1794679221566853,write,ALLOW,,vfl_client_model,latest,cached,GUID-state-aware,jake-jongejans-2a8a7e8aclientone1
+clientone,gateway@clientone,1794679221847775,write,ALLOW,,vfl_client_model,latest,cached,GUID-state-aware,jake-jongejans-2a8a7e8aclientone1
+clientone,gateway@clientone,1794679222132076,write,ALLOW,,vfl_client_model,latest,cached,GUID-state-aware,jake-jongejans-2a8a7e8aclientone1
+clientone,gateway@clientone,1794679222180089,shutdown,,ms_exit,,,,,jake-jongejans-2a8a7e8aclientone1
+clientone,gateway@clientone,1794679222181467,shutdown,,ms_exit,,,,,jake-jongejans-2a8a7e8aclientone1
+clienttwo,gateway@clienttwo,1794679020842344,subscribe,,subscription established,,,cached,,jake-jongejans-2a8a7e8aclienttwo1
+clienttwo,gateway@clienttwo,1794679021769806,subscribe,,subscription established,,,cached,,jake-jongejans-2a8a7e8aclienttwo1
+clienttwo,gateway@clienttwo,1794679022842088,read,DENY,allowed = false,vfl_client_model,latest,cached,GUID-state-aware,jake-jongejans-2a8a7e8aclienttwo1
+clienttwo,gateway@clienttwo,1794679025977200,write,DENY,allowed = false,vfl_client_model,latest,cached,GUID-state-aware,jake-jongejans-2a8a7e8aclienttwo1
+clienttwo,gateway@clienttwo,1794679026386075,write,DENY,allowed = false,vfl_client_model,latest,cached,GUID-state-aware,jake-jongejans-2a8a7e8aclienttwo1
+clienttwo,gateway@clienttwo,1794679026693969,write,DENY,allowed = false,vfl_client_model,latest,cached,GUID-state-aware,jake-jongejans-2a8a7e8aclienttwo1
+clienttwo,gateway@clienttwo,1794679026749033,shutdown,,ms_exit,,,,,jake-jongejans-2a8a7e8aclienttwo1
+clienttwo,gateway@clienttwo,1794679026750107,shutdown,,ms_exit,,,,,jake-jongejans-2a8a7e8aclienttwo1
+clienttwo,gateway@clienttwo,1794679069046475,subscribe,,subscription established,,,cached,,jake-jongejans-2a8a7e8aclienttwo1
+clienttwo,gateway@clienttwo,1794679069954987,subscribe,,subscription established,,,cached,,jake-jongejans-2a8a7e8aclienttwo1
+clienttwo,gateway@clienttwo,1794679071206280,read,DENY,stateDirectives absent,vfl_client_model,latest,cached,GUID-state-aware,jake-jongejans-2a8a7e8aclienttwo1
+clienttwo,gateway@clienttwo,1794679072942212,write,DENY,stateDirectives absent,vfl_client_model,latest,cached,GUID-state-aware,jake-jongejans-2a8a7e8aclienttwo1
+clienttwo,gateway@clienttwo,1794679073288687,write,DENY,stateDirectives absent,vfl_client_model,latest,cached,GUID-state-aware,jake-jongejans-2a8a7e8aclienttwo1
+clienttwo,gateway@clienttwo,1794679073580348,write,DENY,stateDirectives absent,vfl_client_model,latest,cached,GUID-state-aware,jake-jongejans-2a8a7e8aclienttwo1
+clienttwo,gateway@clienttwo,1794679073627638,shutdown,,ms_exit,,,,,jake-jongejans-2a8a7e8aclienttwo1
+clienttwo,gateway@clienttwo,1794679073628801,shutdown,,ms_exit,,,,,jake-jongejans-2a8a7e8aclienttwo1
+clienttwo,gateway@clienttwo,1794679114074090,invalid_directives,,"unknown onRevocation ""shred""",,,cached,GUID-state-aware,jake-jongejans-2a8a7e8aclienttwo1
+clienttwo,gateway@clienttwo,1794679116177196,subscribe,,subscription established,,,cached,,jake-jongejans-2a8a7e8aclienttwo1
+clienttwo,gateway@clienttwo,1794679117111349,subscribe,,subscription established,,,cached,,jake-jongejans-2a8a7e8aclienttwo1
+clienttwo,gateway@clienttwo,1794679118151701,read,DENY,invalid stateDirectives; fail closed,vfl_client_model,latest,cached,GUID-state-aware,jake-jongejans-2a8a7e8aclienttwo1
+clienttwo,gateway@clienttwo,1794679121597269,write,DENY,invalid stateDirectives; fail closed,vfl_client_model,latest,cached,GUID-state-aware,jake-jongejans-2a8a7e8aclienttwo1
+clienttwo,gateway@clienttwo,1794679121895194,write,DENY,invalid stateDirectives; fail closed,vfl_client_model,latest,cached,GUID-state-aware,jake-jongejans-2a8a7e8aclienttwo1
+clienttwo,gateway@clienttwo,1794679122192977,write,DENY,invalid stateDirectives; fail closed,vfl_client_model,latest,cached,GUID-state-aware,jake-jongejans-2a8a7e8aclienttwo1
+clienttwo,gateway@clienttwo,1794679122236104,shutdown,,ms_exit,,,,,jake-jongejans-2a8a7e8aclienttwo1
+clienttwo,gateway@clienttwo,1794679122237609,shutdown,,ms_exit,,,,,jake-jongejans-2a8a7e8aclienttwo1
+clienttwo,gateway@clienttwo,1794679161819116,invalid_directives,,negative retentionSeconds -1,,,cached,GUID-state-aware,jake-jongejans-2a8a7e8aclienttwo1
+clienttwo,gateway@clienttwo,1794679163867111,subscribe,,subscription established,,,cached,,jake-jongejans-2a8a7e8aclienttwo1
+clienttwo,gateway@clienttwo,1794679164830344,subscribe,,subscription established,,,cached,,jake-jongejans-2a8a7e8aclienttwo1
+clienttwo,gateway@clienttwo,1794679165878004,read,DENY,invalid stateDirectives; fail closed,vfl_client_model,latest,cached,GUID-state-aware,jake-jongejans-2a8a7e8aclienttwo1
+clienttwo,gateway@clienttwo,1794679169318168,write,DENY,invalid stateDirectives; fail closed,vfl_client_model,latest,cached,GUID-state-aware,jake-jongejans-2a8a7e8aclienttwo1
+clienttwo,gateway@clienttwo,1794679169727223,write,DENY,invalid stateDirectives; fail closed,vfl_client_model,latest,cached,GUID-state-aware,jake-jongejans-2a8a7e8aclienttwo1
+clienttwo,gateway@clienttwo,1794679170018135,write,DENY,invalid stateDirectives; fail closed,vfl_client_model,latest,cached,GUID-state-aware,jake-jongejans-2a8a7e8aclienttwo1
+clienttwo,gateway@clienttwo,1794679170071006,shutdown,,ms_exit,,,,,jake-jongejans-2a8a7e8aclienttwo1
+clienttwo,gateway@clienttwo,1794679170072266,shutdown,,ms_exit,,,,,jake-jongejans-2a8a7e8aclienttwo1
+clienttwo,gateway@clienttwo,1794679216060160,subscribe,,subscription established,,,cached,,jake-jongejans-2a8a7e8aclienttwo1
+clienttwo,gateway@clienttwo,1794679216948213,subscribe,,subscription established,,,cached,,jake-jongejans-2a8a7e8aclienttwo1
+clienttwo,gateway@clienttwo,1794679218060433,read,DENY,resume disabled,vfl_client_model,latest,cached,GUID-state-aware,jake-jongejans-2a8a7e8aclienttwo1
+clienttwo,gateway@clienttwo,1794679221522402,write,ALLOW,,vfl_client_model,latest,cached,GUID-state-aware,jake-jongejans-2a8a7e8aclienttwo1
+clienttwo,gateway@clienttwo,1794679221848349,write,ALLOW,,vfl_client_model,latest,cached,GUID-state-aware,jake-jongejans-2a8a7e8aclienttwo1
+clienttwo,gateway@clienttwo,1794679222118713,write,ALLOW,,vfl_client_model,latest,cached,GUID-state-aware,jake-jongejans-2a8a7e8aclienttwo1
+clienttwo,gateway@clienttwo,1794679222177386,shutdown,,ms_exit,,,,,jake-jongejans-2a8a7e8aclienttwo1
+clienttwo,gateway@clienttwo,1794679222178484,shutdown,,ms_exit,,,,,jake-jongejans-2a8a7e8aclienttwo1
+clientthree,gateway@clientthree,1794679019497878,subscribe,,subscription established,,,cached,,jake-jongejans-2a8a7e8aclientthree1
+clientthree,gateway@clientthree,1794679020317230,subscribe,,subscription established,,,cached,,jake-jongejans-2a8a7e8aclientthree1
+clientthree,gateway@clientthree,1794679021520777,read,DENY,allowed = false,vfl_client_model,latest,cached,GUID-state-aware,jake-jongejans-2a8a7e8aclientthree1
+clientthree,gateway@clientthree,1794679026098670,write,DENY,allowed = false,vfl_client_model,latest,cached,GUID-state-aware,jake-jongejans-2a8a7e8aclientthree1
+clientthree,gateway@clientthree,1794679026399142,write,DENY,allowed = false,vfl_client_model,latest,cached,GUID-state-aware,jake-jongejans-2a8a7e8aclientthree1
+clientthree,gateway@clientthree,1794679026704697,write,DENY,allowed = false,vfl_client_model,latest,cached,GUID-state-aware,jake-jongejans-2a8a7e8aclientthree1
+clientthree,gateway@clientthree,1794679026753439,shutdown,,ms_exit,,,,,jake-jongejans-2a8a7e8aclientthree1
+clientthree,gateway@clientthree,1794679026754606,shutdown,,ms_exit,,,,,jake-jongejans-2a8a7e8aclientthree1
+clientthree,gateway@clientthree,1794679069442695,subscribe,,subscription established,,,cached,,jake-jongejans-2a8a7e8aclientthree1
+clientthree,gateway@clientthree,1794679069543107,subscribe,,subscription established,,,cached,,jake-jongejans-2a8a7e8aclientthree1
+clientthree,gateway@clientthree,1794679071535513,read,DENY,stateDirectives absent,vfl_client_model,latest,cached,GUID-state-aware,jake-jongejans-2a8a7e8aclientthree1
+clientthree,gateway@clientthree,1794679072793306,write,DENY,stateDirectives absent,vfl_client_model,latest,cached,GUID-state-aware,jake-jongejans-2a8a7e8aclientthree1
+clientthree,gateway@clientthree,1794679073278462,write,DENY,stateDirectives absent,vfl_client_model,latest,cached,GUID-state-aware,jake-jongejans-2a8a7e8aclientthree1
+clientthree,gateway@clientthree,1794679073580913,write,DENY,stateDirectives absent,vfl_client_model,latest,cached,GUID-state-aware,jake-jongejans-2a8a7e8aclientthree1
+clientthree,gateway@clientthree,1794679073630343,shutdown,,ms_exit,,,,,jake-jongejans-2a8a7e8aclientthree1
+clientthree,gateway@clientthree,1794679073632505,shutdown,,ms_exit,,,,,jake-jongejans-2a8a7e8aclientthree1
+clientthree,gateway@clientthree,1794679114350737,invalid_directives,,"unknown onRevocation ""shred""",,,cached,GUID-state-aware,jake-jongejans-2a8a7e8aclientthree1
+clientthree,gateway@clientthree,1794679116594754,subscribe,,subscription established,,,cached,,jake-jongejans-2a8a7e8aclientthree1
+clientthree,gateway@clientthree,1794679117207862,subscribe,,subscription established,,,cached,,jake-jongejans-2a8a7e8aclientthree1
+clientthree,gateway@clientthree,1794679118583717,read,DENY,invalid stateDirectives; fail closed,vfl_client_model,latest,cached,GUID-state-aware,jake-jongejans-2a8a7e8aclientthree1
+clientthree,gateway@clientthree,1794679121481093,write,DENY,invalid stateDirectives; fail closed,vfl_client_model,latest,cached,GUID-state-aware,jake-jongejans-2a8a7e8aclientthree1
+clientthree,gateway@clientthree,1794679121881631,write,DENY,invalid stateDirectives; fail closed,vfl_client_model,latest,cached,GUID-state-aware,jake-jongejans-2a8a7e8aclientthree1
+clientthree,gateway@clientthree,1794679122192844,write,DENY,invalid stateDirectives; fail closed,vfl_client_model,latest,cached,GUID-state-aware,jake-jongejans-2a8a7e8aclientthree1
+clientthree,gateway@clientthree,1794679122238136,shutdown,,ms_exit,,,,,jake-jongejans-2a8a7e8aclientthree1
+clientthree,gateway@clientthree,1794679122239091,shutdown,,ms_exit,,,,,jake-jongejans-2a8a7e8aclientthree1
+clientthree,gateway@clientthree,1794679161900028,invalid_directives,,negative retentionSeconds -1,,,cached,GUID-state-aware,jake-jongejans-2a8a7e8aclientthree1
+clientthree,gateway@clientthree,1794679163896384,subscribe,,subscription established,,,cached,,jake-jongejans-2a8a7e8aclientthree1
+clientthree,gateway@clientthree,1794679164795776,subscribe,,subscription established,,,cached,,jake-jongejans-2a8a7e8aclientthree1
+clientthree,gateway@clientthree,1794679166020973,read,DENY,invalid stateDirectives; fail closed,vfl_client_model,latest,cached,GUID-state-aware,jake-jongejans-2a8a7e8aclientthree1
+clientthree,gateway@clientthree,1794679169245387,write,DENY,invalid stateDirectives; fail closed,vfl_client_model,latest,cached,GUID-state-aware,jake-jongejans-2a8a7e8aclientthree1
+clientthree,gateway@clientthree,1794679169733439,write,DENY,invalid stateDirectives; fail closed,vfl_client_model,latest,cached,GUID-state-aware,jake-jongejans-2a8a7e8aclientthree1
+clientthree,gateway@clientthree,1794679170023683,write,DENY,invalid stateDirectives; fail closed,vfl_client_model,latest,cached,GUID-state-aware,jake-jongejans-2a8a7e8aclientthree1
+clientthree,gateway@clientthree,1794679170072178,shutdown,,ms_exit,,,,,jake-jongejans-2a8a7e8aclientthree1
+clientthree,gateway@clientthree,1794679170073102,shutdown,,ms_exit,,,,,jake-jongejans-2a8a7e8aclientthree1
+clientthree,gateway@clientthree,1794679216212421,subscribe,,subscription established,,,cached,,jake-jongejans-2a8a7e8aclientthree1
+clientthree,gateway@clientthree,1794679216957788,subscribe,,subscription established,,,cached,,jake-jongejans-2a8a7e8aclientthree1
+clientthree,gateway@clientthree,1794679218301398,read,DENY,resume disabled,vfl_client_model,latest,cached,GUID-state-aware,jake-jongejans-2a8a7e8aclientthree1
+clientthree,gateway@clientthree,1794679221445422,write,ALLOW,,vfl_client_model,latest,cached,GUID-state-aware,jake-jongejans-2a8a7e8aclientthree1
+clientthree,gateway@clientthree,1794679221838807,write,ALLOW,,vfl_client_model,latest,cached,GUID-state-aware,jake-jongejans-2a8a7e8aclientthree1
+clientthree,gateway@clientthree,1794679222124395,write,ALLOW,,vfl_client_model,latest,cached,GUID-state-aware,jake-jongejans-2a8a7e8aclientthree1
+clientthree,gateway@clientthree,1794679222177713,shutdown,,ms_exit,,,,,jake-jongejans-2a8a7e8aclientthree1
+clientthree,gateway@clientthree,1794679222178712,shutdown,,ms_exit,,,,,jake-jongejans-2a8a7e8aclientthree1

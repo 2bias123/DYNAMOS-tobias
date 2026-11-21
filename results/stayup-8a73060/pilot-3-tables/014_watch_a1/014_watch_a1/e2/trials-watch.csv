@@ -1,0 +1,4 @@
+trial,pod,reenable_us,allowed_us,sent_clock,sent_us,returned_us,end_clock,end_us,value_us,rtt_us,end_op,end_decision,end_reason,policy_source,relation_id,purge_records,machines,result
+1,jake-jongejans-bb534fb7server1-zhmrh,1794644195864633,1794644216268600,sender@server,1794644218082008,1794644218115181,gateway@server,1794644218120965,38957,33173,write,DENY,allowed = false,cached,GUID-state-aware,1,one: server,pass
+2,jake-jongejans-bb534fb7server1-zhmrh,1794644218689144,1794644218719981,sender@server,1794644220396220,1794644220427545,gateway@server,1794644220434468,38248,31325,write,DENY,allowed = false,cached,GUID-state-aware,1,one: server,pass
+3,jake-jongejans-bb534fb7server1-zhmrh,1794644221002837,1794644221035028,sender@server,1794644222724761,1794644222759448,gateway@server,1794644222764255,39494,34687,write,DENY,allowed = false,cached,GUID-state-aware,1,one: server,pass

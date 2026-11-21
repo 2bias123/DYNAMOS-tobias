@@ -1,0 +1,4 @@
+trial,pod,reenable_us,allowed_us,sent_clock,sent_us,returned_us,end_clock,end_us,value_us,rtt_us,end_op,end_decision,end_reason,policy_source,relation_id,purge_records,machines,result
+1,jake-jongejans-740256a5server1-wrxnr,1794755535302693,1794755558442228,sender@server,1794755560224704,1794755560256541,gateway@server,1794755560262215,37511,31837,write,DENY,allowed = false,cached,GUID-state-aware,1,one: server,pass
+2,jake-jongejans-740256a5server1-wrxnr,1794755560800422,1794755560834022,sender@server,1794755562459049,1794755562489218,gateway@server,1794755562498189,39140,30169,write,DENY,allowed = false,cached,GUID-state-aware,1,one: server,pass
+3,jake-jongejans-740256a5server1-wrxnr,1794755563041886,1794755563083713,sender@server,1794755564750268,1794755564782273,gateway@server,1794755564792739,42471,32005,write,DENY,allowed = false,cached,GUID-state-aware,1,one: server,pass

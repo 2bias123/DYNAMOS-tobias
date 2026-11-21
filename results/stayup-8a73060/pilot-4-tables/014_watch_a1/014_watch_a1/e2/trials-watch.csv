@@ -1,0 +1,4 @@
+trial,pod,reenable_us,allowed_us,sent_clock,sent_us,returned_us,end_clock,end_us,value_us,rtt_us,end_op,end_decision,end_reason,policy_source,relation_id,purge_records,machines,result
+1,jake-jongejans-cba024eeserver1-25qhd,1794672956485734,1794672976320053,sender@server,1794672978147997,1794672978180890,gateway@server,1794672978186569,38572,32893,write,DENY,allowed = false,cached,GUID-state-aware,1,one: server,pass
+2,jake-jongejans-cba024eeserver1-25qhd,1794672978784257,1794672978819572,sender@server,1794672980552665,1794672980584686,gateway@server,1794672980595572,42907,32021,write,DENY,allowed = false,cached,GUID-state-aware,1,one: server,pass
+3,jake-jongejans-cba024eeserver1-25qhd,1794672981182326,1794672981217593,sender@server,1794672982951988,1794672982985054,gateway@server,1794672982989023,37035,33066,write,DENY,allowed = false,cached,GUID-state-aware,1,one: server,pass

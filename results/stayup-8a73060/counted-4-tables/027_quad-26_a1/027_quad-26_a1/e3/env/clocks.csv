@@ -1,0 +1,15 @@
+when,vm,offset_us,uncertainty_us,exchanges,reference_clock
+before,control,0,10,200,host@control
+before,clientone,-450,76,200,host@control
+before,clientthree,1267,81,200,host@control
+before,clienttwo,-573,77,200,host@control
+before,control,-1,11,200,host@control
+before,dynamos,586,85,200,host@control
+before,server,-221,82,200,host@control
+after,control,-4,11,200,host@control
+after,clientone,-598,76,200,host@control
+after,clientthree,1340,75,200,host@control
+after,clienttwo,-691,107,200,host@control
+after,control,-4,11,200,host@control
+after,dynamos,805,70,200,host@control
+after,server,64,85,200,host@control

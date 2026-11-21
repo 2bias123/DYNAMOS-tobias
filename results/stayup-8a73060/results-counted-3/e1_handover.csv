@@ -1,0 +1,5 @@
+unit,case,check,steward,start_clock,start_us,end_clock,end_us,value_us,value_ms,result
+idle-c,(c) hand-over,duration logged by the agent,server,agent@server,1794718470771703,agent@server,1794718471302043,530340,530.3,pass
+idle-c,(c) hand-over,duration logged by the agent,clientone,agent@clientone,1794718470779726,agent@clientone,1794718471836641,1056915,1056.9,pass
+idle-c,(c) hand-over,duration logged by the agent,clienttwo,agent@clienttwo,1794718470786501,agent@clienttwo,1794718471833992,1047491,1047.5,pass
+idle-c,(c) hand-over,duration logged by the agent,clientthree,agent@clientthree,1794718470770537,agent@clientthree,1794718471300122,529585,529.6,pass

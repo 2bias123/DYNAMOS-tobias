@@ -1,0 +1,15 @@
+row,case,steward,expected,observed,result
+allow then deny,allow then deny,server,"at least 10 and fewer than 50 ALLOW writes, then only DENY 'allowed = false', at least one","10 ALLOW, 40 DENY with reasons ['allowed = false'], no ALLOW after a DENY",pass
+run 1 destroys nothing,run 1 destroys nothing,server,"no PURGED record at all, no DELETED up to run 1's shutdown record","0 PURGED, 0 PURGED or DELETED up to run 1's shutdown record",pass
+put on the claim's VM,put on the claim's VM,server,"the claim on server, where the put was stamped",the claim on server,pass
+expiry window,expiry window,server,"every file run 1 wrote has one DELETED record from its due time (the later of its last write ALLOW + 120 s and the retention put on server's VM) to 35 s after it, either form; DEFERRED and CANCELLED kept","vfl_server_model/latest: 1 DELETED, 120.1 s after its last write and 0.1 s after its due time (R put 57.9 s after it), idle form, 0 DEFERRED and 0 CANCELLED kept",pass
+nothing to resume,nothing to resume,server,"after the expiry, run 2's first read DENY 'not found'","DENY 'not found', a DELETED record before run 2",pass
+persisted every round,persisted every round,clientone,50 write ALLOW records by run 1's job,"50 write records, 50 ALLOW",pass
+run 1 destroys nothing,run 1 destroys nothing,clientone,"no PURGED record at all, no DELETED up to run 1's shutdown record","0 PURGED, 0 PURGED or DELETED up to run 1's shutdown record",pass
+expiry window,expiry window,clientone,"every file run 1 wrote has one DELETED record from its due time (its last write ALLOW + 120 s) to 35 s after it, either form; DEFERRED and CANCELLED kept","vfl_client_model/latest: 1 DELETED, 134.5 s after its last write and 14.5 s after its due time, idle form, 0 DEFERRED and 0 CANCELLED kept",pass
+persisted every round,persisted every round,clienttwo,50 write ALLOW records by run 1's job,"50 write records, 50 ALLOW",pass
+run 1 destroys nothing,run 1 destroys nothing,clienttwo,"no PURGED record at all, no DELETED up to run 1's shutdown record","0 PURGED, 0 PURGED or DELETED up to run 1's shutdown record",pass
+expiry window,expiry window,clienttwo,"every file run 1 wrote has one DELETED record from its due time (its last write ALLOW + 120 s) to 35 s after it, either form; DEFERRED and CANCELLED kept","vfl_client_model/latest: 1 DELETED, 135.2 s after its last write and 15.2 s after its due time, idle form, 0 DEFERRED and 0 CANCELLED kept",pass
+persisted every round,persisted every round,clientthree,50 write ALLOW records by run 1's job,"50 write records, 50 ALLOW",pass
+run 1 destroys nothing,run 1 destroys nothing,clientthree,"no PURGED record at all, no DELETED up to run 1's shutdown record","0 PURGED, 0 PURGED or DELETED up to run 1's shutdown record",pass
+expiry window,expiry window,clientthree,"every file run 1 wrote has one DELETED record from its due time (its last write ALLOW + 120 s) to 35 s after it, either form; DEFERRED and CANCELLED kept","vfl_client_model/latest: 1 DELETED, 135.4 s after its last write and 15.4 s after its due time, idle form, 0 DEFERRED and 0 CANCELLED kept",pass

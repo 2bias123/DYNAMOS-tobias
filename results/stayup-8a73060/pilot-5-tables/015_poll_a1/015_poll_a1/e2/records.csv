@@ -1,0 +1,92 @@
+steward,clock,decided_us,op,decision,reason,state_class,state_key,policy_source,relation_id,job_id
+server,gateway@server,1794710464997741,write,ALLOW,,e2_probe,probe,cached,GUID-state-aware,e2-poll
+server,gateway@server,1794710466000629,write,ALLOW,,e2_probe,probe,cached,GUID-state-aware,e2-poll
+server,gateway@server,1794710467003567,write,ALLOW,,e2_probe,probe,cached,GUID-state-aware,e2-poll
+server,gateway@server,1794710468006285,write,ALLOW,,e2_probe,probe,cached,GUID-state-aware,e2-poll
+server,gateway@server,1794710469008935,write,ALLOW,,e2_probe,probe,cached,GUID-state-aware,e2-poll
+server,gateway@server,1794710470011683,write,ALLOW,,e2_probe,probe,cached,GUID-state-aware,e2-poll
+server,gateway@server,1794710471014178,write,ALLOW,,e2_probe,probe,cached,GUID-state-aware,e2-poll
+server,gateway@server,1794710472019339,write,ALLOW,,e2_probe,probe,cached,GUID-state-aware,e2-poll
+server,gateway@server,1794710473022463,write,ALLOW,,e2_probe,probe,cached,GUID-state-aware,e2-poll
+server,gateway@server,1794710474024882,write,ALLOW,,e2_probe,probe,cached,GUID-state-aware,e2-poll
+server,gateway@server,1794710475027287,write,ALLOW,,e2_probe,probe,cached,GUID-state-aware,e2-poll
+server,gateway@server,1794710476030118,write,ALLOW,,e2_probe,probe,cached,GUID-state-aware,e2-poll
+server,gateway@server,1794710477032836,write,ALLOW,,e2_probe,probe,cached,GUID-state-aware,e2-poll
+server,gateway@server,1794710478035124,write,ALLOW,,e2_probe,probe,cached,GUID-state-aware,e2-poll
+server,gateway@server,1794710479038242,write,ALLOW,,e2_probe,probe,cached,GUID-state-aware,e2-poll
+server,gateway@server,1794710480042160,write,ALLOW,,e2_probe,probe,cached,GUID-state-aware,e2-poll
+server,gateway@server,1794710481044614,write,ALLOW,,e2_probe,probe,cached,GUID-state-aware,e2-poll
+server,gateway@server,1794710482047096,write,ALLOW,,e2_probe,probe,cached,GUID-state-aware,e2-poll
+server,gateway@server,1794710483049545,write,ALLOW,,e2_probe,probe,cached,GUID-state-aware,e2-poll
+server,gateway@server,1794710484051933,write,ALLOW,,e2_probe,probe,cached,GUID-state-aware,e2-poll
+server,gateway@server,1794710485054581,write,ALLOW,,e2_probe,probe,cached,GUID-state-aware,e2-poll
+server,gateway@server,1794710486057022,write,ALLOW,,e2_probe,probe,cached,GUID-state-aware,e2-poll
+server,gateway@server,1794710487059874,write,ALLOW,,e2_probe,probe,cached,GUID-state-aware,e2-poll
+server,gateway@server,1794710488062362,write,ALLOW,,e2_probe,probe,cached,GUID-state-aware,e2-poll
+server,gateway@server,1794710489064923,write,ALLOW,,e2_probe,probe,cached,GUID-state-aware,e2-poll
+server,gateway@server,1794710490067206,write,ALLOW,,e2_probe,probe,cached,GUID-state-aware,e2-poll
+server,gateway@server,1794710491069474,write,ALLOW,,e2_probe,probe,cached,GUID-state-aware,e2-poll
+server,gateway@server,1794710492071965,write,ALLOW,,e2_probe,probe,cached,GUID-state-aware,e2-poll
+server,gateway@server,1794710492811987,purge,PURGED,revoked; onRevocation=purge,e2_probe,probe,fresh,GUID-state-aware,e2-poll
+server,gateway@server,1794710493074921,write,DENY,allowed = false,e2_probe,probe,cached,GUID-state-aware,e2-poll
+server,gateway@server,1794710494077012,write,DENY,allowed = false,e2_probe,probe,cached,GUID-state-aware,e2-poll
+server,gateway@server,1794710495079075,write,DENY,allowed = false,e2_probe,probe,cached,GUID-state-aware,e2-poll
+server,gateway@server,1794710496080789,write,DENY,allowed = false,e2_probe,probe,cached,GUID-state-aware,e2-poll
+server,gateway@server,1794710497082978,write,DENY,allowed = false,e2_probe,probe,cached,GUID-state-aware,e2-poll
+server,gateway@server,1794710498085534,write,DENY,allowed = false,e2_probe,probe,cached,GUID-state-aware,e2-poll
+server,gateway@server,1794710499087993,write,DENY,allowed = false,e2_probe,probe,cached,GUID-state-aware,e2-poll
+server,gateway@server,1794710500090113,write,DENY,allowed = false,e2_probe,probe,cached,GUID-state-aware,e2-poll
+server,gateway@server,1794710501092047,write,DENY,allowed = false,e2_probe,probe,cached,GUID-state-aware,e2-poll
+server,gateway@server,1794710502094016,write,DENY,allowed = false,e2_probe,probe,cached,GUID-state-aware,e2-poll
+server,gateway@server,1794710503096038,write,DENY,allowed = false,e2_probe,probe,cached,GUID-state-aware,e2-poll
+server,gateway@server,1794710504098816,write,DENY,allowed = false,e2_probe,probe,cached,GUID-state-aware,e2-poll
+server,gateway@server,1794710505101669,write,DENY,allowed = false,e2_probe,probe,cached,GUID-state-aware,e2-poll
+server,gateway@server,1794710506103603,write,DENY,allowed = false,e2_probe,probe,cached,GUID-state-aware,e2-poll
+server,gateway@server,1794710507105382,write,DENY,allowed = false,e2_probe,probe,cached,GUID-state-aware,e2-poll
+server,gateway@server,1794710508107199,write,DENY,allowed = false,e2_probe,probe,cached,GUID-state-aware,e2-poll
+server,gateway@server,1794710509109254,write,DENY,allowed = false,e2_probe,probe,cached,GUID-state-aware,e2-poll
+server,gateway@server,1794710510111344,write,DENY,allowed = false,e2_probe,probe,cached,GUID-state-aware,e2-poll
+server,gateway@server,1794710511113776,write,DENY,allowed = false,e2_probe,probe,cached,GUID-state-aware,e2-poll
+server,gateway@server,1794710512116043,write,DENY,allowed = false,e2_probe,probe,cached,GUID-state-aware,e2-poll
+server,gateway@server,1794710513117839,write,DENY,allowed = false,e2_probe,probe,cached,GUID-state-aware,e2-poll
+server,gateway@server,1794710514119885,write,DENY,allowed = false,e2_probe,probe,cached,GUID-state-aware,e2-poll
+server,gateway@server,1794710515121690,write,DENY,allowed = false,e2_probe,probe,cached,GUID-state-aware,e2-poll
+server,gateway@server,1794710516123254,write,DENY,allowed = false,e2_probe,probe,cached,GUID-state-aware,e2-poll
+server,gateway@server,1794710517125135,write,DENY,allowed = false,e2_probe,probe,cached,GUID-state-aware,e2-poll
+server,gateway@server,1794710518127010,write,DENY,allowed = false,e2_probe,probe,cached,GUID-state-aware,e2-poll
+server,gateway@server,1794710519128694,write,DENY,allowed = false,e2_probe,probe,cached,GUID-state-aware,e2-poll
+server,gateway@server,1794710520130558,write,DENY,allowed = false,e2_probe,probe,cached,GUID-state-aware,e2-poll
+server,gateway@server,1794710521132554,write,DENY,allowed = false,e2_probe,probe,cached,GUID-state-aware,e2-poll
+server,gateway@server,1794710522134421,write,DENY,allowed = false,e2_probe,probe,cached,GUID-state-aware,e2-poll
+server,gateway@server,1794710523136560,write,ALLOW,,e2_probe,probe,cached,GUID-state-aware,e2-poll
+server,gateway@server,1794710524138960,write,ALLOW,,e2_probe,probe,cached,GUID-state-aware,e2-poll
+server,gateway@server,1794710525141233,write,ALLOW,,e2_probe,probe,cached,GUID-state-aware,e2-poll
+server,gateway@server,1794710526143998,write,ALLOW,,e2_probe,probe,cached,GUID-state-aware,e2-poll
+server,gateway@server,1794710527146640,write,ALLOW,,e2_probe,probe,cached,GUID-state-aware,e2-poll
+server,gateway@server,1794710528148941,write,ALLOW,,e2_probe,probe,cached,GUID-state-aware,e2-poll
+server,gateway@server,1794710529151365,write,ALLOW,,e2_probe,probe,cached,GUID-state-aware,e2-poll
+server,gateway@server,1794710530153693,write,ALLOW,,e2_probe,probe,cached,GUID-state-aware,e2-poll
+server,gateway@server,1794710531155945,write,ALLOW,,e2_probe,probe,cached,GUID-state-aware,e2-poll
+server,gateway@server,1794710532158469,write,ALLOW,,e2_probe,probe,cached,GUID-state-aware,e2-poll
+server,gateway@server,1794710533161826,write,ALLOW,,e2_probe,probe,cached,GUID-state-aware,e2-poll
+server,gateway@server,1794710534164264,write,ALLOW,,e2_probe,probe,cached,GUID-state-aware,e2-poll
+server,gateway@server,1794710535166678,write,ALLOW,,e2_probe,probe,cached,GUID-state-aware,e2-poll
+server,gateway@server,1794710536169452,write,ALLOW,,e2_probe,probe,cached,GUID-state-aware,e2-poll
+server,gateway@server,1794710537171712,write,ALLOW,,e2_probe,probe,cached,GUID-state-aware,e2-poll
+server,gateway@server,1794710538173940,write,ALLOW,,e2_probe,probe,cached,GUID-state-aware,e2-poll
+server,gateway@server,1794710539176204,write,ALLOW,,e2_probe,probe,cached,GUID-state-aware,e2-poll
+server,gateway@server,1794710540178763,write,ALLOW,,e2_probe,probe,cached,GUID-state-aware,e2-poll
+server,gateway@server,1794710541181291,write,ALLOW,,e2_probe,probe,cached,GUID-state-aware,e2-poll
+server,gateway@server,1794710542183310,write,ALLOW,,e2_probe,probe,cached,GUID-state-aware,e2-poll
+server,gateway@server,1794710543185702,write,ALLOW,,e2_probe,probe,cached,GUID-state-aware,e2-poll
+server,gateway@server,1794710544187735,write,ALLOW,,e2_probe,probe,cached,GUID-state-aware,e2-poll
+server,gateway@server,1794710545190535,write,ALLOW,,e2_probe,probe,cached,GUID-state-aware,e2-poll
+server,gateway@server,1794710546193255,write,ALLOW,,e2_probe,probe,cached,GUID-state-aware,e2-poll
+server,gateway@server,1794710547195705,write,ALLOW,,e2_probe,probe,cached,GUID-state-aware,e2-poll
+server,gateway@server,1794710548197801,write,ALLOW,,e2_probe,probe,cached,GUID-state-aware,e2-poll
+server,gateway@server,1794710549200091,write,ALLOW,,e2_probe,probe,cached,GUID-state-aware,e2-poll
+server,gateway@server,1794710550202654,write,ALLOW,,e2_probe,probe,cached,GUID-state-aware,e2-poll
+server,gateway@server,1794710551205054,write,ALLOW,,e2_probe,probe,cached,GUID-state-aware,e2-poll
+server,gateway@server,1794710552207115,write,ALLOW,,e2_probe,probe,cached,GUID-state-aware,e2-poll
+server,gateway@server,1794710552810926,purge,PURGED,revoked; onRevocation=purge,e2_probe,probe,fresh,GUID-state-aware,e2-poll
+server,gateway@server,1794710553209352,write,DENY,allowed = false,e2_probe,probe,cached,GUID-state-aware,e2-poll

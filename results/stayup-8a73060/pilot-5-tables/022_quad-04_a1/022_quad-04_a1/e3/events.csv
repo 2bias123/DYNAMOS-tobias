@@ -1,0 +1,80 @@
+clock,at_us,event,subject,duration_us,detail
+host@control,1794713552895854,quadruplet,q04,0,"Williams order h a c b, 10 rounds each"
+host@control,1794713655691479,clean start,all,102795284,jobs of the four stewards deleted together in 33.0 s; agent mode store-only; agents switched: server clientone clienttwo clientthree; with the seven rollouts;every check holds
+host@control,1794713664471499,deploy gap: chain jobs deleted,server,0,none standing
+host@control,1794713664667079,deploy gap: chain jobs deleted,clientone,0,none standing
+host@control,1794713664827265,deploy gap: chain jobs deleted,clienttwo,0,none standing
+host@control,1794713665006003,deploy gap: chain jobs deleted,clientthree,0,none standing
+host@control,1794713665322631,deploy gap: chain pods gone,server,192560,
+host@control,1794713665322776,deploy gap: held,server,0,30 s after the harness's deletion at 1794713556449014
+host@control,1794713665465292,deploy gap: chain pods gone,clientone,142430,
+host@control,1794713665465461,deploy gap: held,clientone,0,30 s after the harness's deletion at 1794713556534798
+host@control,1794713665658921,deploy gap: chain pods gone,clienttwo,193374,
+host@control,1794713665659061,deploy gap: held,clienttwo,0,30 s after the harness's deletion at 1794713556680092
+host@control,1794713665831615,deploy gap: chain pods gone,clientthree,172311,
+host@control,1794713665831745,deploy gap: held,clientthree,0,30 s after the harness's deletion at 1794713556790276
+host@control,1794713665831768,trigger,api-gateway,2632,"request 589c4982-b32f-4a2d-9afe-7aef91d16406, 10 rounds; time is the send"
+host@control,1794713690850863,config h: run done,api-gateway,29115643,request 589c4982-b32f-4a2d-9afe-7aef91d16406
+agent@server,1794713666026664,config h: hand-over,server,62554,logged by the agent for state-server-ad751c18-vfltrainmodelrequest
+agent@clientone,1794713665974641,config h: hand-over,clientone,21868,logged by the agent for state-clientone-ad751c18-vfltrainmodelrequest
+agent@clienttwo,1794713666027447,config h: hand-over,clienttwo,75895,logged by the agent for state-clienttwo-ad751c18-vfltrainmodelrequest
+agent@clientthree,1794713665977621,config h: hand-over,clientthree,21803,logged by the agent for state-clientthree-ad751c18-vfltrainmodelrequest
+host@control,1794713925304757,clean start,all,197825299,jobs of the four stewards deleted together in 32.8 s; agent mode none; agents switched: server clientone clienttwo clientthree; with the seven rollouts;every check holds
+host@control,1794713930952779,config a: requiresGateway dropped,vfl-train-model-demo vfl-train-demo,0,"the chain metadata in etcd, put back after the run"
+host@control,1794713933525671,deploy gap: chain jobs deleted,server,0,none standing
+host@control,1794713933709086,deploy gap: chain jobs deleted,clientone,0,none standing
+host@control,1794713933927255,deploy gap: chain jobs deleted,clienttwo,0,none standing
+host@control,1794713934103034,deploy gap: chain jobs deleted,clientthree,0,none standing
+host@control,1794713934382430,deploy gap: chain pods gone,server,185952,
+host@control,1794713934382667,deploy gap: held,server,0,30 s after the harness's deletion at 1794713733835182
+host@control,1794713934571127,deploy gap: chain pods gone,clientone,188372,
+host@control,1794713934571262,deploy gap: held,clientone,0,30 s after the harness's deletion at 1794713733951210
+host@control,1794713934720379,deploy gap: chain pods gone,clienttwo,148996,
+host@control,1794713934720502,deploy gap: held,clienttwo,0,30 s after the harness's deletion at 1794713734045586
+host@control,1794713934858405,deploy gap: chain pods gone,clientthree,137826,
+host@control,1794713934858531,deploy gap: held,clientthree,0,30 s after the harness's deletion at 1794713734147473
+host@control,1794713934858551,trigger,api-gateway,3872,"request c4b6ec29-47f9-4ed7-a33b-60067743cb96, 10 rounds; time is the send"
+host@control,1794713949870481,config a: run done,api-gateway,18757780,request c4b6ec29-47f9-4ed7-a33b-60067743cb96
+host@control,1794713950624722,config a: chain metadata put back,vfl-train-model-demo vfl-train-demo,0,
+host@control,1794714046202030,clean start,all,93817508,jobs of the four stewards deleted together in 33.2 s; agent mode none; agents switched: none; with the seven rollouts;every check holds
+host@control,1794714053819191,deploy gap: chain jobs deleted,server,0,none standing
+host@control,1794714053982425,deploy gap: chain jobs deleted,clientone,0,none standing
+host@control,1794714054147409,deploy gap: chain jobs deleted,clienttwo,0,none standing
+host@control,1794714054299643,deploy gap: chain jobs deleted,clientthree,0,none standing
+host@control,1794714054541198,deploy gap: chain pods gone,server,152978,
+host@control,1794714054541368,deploy gap: held,server,0,30 s after the harness's deletion at 1794713955632111
+host@control,1794714054704232,deploy gap: chain pods gone,clientone,162755,
+host@control,1794714054704378,deploy gap: held,clientone,0,30 s after the harness's deletion at 1794713955746521
+host@control,1794714054858736,deploy gap: chain pods gone,clienttwo,154250,
+host@control,1794714054858876,deploy gap: held,clienttwo,0,30 s after the harness's deletion at 1794713955883532
+host@control,1794714055018277,deploy gap: chain pods gone,clientthree,159286,
+host@control,1794714055018503,deploy gap: held,clientthree,0,30 s after the harness's deletion at 1794713956006066
+host@control,1794714055018525,trigger,api-gateway,3092,"request da29d544-3f9f-4be8-b0c3-60fb1e938c4a, 10 rounds; time is the send"
+host@control,1794714080037837,config c: run done,api-gateway,28615779,request da29d544-3f9f-4be8-b0c3-60fb1e938c4a
+agent@server,1794714055169256,config c: hand-over,server,31632,logged by the agent for state-server-ad751c18-vfltrainmodelrequest
+kubelet@server,1794714080000000,config c: idle gap,server,5738703,"job's enforcement point ended (kubelet, whole seconds) to 'Agreement loaded' of idle-state-server-ad751c18-vfltrainmodelrequest-b2vqt on server; its container started 5 s after"
+agent@clientone,1794714055170892,config c: hand-over,clientone,33070,logged by the agent for state-clientone-ad751c18-vfltrainmodelrequest
+kubelet@clientone,1794714080000000,config c: idle gap,clientone,6605715,"job's enforcement point ended (kubelet, whole seconds) to 'Agreement loaded' of idle-state-clientone-ad751c18-vfltrainmodelrequest-q4j94 on clientone; its container started 6 s after"
+agent@clienttwo,1794714055214536,config c: hand-over,clienttwo,75272,logged by the agent for state-clienttwo-ad751c18-vfltrainmodelrequest
+kubelet@clienttwo,1794714080000000,config c: idle gap,clienttwo,6488596,"job's enforcement point ended (kubelet, whole seconds) to 'Agreement loaded' of idle-state-clienttwo-ad751c18-vfltrainmodelrequest-x28k4 on clienttwo; its container started 6 s after"
+agent@clientthree,1794714055217458,config c: hand-over,clientthree,72310,logged by the agent for state-clientthree-ad751c18-vfltrainmodelrequest
+kubelet@clientthree,1794714080000000,config c: idle gap,clientthree,6383768,"job's enforcement point ended (kubelet, whole seconds) to 'Agreement loaded' of idle-state-clientthree-ad751c18-vfltrainmodelrequest-m262d on clientthree; its container started 6 s after"
+host@control,1794714292391744,clean start,all,198272162,jobs of the four stewards deleted together in 33.5 s; agent mode passthrough; agents switched: server clientone clienttwo clientthree; with the seven rollouts;every check holds
+host@control,1794714299831829,deploy gap: chain jobs deleted,server,0,none standing
+host@control,1794714299975395,deploy gap: chain jobs deleted,clientone,0,none standing
+host@control,1794714300121100,deploy gap: chain jobs deleted,clienttwo,0,none standing
+host@control,1794714300272727,deploy gap: chain jobs deleted,clientthree,0,none standing
+host@control,1794714300484180,deploy gap: chain pods gone,server,142433,
+host@control,1794714300484306,deploy gap: held,server,0,30 s after the harness's deletion at 1794714097911763
+host@control,1794714300622389,deploy gap: chain pods gone,clientone,137911,
+host@control,1794714300622514,deploy gap: held,clientone,0,30 s after the harness's deletion at 1794714098041346
+host@control,1794714300779305,deploy gap: chain pods gone,clienttwo,156713,
+host@control,1794714300779465,deploy gap: held,clienttwo,0,30 s after the harness's deletion at 1794714098201903
+host@control,1794714300925915,deploy gap: chain pods gone,clientthree,146377,
+host@control,1794714300926046,deploy gap: held,clientthree,0,30 s after the harness's deletion at 1794714098317760
+host@control,1794714300926063,trigger,api-gateway,2884,"request fbfcc0ec-e434-4bf3-bee6-0549b3c0d62f, 10 rounds; time is the send"
+host@control,1794714325946344,config b: run done,api-gateway,28469865,request fbfcc0ec-e434-4bf3-bee6-0549b3c0d62f
+agent@server,1794714301039050,config b: hand-over,server,11556,logged by the agent for state-server-ad751c18-vfltrainmodelrequest
+agent@clientone,1794714301165367,config b: hand-over,clientone,31515,logged by the agent for state-clientone-ad751c18-vfltrainmodelrequest
+agent@clienttwo,1794714301143198,config b: hand-over,clienttwo,14371,logged by the agent for state-clienttwo-ad751c18-vfltrainmodelrequest
+agent@clientthree,1794714301143881,config b: hand-over,clientthree,14600,logged by the agent for state-clientthree-ad751c18-vfltrainmodelrequest

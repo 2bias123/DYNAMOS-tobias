@@ -1,0 +1,195 @@
+unit,row,case,steward,expected,observed,result
+unit-tests,unit,the gateway package's tests,control,"68 test functions (the set's source), every one PASS, exit 0","68 run: 68 PASS, 0 FAIL, 0 SKIP, exit 0, 2.4 s",pass
+w4,W4,write allowed,server,"write records only ALLOW, at least one, each by the job's enforcement point on relation GUID-state-aware with a fresh or cached view and allowed terms","3 write records, 3 of them ALLOW as expected",pass
+w4,completeness,every state file has a write ALLOW record,server,at least one state file and one write ALLOW record; every state file data/<class>/<key>.bin with a write ALLOW record of its class and key,"1 state files, each with a write ALLOW record",pass
+w4,W4,write allowed,clientone,"write records only ALLOW, at least one, each by the job's enforcement point on relation GUID-state-aware with a fresh or cached view and allowed terms","3 write records, 3 of them ALLOW as expected",pass
+w4,completeness,every state file has a write ALLOW record,clientone,at least one state file and one write ALLOW record; every state file data/<class>/<key>.bin with a write ALLOW record of its class and key,"1 state files, each with a write ALLOW record",pass
+w4,W4,write allowed,clienttwo,"write records only ALLOW, at least one, each by the job's enforcement point on relation GUID-state-aware with a fresh or cached view and allowed terms","3 write records, 3 of them ALLOW as expected",pass
+w4,completeness,every state file has a write ALLOW record,clienttwo,at least one state file and one write ALLOW record; every state file data/<class>/<key>.bin with a write ALLOW record of its class and key,"1 state files, each with a write ALLOW record",pass
+w4,W4,write allowed,clientthree,"write records only ALLOW, at least one, each by the job's enforcement point on relation GUID-state-aware with a fresh or cached view and allowed terms","3 write records, 3 of them ALLOW as expected",pass
+w4,completeness,every state file has a write ALLOW record,clientthree,at least one state file and one write ALLOW record; every state file data/<class>/<key>.bin with a write ALLOW record of its class and key,"1 state files, each with a write ALLOW record",pass
+terms,runs,one run per set of terms,server,5 runs of job records,5,pass
+terms,W1,"write, allowed false",server,"every write record DENY with reason 'allowed = false' on relation GUID-state-aware, at least one","write records: 3, 0 otherwise",pass
+terms,R1,"read, allowed false",server,"every read record DENY with reason 'allowed = false' on relation GUID-state-aware, at least one","read records: 1, 0 otherwise",pass
+terms,W1,"nothing destroyed, allowed false",server,no PURGED or DELETED record in the run,0,pass
+terms,W1,"write, no state directives",server,"every write record DENY with reason 'stateDirectives absent' on relation GUID-state-aware, at least one","write records: 3, 0 otherwise",pass
+terms,R1,"read, no state directives",server,"every read record DENY with reason 'stateDirectives absent' on relation GUID-state-aware, at least one","read records: 1, 0 otherwise",pass
+terms,W1,"nothing destroyed, no state directives",server,no PURGED or DELETED record in the run,0,pass
+terms,W1,"write, unknown onRevocation",server,"every write record DENY with reason 'invalid stateDirectives; fail closed' on relation GUID-state-aware, at least one","write records: 3, 0 otherwise",pass
+terms,R1,"read, unknown onRevocation",server,"every read record DENY with reason 'invalid stateDirectives; fail closed' on relation GUID-state-aware, at least one","read records: 1, 0 otherwise",pass
+terms,W1,"invalid directives recorded, unknown onRevocation",server,at least one invalid_directives record by the job's enforcement point,"1: unknown onRevocation ""shred""",pass
+terms,W1,"nothing destroyed, unknown onRevocation",server,no PURGED or DELETED record in the run,0,pass
+terms,W1,"write, negative retention",server,"every write record DENY with reason 'invalid stateDirectives; fail closed' on relation GUID-state-aware, at least one","write records: 3, 0 otherwise",pass
+terms,R1,"read, negative retention",server,"every read record DENY with reason 'invalid stateDirectives; fail closed' on relation GUID-state-aware, at least one","read records: 1, 0 otherwise",pass
+terms,W1,"invalid directives recorded, negative retention",server,at least one invalid_directives record by the job's enforcement point,1: negative retentionSeconds -1,pass
+terms,W1,"nothing destroyed, negative retention",server,no PURGED or DELETED record in the run,0,pass
+terms,W4,"write, resume disabled",server,"every write record ALLOW on allowed terms on relation GUID-state-aware, at least one","write records: 3, 0 otherwise",pass
+terms,R2,"read, resume disabled",server,"every read record DENY with reason 'resume disabled' on relation GUID-state-aware, at least one","read records: 1, 0 otherwise",pass
+terms,W4,"nothing destroyed, resume disabled",server,no PURGED or DELETED record in the run,0,pass
+terms,runs,one run per set of terms,clientone,5 runs of job records,5,pass
+terms,W1,"write, allowed false",clientone,"every write record DENY with reason 'allowed = false' on relation GUID-state-aware, at least one","write records: 3, 0 otherwise",pass
+terms,R1,"read, allowed false",clientone,"every read record DENY with reason 'allowed = false' on relation GUID-state-aware, at least one","read records: 1, 0 otherwise",pass
+terms,W1,"nothing destroyed, allowed false",clientone,no PURGED or DELETED record in the run,0,pass
+terms,W1,"write, no state directives",clientone,"every write record DENY with reason 'stateDirectives absent' on relation GUID-state-aware, at least one","write records: 3, 0 otherwise",pass
+terms,R1,"read, no state directives",clientone,"every read record DENY with reason 'stateDirectives absent' on relation GUID-state-aware, at least one","read records: 1, 0 otherwise",pass
+terms,W1,"nothing destroyed, no state directives",clientone,no PURGED or DELETED record in the run,0,pass
+terms,W1,"write, unknown onRevocation",clientone,"every write record DENY with reason 'invalid stateDirectives; fail closed' on relation GUID-state-aware, at least one","write records: 3, 0 otherwise",pass
+terms,R1,"read, unknown onRevocation",clientone,"every read record DENY with reason 'invalid stateDirectives; fail closed' on relation GUID-state-aware, at least one","read records: 1, 0 otherwise",pass
+terms,W1,"invalid directives recorded, unknown onRevocation",clientone,at least one invalid_directives record by the job's enforcement point,"1: unknown onRevocation ""shred""",pass
+terms,W1,"nothing destroyed, unknown onRevocation",clientone,no PURGED or DELETED record in the run,0,pass
+terms,W1,"write, negative retention",clientone,"every write record DENY with reason 'invalid stateDirectives; fail closed' on relation GUID-state-aware, at least one","write records: 3, 0 otherwise",pass
+terms,R1,"read, negative retention",clientone,"every read record DENY with reason 'invalid stateDirectives; fail closed' on relation GUID-state-aware, at least one","read records: 1, 0 otherwise",pass
+terms,W1,"invalid directives recorded, negative retention",clientone,at least one invalid_directives record by the job's enforcement point,1: negative retentionSeconds -1,pass
+terms,W1,"nothing destroyed, negative retention",clientone,no PURGED or DELETED record in the run,0,pass
+terms,W4,"write, resume disabled",clientone,"every write record ALLOW on allowed terms on relation GUID-state-aware, at least one","write records: 3, 0 otherwise",pass
+terms,R2,"read, resume disabled",clientone,"every read record DENY with reason 'resume disabled' on relation GUID-state-aware, at least one","read records: 1, 0 otherwise",pass
+terms,W4,"nothing destroyed, resume disabled",clientone,no PURGED or DELETED record in the run,0,pass
+terms,runs,one run per set of terms,clienttwo,5 runs of job records,5,pass
+terms,W1,"write, allowed false",clienttwo,"every write record DENY with reason 'allowed = false' on relation GUID-state-aware, at least one","write records: 3, 0 otherwise",pass
+terms,R1,"read, allowed false",clienttwo,"every read record DENY with reason 'allowed = false' on relation GUID-state-aware, at least one","read records: 1, 0 otherwise",pass
+terms,W1,"nothing destroyed, allowed false",clienttwo,no PURGED or DELETED record in the run,0,pass
+terms,W1,"write, no state directives",clienttwo,"every write record DENY with reason 'stateDirectives absent' on relation GUID-state-aware, at least one","write records: 3, 0 otherwise",pass
+terms,R1,"read, no state directives",clienttwo,"every read record DENY with reason 'stateDirectives absent' on relation GUID-state-aware, at least one","read records: 1, 0 otherwise",pass
+terms,W1,"nothing destroyed, no state directives",clienttwo,no PURGED or DELETED record in the run,0,pass
+terms,W1,"write, unknown onRevocation",clienttwo,"every write record DENY with reason 'invalid stateDirectives; fail closed' on relation GUID-state-aware, at least one","write records: 3, 0 otherwise",pass
+terms,R1,"read, unknown onRevocation",clienttwo,"every read record DENY with reason 'invalid stateDirectives; fail closed' on relation GUID-state-aware, at least one","read records: 1, 0 otherwise",pass
+terms,W1,"invalid directives recorded, unknown onRevocation",clienttwo,at least one invalid_directives record by the job's enforcement point,"1: unknown onRevocation ""shred""",pass
+terms,W1,"nothing destroyed, unknown onRevocation",clienttwo,no PURGED or DELETED record in the run,0,pass
+terms,W1,"write, negative retention",clienttwo,"every write record DENY with reason 'invalid stateDirectives; fail closed' on relation GUID-state-aware, at least one","write records: 3, 0 otherwise",pass
+terms,R1,"read, negative retention",clienttwo,"every read record DENY with reason 'invalid stateDirectives; fail closed' on relation GUID-state-aware, at least one","read records: 1, 0 otherwise",pass
+terms,W1,"invalid directives recorded, negative retention",clienttwo,at least one invalid_directives record by the job's enforcement point,1: negative retentionSeconds -1,pass
+terms,W1,"nothing destroyed, negative retention",clienttwo,no PURGED or DELETED record in the run,0,pass
+terms,W4,"write, resume disabled",clienttwo,"every write record ALLOW on allowed terms on relation GUID-state-aware, at least one","write records: 3, 0 otherwise",pass
+terms,R2,"read, resume disabled",clienttwo,"every read record DENY with reason 'resume disabled' on relation GUID-state-aware, at least one","read records: 1, 0 otherwise",pass
+terms,W4,"nothing destroyed, resume disabled",clienttwo,no PURGED or DELETED record in the run,0,pass
+terms,runs,one run per set of terms,clientthree,5 runs of job records,5,pass
+terms,W1,"write, allowed false",clientthree,"every write record DENY with reason 'allowed = false' on relation GUID-state-aware, at least one","write records: 3, 0 otherwise",pass
+terms,R1,"read, allowed false",clientthree,"every read record DENY with reason 'allowed = false' on relation GUID-state-aware, at least one","read records: 1, 0 otherwise",pass
+terms,W1,"nothing destroyed, allowed false",clientthree,no PURGED or DELETED record in the run,0,pass
+terms,W1,"write, no state directives",clientthree,"every write record DENY with reason 'stateDirectives absent' on relation GUID-state-aware, at least one","write records: 3, 0 otherwise",pass
+terms,R1,"read, no state directives",clientthree,"every read record DENY with reason 'stateDirectives absent' on relation GUID-state-aware, at least one","read records: 1, 0 otherwise",pass
+terms,W1,"nothing destroyed, no state directives",clientthree,no PURGED or DELETED record in the run,0,pass
+terms,W1,"write, unknown onRevocation",clientthree,"every write record DENY with reason 'invalid stateDirectives; fail closed' on relation GUID-state-aware, at least one","write records: 3, 0 otherwise",pass
+terms,R1,"read, unknown onRevocation",clientthree,"every read record DENY with reason 'invalid stateDirectives; fail closed' on relation GUID-state-aware, at least one","read records: 1, 0 otherwise",pass
+terms,W1,"invalid directives recorded, unknown onRevocation",clientthree,at least one invalid_directives record by the job's enforcement point,"1: unknown onRevocation ""shred""",pass
+terms,W1,"nothing destroyed, unknown onRevocation",clientthree,no PURGED or DELETED record in the run,0,pass
+terms,W1,"write, negative retention",clientthree,"every write record DENY with reason 'invalid stateDirectives; fail closed' on relation GUID-state-aware, at least one","write records: 3, 0 otherwise",pass
+terms,R1,"read, negative retention",clientthree,"every read record DENY with reason 'invalid stateDirectives; fail closed' on relation GUID-state-aware, at least one","read records: 1, 0 otherwise",pass
+terms,W1,"invalid directives recorded, negative retention",clientthree,at least one invalid_directives record by the job's enforcement point,1: negative retentionSeconds -1,pass
+terms,W1,"nothing destroyed, negative retention",clientthree,no PURGED or DELETED record in the run,0,pass
+terms,W4,"write, resume disabled",clientthree,"every write record ALLOW on allowed terms on relation GUID-state-aware, at least one","write records: 3, 0 otherwise",pass
+terms,R2,"read, resume disabled",clientthree,"every read record DENY with reason 'resume disabled' on relation GUID-state-aware, at least one","read records: 1, 0 otherwise",pass
+terms,W4,"nothing destroyed, resume disabled",clientthree,no PURGED or DELETED record in the run,0,pass
+r3,runs,two runs,server,2 runs of job records,2,pass
+r3,outside,read of an absent object,server,"run 1's read records DENY 'not found' on the seeded relation, at least one","read records: 1, 0 otherwise",pass
+r3,R3,read within retention,server,"run 2's first read ALLOW on the seeded relation, its written time that of run 1's last write of the same state","ALLOW ('vfl_server_model', 'latest') on GUID-state-aware, written 1794716436, run 1's last write 1794716436",pass
+r3,completeness,every state file has a write ALLOW record,server,at least one state file and one write ALLOW record; every state file data/<class>/<key>.bin with a write ALLOW record of its class and key,"1 state files, each with a write ALLOW record",pass
+r3,runs,two runs,clientone,2 runs of job records,2,pass
+r3,outside,read of an absent object,clientone,"run 1's read records DENY 'not found' on the seeded relation, at least one","read records: 1, 0 otherwise",pass
+r3,R3,read within retention,clientone,"run 2's first read ALLOW on the seeded relation, its written time that of run 1's last write of the same state","ALLOW ('vfl_client_model', 'latest') on GUID-state-aware, written 1794716436, run 1's last write 1794716436",pass
+r3,completeness,every state file has a write ALLOW record,clientone,at least one state file and one write ALLOW record; every state file data/<class>/<key>.bin with a write ALLOW record of its class and key,"1 state files, each with a write ALLOW record",pass
+r3,runs,two runs,clienttwo,2 runs of job records,2,pass
+r3,outside,read of an absent object,clienttwo,"run 1's read records DENY 'not found' on the seeded relation, at least one","read records: 1, 0 otherwise",pass
+r3,R3,read within retention,clienttwo,"run 2's first read ALLOW on the seeded relation, its written time that of run 1's last write of the same state","ALLOW ('vfl_client_model', 'latest') on GUID-state-aware, written 1794716436, run 1's last write 1794716436",pass
+r3,completeness,every state file has a write ALLOW record,clienttwo,at least one state file and one write ALLOW record; every state file data/<class>/<key>.bin with a write ALLOW record of its class and key,"1 state files, each with a write ALLOW record",pass
+r3,runs,two runs,clientthree,2 runs of job records,2,pass
+r3,outside,read of an absent object,clientthree,"run 1's read records DENY 'not found' on the seeded relation, at least one","read records: 1, 0 otherwise",pass
+r3,R3,read within retention,clientthree,"run 2's first read ALLOW on the seeded relation, its written time that of run 1's last write of the same state","ALLOW ('vfl_client_model', 'latest') on GUID-state-aware, written 1794716436, run 1's last write 1794716436",pass
+r3,completeness,every state file has a write ALLOW record,clientthree,at least one state file and one write ALLOW record; every state file data/<class>/<key>.bin with a write ALLOW record of its class and key,"1 state files, each with a write ALLOW record",pass
+d1-job,D1,job form: one PURGED per state file,server,"one purge PURGED record per state file the job wrote, each with job fields and on fresh terms, while the job's enforcement point was still serving",1 PURGED for 1 state files written,pass
+d1-job,D1,no write allowed after the purge,server,no write ALLOW record after the first PURGED,0,pass
+d1-job,D1,no state left,server,no state file on the claim at the unit's end,0 state files,pass
+d1-job,D1,job form: one PURGED per state file,clientone,"one purge PURGED record per state file the job wrote, each with job fields and on fresh terms, while the job's enforcement point was still serving",1 PURGED for 1 state files written,pass
+d1-job,D1,no write allowed after the purge,clientone,no write ALLOW record after the first PURGED,0,pass
+d1-job,D1,no state left,clientone,no state file on the claim at the unit's end,0 state files,pass
+d1-job,D1,job form: one PURGED per state file,clienttwo,"one purge PURGED record per state file the job wrote, each with job fields and on fresh terms, while the job's enforcement point was still serving",1 PURGED for 1 state files written,pass
+d1-job,D1,no write allowed after the purge,clienttwo,no write ALLOW record after the first PURGED,0,pass
+d1-job,D1,no state left,clienttwo,no state file on the claim at the unit's end,0 state files,pass
+d1-job,D1,job form: one PURGED per state file,clientthree,"one purge PURGED record per state file the job wrote, each with job fields and on fresh terms, while the job's enforcement point was still serving",1 PURGED for 1 state files written,pass
+d1-job,D1,no write allowed after the purge,clientthree,no write ALLOW record after the first PURGED,0,pass
+d1-job,D1,no state left,clientthree,no state file on the claim at the unit's end,0 state files,pass
+d6,runs,two runs,server,2 runs of job records,2,pass
+d6,D6,write denied,server,"every write record of run 2 DENY with reason 'allowed = false' on relation GUID-state-aware, at least one","write records: 3, 0 otherwise",pass
+d6,D6,read denied,server,"every read record of run 2 DENY with reason 'allowed = false' on relation GUID-state-aware, at least one","read records: 1, 0 otherwise",pass
+d6,D6,nothing destroyed,server,no PURGED or DELETED record in the unit,0,pass
+d6,D6,state kept,server,"the state files after the revocation, at least one, byte-identical at the unit's end","1 state files after the revocation, 1 at the end, identical",pass
+d6,runs,two runs,clientone,2 runs of job records,2,pass
+d6,D6,write denied,clientone,"every write record of run 2 DENY with reason 'allowed = false' on relation GUID-state-aware, at least one","write records: 3, 0 otherwise",pass
+d6,D6,read denied,clientone,"every read record of run 2 DENY with reason 'allowed = false' on relation GUID-state-aware, at least one","read records: 1, 0 otherwise",pass
+d6,D6,nothing destroyed,clientone,no PURGED or DELETED record in the unit,0,pass
+d6,D6,state kept,clientone,"the state files after the revocation, at least one, byte-identical at the unit's end","1 state files after the revocation, 1 at the end, identical",pass
+d6,runs,two runs,clienttwo,2 runs of job records,2,pass
+d6,D6,write denied,clienttwo,"every write record of run 2 DENY with reason 'allowed = false' on relation GUID-state-aware, at least one","write records: 3, 0 otherwise",pass
+d6,D6,read denied,clienttwo,"every read record of run 2 DENY with reason 'allowed = false' on relation GUID-state-aware, at least one","read records: 1, 0 otherwise",pass
+d6,D6,nothing destroyed,clienttwo,no PURGED or DELETED record in the unit,0,pass
+d6,D6,state kept,clienttwo,"the state files after the revocation, at least one, byte-identical at the unit's end","1 state files after the revocation, 1 at the end, identical",pass
+d6,runs,two runs,clientthree,2 runs of job records,2,pass
+d6,D6,write denied,clientthree,"every write record of run 2 DENY with reason 'allowed = false' on relation GUID-state-aware, at least one","write records: 3, 0 otherwise",pass
+d6,D6,read denied,clientthree,"every read record of run 2 DENY with reason 'allowed = false' on relation GUID-state-aware, at least one","read records: 1, 0 otherwise",pass
+d6,D6,nothing destroyed,clientthree,no PURGED or DELETED record in the unit,0,pass
+d6,D6,state kept,clientthree,"the state files after the revocation, at least one, byte-identical at the unit's end","1 state files after the revocation, 1 at the end, identical",pass
+adversarial,adversarial,tampered identity,server,"the write refused PERMISSION_DENIED, one identity_mismatch record, no state file for it","PERMISSION_DENIED, 1 identity_mismatch records, no state file",pass
+adversarial,adversarial,8 concurrent writes on one slot,server,"8 ALLOW answers, 8 write ALLOW records for the slot, one state file for it","answers ALLOW ALLOW ALLOW ALLOW ALLOW ALLOW ALLOW ALLOW, 8 records, 1 state files",pass
+adversarial,adversarial,a file past the enforcement point,server,completeness on the claim names data/adversarial/rogue.bin and nothing else,without a write ALLOW record: adversarial/rogue,pass
+adversarial,adversarial,one record per operation,server,"every operation the battery sent has exactly one record of its expected op and decision, decided between its send and its return, both on the steward's VM","9 operations, one record each",pass
+adversarial,completeness,every state file has a write ALLOW record,server,at least one state file and one write ALLOW record; every state file data/<class>/<key>.bin with a write ALLOW record of its class and key,"2 state files, each with a write ALLOW record",pass
+adversarial,completeness,every state file has a write ALLOW record,clientone,at least one state file and one write ALLOW record; every state file data/<class>/<key>.bin with a write ALLOW record of its class and key,"1 state files, each with a write ALLOW record",pass
+adversarial,completeness,every state file has a write ALLOW record,clienttwo,at least one state file and one write ALLOW record; every state file data/<class>/<key>.bin with a write ALLOW record of its class and key,"1 state files, each with a write ALLOW record",pass
+adversarial,completeness,every state file has a write ALLOW record,clientthree,at least one state file and one write ALLOW record; every state file data/<class>/<key>.bin with a write ALLOW record of its class and key,"1 state files, each with a write ALLOW record",pass
+idle-a,stay-up,run: idle up,server,"an idle process up (its 'Agreement loaded' line, logged once it holds the lock) within 60 s of the job's enforcement point ending (kubelet's whole-second finishedAt), both on the steward's VM","idle up 30.4 s after the job's enforcement point ended (its container started 30 s after), pod idle-state-server-ad751c18-vfltrainmodelrequest-tcwrr",pass
+idle-a,stay-up,run: idle up,clientone,"an idle process up (its 'Agreement loaded' line, logged once it holds the lock) within 60 s of the job's enforcement point ending (kubelet's whole-second finishedAt), both on the steward's VM","idle up 30.1 s after the job's enforcement point ended (its container started 30 s after), pod idle-state-clientone-ad751c18-vfltrainmodelrequest-4kjmt",pass
+idle-a,stay-up,run: idle up,clienttwo,"an idle process up (its 'Agreement loaded' line, logged once it holds the lock) within 60 s of the job's enforcement point ending (kubelet's whole-second finishedAt), both on the steward's VM","idle up 30.5 s after the job's enforcement point ended (its container started 30 s after), pod idle-state-clienttwo-ad751c18-vfltrainmodelrequest-vms5r",pass
+idle-a,stay-up,run: idle up,clientthree,"an idle process up (its 'Agreement loaded' line, logged once it holds the lock) within 60 s of the job's enforcement point ending (kubelet's whole-second finishedAt), both on the steward's VM","idle up 30.3 s after the job's enforcement point ended (its container started 30 s after), pod idle-state-clientthree-ad751c18-vfltrainmodelrequest-rw2zt",pass
+idle-a,stay-up,(a) revocation,server,"one PURGED record per state file the run wrote, idle form (no job fields) on fresh terms, decided 0 to 5 s after the revocation's send from the steward's own VM, no state file left","1 PURGED for 1 state files written, 0.049 to 0.049 s after the send; 0 state files left; clocks one: server",pass
+idle-a,stay-up,(a) idle process ended,server,the idle Job complete after the purge (exit 0),complete,pass
+idle-a,stay-up,(a) revocation,clientone,"one PURGED record per state file the run wrote, idle form (no job fields) on fresh terms, decided 0 to 5 s after the revocation's send from the steward's own VM, no state file left","1 PURGED for 1 state files written, 0.033 to 0.033 s after the send; 0 state files left; clocks one: clientone",pass
+idle-a,stay-up,(a) idle process ended,clientone,the idle Job complete after the purge (exit 0),complete,pass
+idle-a,stay-up,(a) revocation,clienttwo,"one PURGED record per state file the run wrote, idle form (no job fields) on fresh terms, decided 0 to 5 s after the revocation's send from the steward's own VM, no state file left","1 PURGED for 1 state files written, 0.034 to 0.034 s after the send; 0 state files left; clocks one: clienttwo",pass
+idle-a,stay-up,(a) idle process ended,clienttwo,the idle Job complete after the purge (exit 0),complete,pass
+idle-a,stay-up,(a) revocation,clientthree,"one PURGED record per state file the run wrote, idle form (no job fields) on fresh terms, decided 0 to 5 s after the revocation's send from the steward's own VM, no state file left","1 PURGED for 1 state files written, 0.033 to 0.033 s after the send; 0 state files left; clocks one: clientthree",pass
+idle-a,stay-up,(a) idle process ended,clientthree,the idle Job complete after the purge (exit 0),complete,pass
+idle-b,stay-up,run: idle up,server,"an idle process up (its 'Agreement loaded' line, logged once it holds the lock) within 60 s of the job's enforcement point ending (kubelet's whole-second finishedAt), both on the steward's VM","idle up 28.0 s after the job's enforcement point ended (its container started 28 s after), pod idle-state-server-ad751c18-vfltrainmodelrequest-7cqhj",pass
+idle-b,stay-up,run: idle up,clientone,"an idle process up (its 'Agreement loaded' line, logged once it holds the lock) within 60 s of the job's enforcement point ending (kubelet's whole-second finishedAt), both on the steward's VM","idle up 28.4 s after the job's enforcement point ended (its container started 28 s after), pod idle-state-clientone-ad751c18-vfltrainmodelrequest-g8mrw",pass
+idle-b,stay-up,run: idle up,clienttwo,"an idle process up (its 'Agreement loaded' line, logged once it holds the lock) within 60 s of the job's enforcement point ending (kubelet's whole-second finishedAt), both on the steward's VM","idle up 28.3 s after the job's enforcement point ended (its container started 28 s after), pod idle-state-clienttwo-ad751c18-vfltrainmodelrequest-wmfwp",pass
+idle-b,stay-up,run: idle up,clientthree,"an idle process up (its 'Agreement loaded' line, logged once it holds the lock) within 60 s of the job's enforcement point ending (kubelet's whole-second finishedAt), both on the steward's VM","idle up 28.9 s after the job's enforcement point ended (its container started 28 s after), pod idle-state-clientthree-ad751c18-vfltrainmodelrequest-xzqql",pass
+idle-b,stay-up,(b) expiry,server,"every state file has one DELETED record, either form, from retention 120 s to retention + 35 s after its last write ALLOW; DEFERRED and CANCELLED kept","vfl_server_model/latest: DELETED 149.5 s after its last write, idle form; 0 DEFERRED and 0 CANCELLED kept",pass
+idle-b,stay-up,(b) no job in the window,server,no record by a job after the run's shutdown record,0 job records after it,pass
+idle-b,stay-up,(b) idle process ended,server,no state file left and the idle Job complete,"0 state files left, idle Job complete",pass
+idle-b,stay-up,(b) expiry,clientone,"every state file has one DELETED record, either form, from retention 120 s to retention + 35 s after its last write ALLOW; DEFERRED and CANCELLED kept","vfl_client_model/latest: DELETED 149.8 s after its last write, idle form; 0 DEFERRED and 0 CANCELLED kept",pass
+idle-b,stay-up,(b) no job in the window,clientone,no record by a job after the run's shutdown record,0 job records after it,pass
+idle-b,stay-up,(b) idle process ended,clientone,no state file left and the idle Job complete,"0 state files left, idle Job complete",pass
+idle-b,stay-up,(b) expiry,clienttwo,"every state file has one DELETED record, either form, from retention 120 s to retention + 35 s after its last write ALLOW; DEFERRED and CANCELLED kept","vfl_client_model/latest: DELETED 149.7 s after its last write, idle form; 0 DEFERRED and 0 CANCELLED kept",pass
+idle-b,stay-up,(b) no job in the window,clienttwo,no record by a job after the run's shutdown record,0 job records after it,pass
+idle-b,stay-up,(b) idle process ended,clienttwo,no state file left and the idle Job complete,"0 state files left, idle Job complete",pass
+idle-b,stay-up,(b) expiry,clientthree,"every state file has one DELETED record, either form, from retention 120 s to retention + 35 s after its last write ALLOW; DEFERRED and CANCELLED kept","vfl_client_model/latest: DELETED 120.2 s after its last write, idle form; 0 DEFERRED and 0 CANCELLED kept",pass
+idle-b,stay-up,(b) no job in the window,clientthree,no record by a job after the run's shutdown record,0 job records after it,pass
+idle-b,stay-up,(b) idle process ended,clientthree,no state file left and the idle Job complete,"0 state files left, idle Job complete",pass
+idle-c,stay-up,run 1: idle up,server,"an idle process up (its 'Agreement loaded' line, logged once it holds the lock) within 60 s of the job's enforcement point ending (kubelet's whole-second finishedAt), both on the steward's VM","idle up 4.9 s after the job's enforcement point ended (its container started 4 s after), pod idle-state-server-ad751c18-vfltrainmodelrequest-ndlps",pass
+idle-c,stay-up,run 1: idle up,clientone,"an idle process up (its 'Agreement loaded' line, logged once it holds the lock) within 60 s of the job's enforcement point ending (kubelet's whole-second finishedAt), both on the steward's VM","idle up 4.6 s after the job's enforcement point ended (its container started 4 s after), pod idle-state-clientone-ad751c18-vfltrainmodelrequest-dzfdj",pass
+idle-c,stay-up,run 1: idle up,clienttwo,"an idle process up (its 'Agreement loaded' line, logged once it holds the lock) within 60 s of the job's enforcement point ending (kubelet's whole-second finishedAt), both on the steward's VM","idle up 5.3 s after the job's enforcement point ended (its container started 5 s after), pod idle-state-clienttwo-ad751c18-vfltrainmodelrequest-mdlnw",pass
+idle-c,stay-up,run 1: idle up,clientthree,"an idle process up (its 'Agreement loaded' line, logged once it holds the lock) within 60 s of the job's enforcement point ending (kubelet's whole-second finishedAt), both on the steward's VM","idle up 4.8 s after the job's enforcement point ended (its container started 4 s after), pod idle-state-clientthree-ad751c18-vfltrainmodelrequest-v29m8",pass
+idle-c,stay-up,run 2: idle up,server,"an idle process up (its 'Agreement loaded' line, logged once it holds the lock) within 60 s of the job's enforcement point ending (kubelet's whole-second finishedAt), both on the steward's VM","idle up 19.9 s after the job's enforcement point ended (its container started 19 s after), pod idle-state-server-ad751c18-vfltrainmodelrequest-r9dnd",pass
+idle-c,stay-up,run 2: idle up,clientone,"an idle process up (its 'Agreement loaded' line, logged once it holds the lock) within 60 s of the job's enforcement point ending (kubelet's whole-second finishedAt), both on the steward's VM","idle up 19.6 s after the job's enforcement point ended (its container started 19 s after), pod idle-state-clientone-ad751c18-vfltrainmodelrequest-wgq47",pass
+idle-c,stay-up,run 2: idle up,clienttwo,"an idle process up (its 'Agreement loaded' line, logged once it holds the lock) within 60 s of the job's enforcement point ending (kubelet's whole-second finishedAt), both on the steward's VM","idle up 20.3 s after the job's enforcement point ended (its container started 20 s after), pod idle-state-clienttwo-ad751c18-vfltrainmodelrequest-rzg67",pass
+idle-c,stay-up,run 2: idle up,clientthree,"an idle process up (its 'Agreement loaded' line, logged once it holds the lock) within 60 s of the job's enforcement point ending (kubelet's whole-second finishedAt), both on the steward's VM","idle up 19.8 s after the job's enforcement point ended (its container started 19 s after), pod idle-state-clientthree-ad751c18-vfltrainmodelrequest-kdqkx",pass
+idle-c,stay-up,(c) hand-over,server,"one hand-over line from the agent, the idle Job from before the run gone (uid changed) when the job decides, the job's enforcement point started and decided first after that line","hand-over 530 ms, logged 3.885 s before the job's first record",pass
+idle-c,stay-up,(c) every round persists,server,"3 write ALLOW records by run 2's job, nothing else","3 write records, 3 ALLOW",pass
+idle-c,stay-up,(c) state read back,server,"run 2's first read ALLOW, its written time that of run 1's last write of the same state","ALLOW ('vfl_server_model', 'latest'), written 1794718404, run 1's last write 1794718404",pass
+idle-c,stay-up,(c) hand-over,clientone,"one hand-over line from the agent, the idle Job from before the run gone (uid changed) when the job decides, the job's enforcement point started and decided first after that line","hand-over 1057 ms, logged 3.805 s before the job's first record",pass
+idle-c,stay-up,(c) every round persists,clientone,"3 write ALLOW records by run 2's job, nothing else","3 write records, 3 ALLOW",pass
+idle-c,stay-up,(c) hand-over,clienttwo,"one hand-over line from the agent, the idle Job from before the run gone (uid changed) when the job decides, the job's enforcement point started and decided first after that line","hand-over 1047 ms, logged 3.678 s before the job's first record",pass
+idle-c,stay-up,(c) every round persists,clienttwo,"3 write ALLOW records by run 2's job, nothing else","3 write records, 3 ALLOW",pass
+idle-c,stay-up,(c) hand-over,clientthree,"one hand-over line from the agent, the idle Job from before the run gone (uid changed) when the job decides, the job's enforcement point started and decided first after that line","hand-over 530 ms, logged 4.026 s before the job's first record",pass
+idle-c,stay-up,(c) every round persists,clientthree,"3 write ALLOW records by run 2's job, nothing else","3 write records, 3 ALLOW",pass
+idle-d,stay-up,run: idle up,server,"an idle process up (its 'Agreement loaded' line, logged once it holds the lock) within 60 s of the job's enforcement point ending (kubelet's whole-second finishedAt), both on the steward's VM","idle up 27.8 s after the job's enforcement point ended (its container started 27 s after), pod idle-state-server-ad751c18-vfltrainmodelrequest-bh559",pass
+idle-d,stay-up,run: idle up,clientone,"an idle process up (its 'Agreement loaded' line, logged once it holds the lock) within 60 s of the job's enforcement point ending (kubelet's whole-second finishedAt), both on the steward's VM","idle up 28.5 s after the job's enforcement point ended (its container started 28 s after), pod idle-state-clientone-ad751c18-vfltrainmodelrequest-5sw4x",pass
+idle-d,stay-up,run: idle up,clienttwo,"an idle process up (its 'Agreement loaded' line, logged once it holds the lock) within 60 s of the job's enforcement point ending (kubelet's whole-second finishedAt), both on the steward's VM","idle up 28.3 s after the job's enforcement point ended (its container started 28 s after), pod idle-state-clienttwo-ad751c18-vfltrainmodelrequest-75ws9",pass
+idle-d,stay-up,run: idle up,clientthree,"an idle process up (its 'Agreement loaded' line, logged once it holds the lock) within 60 s of the job's enforcement point ending (kubelet's whole-second finishedAt), both on the steward's VM","idle up 28.6 s after the job's enforcement point ended (its container started 28 s after), pod idle-state-clientthree-ad751c18-vfltrainmodelrequest-brtcr",pass
+idle-d,stay-up,(d) nothing due,server,"over 3 polls of 30 s plus 5 s the audit log and every state file unchanged, at least one state file (the idle form logs no poll: that the polls took place is not shown)",audit log and 1 state files byte-identical over 95.000 s,pass
+idle-d,stay-up,(d) the same idle process,server,"the idle pod from before the window still running with its agreement loaded, not restarted","pod idle-state-server-ad751c18-vfltrainmodelrequest-bh559 running, 0 restarts",pass
+idle-d,stay-up,(d) nothing due,clientone,"over 3 polls of 30 s plus 5 s the audit log and every state file unchanged, at least one state file (the idle form logs no poll: that the polls took place is not shown)",audit log and 1 state files byte-identical over 95.000 s,pass
+idle-d,stay-up,(d) the same idle process,clientone,"the idle pod from before the window still running with its agreement loaded, not restarted","pod idle-state-clientone-ad751c18-vfltrainmodelrequest-5sw4x running, 0 restarts",pass
+idle-d,stay-up,(d) nothing due,clienttwo,"over 3 polls of 30 s plus 5 s the audit log and every state file unchanged, at least one state file (the idle form logs no poll: that the polls took place is not shown)",audit log and 1 state files byte-identical over 95.000 s,pass
+idle-d,stay-up,(d) the same idle process,clienttwo,"the idle pod from before the window still running with its agreement loaded, not restarted","pod idle-state-clienttwo-ad751c18-vfltrainmodelrequest-75ws9 running, 0 restarts",pass
+idle-d,stay-up,(d) nothing due,clientthree,"over 3 polls of 30 s plus 5 s the audit log and every state file unchanged, at least one state file (the idle form logs no poll: that the polls took place is not shown)",audit log and 1 state files byte-identical over 95.000 s,pass
+idle-d,stay-up,(d) the same idle process,clientthree,"the idle pod from before the window still running with its agreement loaded, not restarted","pod idle-state-clientthree-ad751c18-vfltrainmodelrequest-brtcr running, 0 restarts",pass

@@ -1,0 +1,205 @@
+# e5 latency, attempt 1
+
+- outcome: pass
+
+## What ran
+
+- cases.csv: 100 rows
+- claims.csv: 0 rows
+- env/clocks.csv: 14 rows
+- env/gates.csv: 68 rows
+- events.csv: 103 rows
+- markers.csv: 4 rows
+- pods.csv: 15 rows
+- records.csv: 360 rows
+- trials-latency.csv: 50 rows
+- verdict.csv: 60 rows
+
+## Checks
+
+- check missing values: pass
+- check cases.csv latency · trial 1 · server: pass
+- check cases.csv latency · trial 2 · server: pass
+- check cases.csv latency · trial 3 · server: pass
+- check cases.csv latency · trial 4 · server: pass
+- check cases.csv latency · trial 5 · server: pass
+- check cases.csv latency · trial 6 · server: pass
+- check cases.csv latency · trial 7 · server: pass
+- check cases.csv latency · trial 8 · server: pass
+- check cases.csv latency · trial 9 · server: pass
+- check cases.csv latency · trial 10 · server: pass
+- check cases.csv latency · trial 11 · server: pass
+- check cases.csv latency · trial 12 · server: pass
+- check cases.csv latency · trial 13 · server: pass
+- check cases.csv latency · trial 14 · server: pass
+- check cases.csv latency · trial 15 · server: pass
+- check cases.csv latency · trial 16 · server: pass
+- check cases.csv latency · trial 17 · server: pass
+- check cases.csv latency · trial 18 · server: pass
+- check cases.csv latency · trial 19 · server: pass
+- check cases.csv latency · trial 20 · server: pass
+- check cases.csv latency · trial 21 · server: pass
+- check cases.csv latency · trial 22 · server: pass
+- check cases.csv latency · trial 23 · server: pass
+- check cases.csv latency · trial 24 · server: pass
+- check cases.csv latency · trial 25 · server: pass
+- check cases.csv latency · trial 26 · server: pass
+- check cases.csv latency · trial 27 · server: pass
+- check cases.csv latency · trial 28 · server: pass
+- check cases.csv latency · trial 29 · server: pass
+- check cases.csv latency · trial 30 · server: pass
+- check cases.csv latency · trial 31 · server: pass
+- check cases.csv latency · trial 32 · server: pass
+- check cases.csv latency · trial 33 · server: pass
+- check cases.csv latency · trial 34 · server: pass
+- check cases.csv latency · trial 35 · server: pass
+- check cases.csv latency · trial 36 · server: pass
+- check cases.csv latency · trial 37 · server: pass
+- check cases.csv latency · trial 38 · server: pass
+- check cases.csv latency · trial 39 · server: pass
+- check cases.csv latency · trial 40 · server: pass
+- check cases.csv latency · trial 41 · server: pass
+- check cases.csv latency · trial 42 · server: pass
+- check cases.csv latency · trial 43 · server: pass
+- check cases.csv latency · trial 44 · server: pass
+- check cases.csv latency · trial 45 · server: pass
+- check cases.csv latency · trial 46 · server: pass
+- check cases.csv latency · trial 47 · server: pass
+- check cases.csv latency · trial 48 · server: pass
+- check cases.csv latency · trial 49 · server: pass
+- check cases.csv latency · trial 50 · server: pass
+- check cases.csv complete log · trial 1 · server: pass
+- check cases.csv complete log · trial 2 · server: pass
+- check cases.csv complete log · trial 3 · server: pass
+- check cases.csv complete log · trial 4 · server: pass
+- check cases.csv complete log · trial 5 · server: pass
+- check cases.csv complete log · trial 6 · server: pass
+- check cases.csv complete log · trial 7 · server: pass
+- check cases.csv complete log · trial 8 · server: pass
+- check cases.csv complete log · trial 9 · server: pass
+- check cases.csv complete log · trial 10 · server: pass
+- check cases.csv complete log · trial 11 · server: pass
+- check cases.csv complete log · trial 12 · server: pass
+- check cases.csv complete log · trial 13 · server: pass
+- check cases.csv complete log · trial 14 · server: pass
+- check cases.csv complete log · trial 15 · server: pass
+- check cases.csv complete log · trial 16 · server: pass
+- check cases.csv complete log · trial 17 · server: pass
+- check cases.csv complete log · trial 18 · server: pass
+- check cases.csv complete log · trial 19 · server: pass
+- check cases.csv complete log · trial 20 · server: pass
+- check cases.csv complete log · trial 21 · server: pass
+- check cases.csv complete log · trial 22 · server: pass
+- check cases.csv complete log · trial 23 · server: pass
+- check cases.csv complete log · trial 24 · server: pass
+- check cases.csv complete log · trial 25 · server: pass
+- check cases.csv complete log · trial 26 · server: pass
+- check cases.csv complete log · trial 27 · server: pass
+- check cases.csv complete log · trial 28 · server: pass
+- check cases.csv complete log · trial 29 · server: pass
+- check cases.csv complete log · trial 30 · server: pass
+- check cases.csv complete log · trial 31 · server: pass
+- check cases.csv complete log · trial 32 · server: pass
+- check cases.csv complete log · trial 33 · server: pass
+- check cases.csv complete log · trial 34 · server: pass
+- check cases.csv complete log · trial 35 · server: pass
+- check cases.csv complete log · trial 36 · server: pass
+- check cases.csv complete log · trial 37 · server: pass
+- check cases.csv complete log · trial 38 · server: pass
+- check cases.csv complete log · trial 39 · server: pass
+- check cases.csv complete log · trial 40 · server: pass
+- check cases.csv complete log · trial 41 · server: pass
+- check cases.csv complete log · trial 42 · server: pass
+- check cases.csv complete log · trial 43 · server: pass
+- check cases.csv complete log · trial 44 · server: pass
+- check cases.csv complete log · trial 45 · server: pass
+- check cases.csv complete log · trial 46 · server: pass
+- check cases.csv complete log · trial 47 · server: pass
+- check cases.csv complete log · trial 48 · server: pass
+- check cases.csv complete log · trial 49 · server: pass
+- check cases.csv complete log · trial 50 · server: pass
+- check env/gates.csv node Ready · after the clean start: pass (6 rows, 0 failing)
+- check env/gates.csv disk free on / · after the clean start: pass (6 rows, 0 failing)
+- check env/gates.csv disk free for archives · after the clean start: pass (1 rows, 0 failing)
+- check env/gates.csv disk free for state claims · after the clean start: pass (4 rows, 0 failing)
+- check env/gates.csv lease · after the clean start: pass (1 rows, 0 failing)
+- check env/gates.csv stop date · after the clean start: pass (1 rows, 0 failing)
+- check env/gates.csv chain images on the node · after the clean start: pass (24 rows, 0 failing)
+- check env/gates.csv digest · after the clean start: pass (20 rows, 0 failing)
+- check env/gates.csv digest at the registry · after the clean start: pass (5 rows, 0 failing)
+- check marker M1 (STATE_LOCK_NOT_ACQUIRED, gateway): pass (0 hits in 1 files)
+- check marker M2 (IDLE_GATEWAY_NOT_STOPPED, agent): pass (0 hits in 8 files)
+- check marker M3 (IDLE_GATEWAY_NOT_RUNNING, agent): pass (0 hits in 8 files)
+- check marker M4 (No policy gateway reachable, service): pass (0 hits in 9 files)
+- check clocks trials-latency.csv: pass (50 intervals, each on one machine)
+- check trials-latency.csv 1: pass
+- check trials-latency.csv 2: pass
+- check trials-latency.csv 3: pass
+- check trials-latency.csv 4: pass
+- check trials-latency.csv 5: pass
+- check trials-latency.csv 6: pass
+- check trials-latency.csv 7: pass
+- check trials-latency.csv 8: pass
+- check trials-latency.csv 9: pass
+- check trials-latency.csv 10: pass
+- check trials-latency.csv 11: pass
+- check trials-latency.csv 12: pass
+- check trials-latency.csv 13: pass
+- check trials-latency.csv 14: pass
+- check trials-latency.csv 15: pass
+- check trials-latency.csv 16: pass
+- check trials-latency.csv 17: pass
+- check trials-latency.csv 18: pass
+- check trials-latency.csv 19: pass
+- check trials-latency.csv 20: pass
+- check trials-latency.csv 21: pass
+- check trials-latency.csv 22: pass
+- check trials-latency.csv 23: pass
+- check trials-latency.csv 24: pass
+- check trials-latency.csv 25: pass
+- check trials-latency.csv 26: pass
+- check trials-latency.csv 27: pass
+- check trials-latency.csv 28: pass
+- check trials-latency.csv 29: pass
+- check trials-latency.csv 30: pass
+- check trials-latency.csv 31: pass
+- check trials-latency.csv 32: pass
+- check trials-latency.csv 33: pass
+- check trials-latency.csv 34: pass
+- check trials-latency.csv 35: pass
+- check trials-latency.csv 36: pass
+- check trials-latency.csv 37: pass
+- check trials-latency.csv 38: pass
+- check trials-latency.csv 39: pass
+- check trials-latency.csv 40: pass
+- check trials-latency.csv 41: pass
+- check trials-latency.csv 42: pass
+- check trials-latency.csv 43: pass
+- check trials-latency.csv 44: pass
+- check trials-latency.csv 45: pass
+- check trials-latency.csv 46: pass
+- check trials-latency.csv 47: pass
+- check trials-latency.csv 48: pass
+- check trials-latency.csv 49: pass
+- check trials-latency.csv 50: pass
+- check verdict.csv class · request path: pass (6 rows, 0 failing)
+- check verdict.csv node · request path: pass (6 rows, 0 failing)
+- check verdict.csv digest · request path: pass (12 rows, 0 failing)
+- check verdict.csv class · agent: pass (8 rows, 0 failing)
+- check verdict.csv node · agent: pass (8 rows, 0 failing)
+- check verdict.csv digest · agent: pass (16 rows, 0 failing)
+- check verdict.csv class · standalone: pass (1 rows, 0 failing)
+- check verdict.csv node · standalone: pass (1 rows, 0 failing)
+- check verdict.csv digest · standalone: pass (2 rows, 0 failing)
+- check verdict: pass
+
+## Values
+
+Intervals from the CSVs' µs values, in ms rounded to 0.1 ms; the median of an even n is the mean of the middle two.
+
+- events.csv duration_us (clean start): n=1, minimum 70459.5 ms, median 70459.5 ms, maximum 70459.5 ms
+- events.csv duration_us (standalone gateway up): n=1, minimum 0.0 ms, median 0.0 ms, maximum 0.0 ms
+- events.csv duration_us (re-enable sent): n=51, minimum 0.0 ms, median 0.0 ms, maximum 0.0 ms
+- events.csv duration_us (flip sent): n=50, minimum 29.7 ms, median 32.4 ms, maximum 43.8 ms
+- trials-latency.csv value_us: n=50, minimum 30.9 ms, median 34.2 ms, maximum 45.4 ms
+- trials-latency.csv rtt_us: n=50, minimum 29.7 ms, median 32.4 ms, maximum 43.8 ms

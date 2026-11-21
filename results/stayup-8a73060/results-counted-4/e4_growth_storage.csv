@@ -1,0 +1,5 @@
+steward,claim,state_size_state_file_count,state_size_audit_bytes,server_only_sampled_data_bytes,file_count_all_files_on_claim
+server,state-server-ad751c18-vfltrainmodelrequest,1,31998,8115,3
+clientone,state-clientone-ad751c18-vfltrainmodelrequest,1,32767,,3
+clienttwo,state-clienttwo-ad751c18-vfltrainmodelrequest,1,32766,,3
+clientthree,state-clientthree-ad751c18-vfltrainmodelrequest,1,33102,,3

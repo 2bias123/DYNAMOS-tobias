@@ -1,0 +1,63 @@
+steward,clock,decided_us,op,decision,reason,state_class,state_key,policy_source,relation_id,job_id
+server,gateway@server,1794717045377355,subscribe,,subscription established,,,cached,,jake-jongejans-bd593d28server1
+server,gateway@server,1794717046207742,subscribe,,subscription established,,,cached,,jake-jongejans-bd593d28server1
+server,gateway@server,1794717046208653,read,DENY,not found,vfl_server_model,latest,cached,GUID-state-aware,jake-jongejans-bd593d28server1
+server,gateway@server,1794717049800639,write,ALLOW,,vfl_server_model,latest,cached,GUID-state-aware,jake-jongejans-bd593d28server1
+server,gateway@server,1794717051259014,write,ALLOW,,vfl_server_model,latest,cached,GUID-state-aware,jake-jongejans-bd593d28server1
+server,gateway@server,1794717051553178,write,ALLOW,,vfl_server_model,latest,cached,GUID-state-aware,jake-jongejans-bd593d28server1
+server,gateway@server,1794717051698358,shutdown,,ms_exit,,,,,jake-jongejans-bd593d28server1
+server,gateway@server,1794717156968233,subscribe,,subscription established,,,cached,,jake-jongejans-bd593d28server1
+server,gateway@server,1794717157922174,subscribe,,subscription established,,,cached,,jake-jongejans-bd593d28server1
+server,gateway@server,1794717157923425,read,DENY,allowed = false,vfl_server_model,latest,cached,GUID-state-aware,jake-jongejans-bd593d28server1
+server,gateway@server,1794717160219883,write,DENY,allowed = false,vfl_server_model,latest,cached,GUID-state-aware,jake-jongejans-bd593d28server1
+server,gateway@server,1794717161771302,write,DENY,allowed = false,vfl_server_model,latest,cached,GUID-state-aware,jake-jongejans-bd593d28server1
+server,gateway@server,1794717162067607,write,DENY,allowed = false,vfl_server_model,latest,cached,GUID-state-aware,jake-jongejans-bd593d28server1
+server,gateway@server,1794717162208892,shutdown,,ms_exit,,,,,jake-jongejans-bd593d28server1
+clientone,gateway@clientone,1794717044645886,subscribe,,subscription established,,,cached,,jake-jongejans-bd593d28clientone1
+clientone,gateway@clientone,1794717044731863,subscribe,,subscription established,,,cached,,jake-jongejans-bd593d28clientone1
+clientone,gateway@clientone,1794717046573856,read,DENY,not found,vfl_client_model,latest,cached,GUID-state-aware,jake-jongejans-bd593d28clientone1
+clientone,gateway@clientone,1794717051047165,write,ALLOW,,vfl_client_model,latest,cached,GUID-state-aware,jake-jongejans-bd593d28clientone1
+clientone,gateway@clientone,1794717051340317,write,ALLOW,,vfl_client_model,latest,cached,GUID-state-aware,jake-jongejans-bd593d28clientone1
+clientone,gateway@clientone,1794717051652411,write,ALLOW,,vfl_client_model,latest,cached,GUID-state-aware,jake-jongejans-bd593d28clientone1
+clientone,gateway@clientone,1794717051699962,shutdown,,ms_exit,,,,,jake-jongejans-bd593d28clientone1
+clientone,gateway@clientone,1794717051701821,shutdown,,ms_exit,,,,,jake-jongejans-bd593d28clientone1
+clientone,gateway@clientone,1794717157509706,subscribe,,subscription established,,,cached,,jake-jongejans-bd593d28clientone1
+clientone,gateway@clientone,1794717157585262,subscribe,,subscription established,,,cached,,jake-jongejans-bd593d28clientone1
+clientone,gateway@clientone,1794717159332645,read,DENY,allowed = false,vfl_client_model,latest,cached,GUID-state-aware,jake-jongejans-bd593d28clientone1
+clientone,gateway@clientone,1794717161565092,write,DENY,allowed = false,vfl_client_model,latest,cached,GUID-state-aware,jake-jongejans-bd593d28clientone1
+clientone,gateway@clientone,1794717161860800,write,DENY,allowed = false,vfl_client_model,latest,cached,GUID-state-aware,jake-jongejans-bd593d28clientone1
+clientone,gateway@clientone,1794717162163612,write,DENY,allowed = false,vfl_client_model,latest,cached,GUID-state-aware,jake-jongejans-bd593d28clientone1
+clientone,gateway@clientone,1794717162212502,shutdown,,ms_exit,,,,,jake-jongejans-bd593d28clientone1
+clientone,gateway@clientone,1794717162213667,shutdown,,ms_exit,,,,,jake-jongejans-bd593d28clientone1
+clienttwo,gateway@clienttwo,1794717047664646,subscribe,,subscription established,,,cached,,jake-jongejans-bd593d28clienttwo1
+clienttwo,gateway@clienttwo,1794717047665778,subscribe,,subscription established,,,cached,,jake-jongejans-bd593d28clienttwo1
+clienttwo,gateway@clienttwo,1794717049696570,read,DENY,not found,vfl_client_model,latest,cached,GUID-state-aware,jake-jongejans-bd593d28clienttwo1
+clienttwo,gateway@clienttwo,1794717050984842,write,ALLOW,,vfl_client_model,latest,cached,GUID-state-aware,jake-jongejans-bd593d28clienttwo1
+clienttwo,gateway@clienttwo,1794717051342088,write,ALLOW,,vfl_client_model,latest,cached,GUID-state-aware,jake-jongejans-bd593d28clienttwo1
+clienttwo,gateway@clienttwo,1794717051647973,write,ALLOW,,vfl_client_model,latest,cached,GUID-state-aware,jake-jongejans-bd593d28clienttwo1
+clienttwo,gateway@clienttwo,1794717051695332,shutdown,,ms_exit,,,,,jake-jongejans-bd593d28clienttwo1
+clienttwo,gateway@clienttwo,1794717051696186,shutdown,,ms_exit,,,,,jake-jongejans-bd593d28clienttwo1
+clienttwo,gateway@clienttwo,1794717156942798,subscribe,,subscription established,,,cached,,jake-jongejans-bd593d28clienttwo1
+clienttwo,gateway@clienttwo,1794717157857876,subscribe,,subscription established,,,cached,,jake-jongejans-bd593d28clienttwo1
+clienttwo,gateway@clienttwo,1794717158995507,read,DENY,allowed = false,vfl_client_model,latest,cached,GUID-state-aware,jake-jongejans-bd593d28clienttwo1
+clienttwo,gateway@clienttwo,1794717161424444,write,DENY,allowed = false,vfl_client_model,latest,cached,GUID-state-aware,jake-jongejans-bd593d28clienttwo1
+clienttwo,gateway@clienttwo,1794717161856339,write,DENY,allowed = false,vfl_client_model,latest,cached,GUID-state-aware,jake-jongejans-bd593d28clienttwo1
+clienttwo,gateway@clienttwo,1794717162152435,write,DENY,allowed = false,vfl_client_model,latest,cached,GUID-state-aware,jake-jongejans-bd593d28clienttwo1
+clienttwo,gateway@clienttwo,1794717162206475,shutdown,,ms_exit,,,,,jake-jongejans-bd593d28clienttwo1
+clienttwo,gateway@clienttwo,1794717162207370,shutdown,,ms_exit,,,,,jake-jongejans-bd593d28clienttwo1
+clientthree,gateway@clientthree,1794717045483372,subscribe,,subscription established,,,cached,,jake-jongejans-bd593d28clientthree1
+clientthree,gateway@clientthree,1794717046292461,subscribe,,subscription established,,,cached,,jake-jongejans-bd593d28clientthree1
+clientthree,gateway@clientthree,1794717047625814,read,DENY,not found,vfl_client_model,latest,cached,GUID-state-aware,jake-jongejans-bd593d28clientthree1
+clientthree,gateway@clientthree,1794717051039295,write,ALLOW,,vfl_client_model,latest,cached,GUID-state-aware,jake-jongejans-bd593d28clientthree1
+clientthree,gateway@clientthree,1794717051340305,write,ALLOW,,vfl_client_model,latest,cached,GUID-state-aware,jake-jongejans-bd593d28clientthree1
+clientthree,gateway@clientthree,1794717051638870,write,ALLOW,,vfl_client_model,latest,cached,GUID-state-aware,jake-jongejans-bd593d28clientthree1
+clientthree,gateway@clientthree,1794717051697197,shutdown,,ms_exit,,,,,jake-jongejans-bd593d28clientthree1
+clientthree,gateway@clientthree,1794717051699603,shutdown,,ms_exit,,,,,jake-jongejans-bd593d28clientthree1
+clientthree,gateway@clientthree,1794717156601484,subscribe,,subscription established,,,cached,,jake-jongejans-bd593d28clientthree1
+clientthree,gateway@clientthree,1794717157540810,subscribe,,subscription established,,,cached,,jake-jongejans-bd593d28clientthree1
+clientthree,gateway@clientthree,1794717158813673,read,DENY,allowed = false,vfl_client_model,latest,cached,GUID-state-aware,jake-jongejans-bd593d28clientthree1
+clientthree,gateway@clientthree,1794717161473995,write,DENY,allowed = false,vfl_client_model,latest,cached,GUID-state-aware,jake-jongejans-bd593d28clientthree1
+clientthree,gateway@clientthree,1794717161865028,write,DENY,allowed = false,vfl_client_model,latest,cached,GUID-state-aware,jake-jongejans-bd593d28clientthree1
+clientthree,gateway@clientthree,1794717162156352,write,DENY,allowed = false,vfl_client_model,latest,cached,GUID-state-aware,jake-jongejans-bd593d28clientthree1
+clientthree,gateway@clientthree,1794717162212405,shutdown,,ms_exit,,,,,jake-jongejans-bd593d28clientthree1
+clientthree,gateway@clientthree,1794717162214665,shutdown,,ms_exit,,,,,jake-jongejans-bd593d28clientthree1

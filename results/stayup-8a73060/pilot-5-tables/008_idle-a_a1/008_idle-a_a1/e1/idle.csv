@@ -1,0 +1,9 @@
+case,check,steward,start_clock,start_us,end_clock,end_us,value_us,bound_us,machines,result
+run,idle up after the job,server,kubelet@server,1794708179000000,log@server,1794708208468301,29468301,60000000,one: server,pass
+run,idle up after the job,clientone,kubelet@clientone,1794708179000000,log@clientone,1794708209025707,30025707,60000000,one: clientone,pass
+run,idle up after the job,clienttwo,kubelet@clienttwo,1794708179000000,log@clienttwo,1794708208949782,29949782,60000000,one: clienttwo,pass
+run,idle up after the job,clientthree,kubelet@clientthree,1794708179000000,log@clientthree,1794708209461950,30461950,60000000,one: clientthree,pass
+(a) revocation,PURGED vfl_server_model/latest,server,sender@server,1794708211049195,gateway@server,1794708211083152,33957,5000000,one: server,pass
+(a) revocation,PURGED vfl_client_model/latest,clientone,sender@clientone,1794708211523282,gateway@clientone,1794708211556074,32792,5000000,one: clientone,pass
+(a) revocation,PURGED vfl_client_model/latest,clienttwo,sender@clienttwo,1794708212003546,gateway@clienttwo,1794708212036338,32792,5000000,one: clienttwo,pass
+(a) revocation,PURGED vfl_client_model/latest,clientthree,sender@clientthree,1794708212494142,gateway@clientthree,1794708212529812,35670,5000000,one: clientthree,pass

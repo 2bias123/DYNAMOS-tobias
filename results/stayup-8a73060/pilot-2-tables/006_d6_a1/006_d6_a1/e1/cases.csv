@@ -1,0 +1,21 @@
+row,case,steward,expected,observed,result
+runs,two runs,server,2 runs of job records,2,pass
+D6,write denied,server,"every write record of run 2 DENY with reason 'allowed = false' on relation GUID-state-aware, at least one","write records: 3, 0 otherwise",pass
+D6,read denied,server,"every read record of run 2 DENY with reason 'allowed = false' on relation GUID-state-aware, at least one","read records: 1, 0 otherwise",pass
+D6,nothing destroyed,server,no PURGED or DELETED record in the unit,0,pass
+D6,state kept,server,"the state files after the revocation, at least one, byte-identical at the unit's end","1 state files after the revocation, 1 at the end, identical",pass
+runs,two runs,clientone,2 runs of job records,2,pass
+D6,write denied,clientone,"every write record of run 2 DENY with reason 'allowed = false' on relation GUID-state-aware, at least one","write records: 3, 0 otherwise",pass
+D6,read denied,clientone,"every read record of run 2 DENY with reason 'allowed = false' on relation GUID-state-aware, at least one","read records: 1, 0 otherwise",pass
+D6,nothing destroyed,clientone,no PURGED or DELETED record in the unit,0,pass
+D6,state kept,clientone,"the state files after the revocation, at least one, byte-identical at the unit's end","1 state files after the revocation, 1 at the end, identical",pass
+runs,two runs,clienttwo,2 runs of job records,2,pass
+D6,write denied,clienttwo,"every write record of run 2 DENY with reason 'allowed = false' on relation GUID-state-aware, at least one","write records: 3, 0 otherwise",pass
+D6,read denied,clienttwo,"every read record of run 2 DENY with reason 'allowed = false' on relation GUID-state-aware, at least one","read records: 1, 0 otherwise",pass
+D6,nothing destroyed,clienttwo,no PURGED or DELETED record in the unit,0,pass
+D6,state kept,clienttwo,"the state files after the revocation, at least one, byte-identical at the unit's end","1 state files after the revocation, 1 at the end, identical",pass
+runs,two runs,clientthree,2 runs of job records,2,pass
+D6,write denied,clientthree,"every write record of run 2 DENY with reason 'allowed = false' on relation GUID-state-aware, at least one","write records: 3, 0 otherwise",pass
+D6,read denied,clientthree,"every read record of run 2 DENY with reason 'allowed = false' on relation GUID-state-aware, at least one","read records: 1, 0 otherwise",pass
+D6,nothing destroyed,clientthree,no PURGED or DELETED record in the unit,0,pass
+D6,state kept,clientthree,"the state files after the revocation, at least one, byte-identical at the unit's end","1 state files after the revocation, 1 at the end, identical",pass

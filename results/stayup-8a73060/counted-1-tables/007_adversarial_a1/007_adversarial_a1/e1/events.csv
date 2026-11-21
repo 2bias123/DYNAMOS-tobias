@@ -1,0 +1,20 @@
+clock,at_us,event,subject,duration_us,detail
+host@control,1794653779632845,clean start,all,180955689,jobs of the four stewards deleted together in 32.8 s; agent mode none; agents switched: none; with the seven rollouts;every check holds
+host@control,1794653786940477,deploy gap: chain jobs deleted,server,0,none standing
+host@control,1794653787078632,deploy gap: chain jobs deleted,clientone,0,none standing
+host@control,1794653787221645,deploy gap: chain jobs deleted,clienttwo,0,none standing
+host@control,1794653787375225,deploy gap: chain jobs deleted,clientthree,0,none standing
+host@control,1794653787590658,deploy gap: chain pods gone,server,133848,
+host@control,1794653787590789,deploy gap: held,server,0,30 s after the harness's deletion at 1794653601862261
+host@control,1794653787731734,deploy gap: chain pods gone,clientone,140867,
+host@control,1794653787731868,deploy gap: held,clientone,0,30 s after the harness's deletion at 1794653601966264
+host@control,1794653787873884,deploy gap: chain pods gone,clienttwo,141936,
+host@control,1794653787874012,deploy gap: held,clienttwo,0,30 s after the harness's deletion at 1794653602063650
+host@control,1794653788018913,deploy gap: chain pods gone,clientthree,144824,
+host@control,1794653788019034,deploy gap: held,clientthree,0,30 s after the harness's deletion at 1794653602162811
+host@control,1794653788019054,trigger,api-gateway,2680,"request b8806387-15ea-4791-8069-364500426695, 40 rounds; time is the send"
+host@control,1794653811508224,adversarial: chain up,server,0,pod/jake-jongejans-9ba65192server1-lm4cm
+host@control,1794653811805885,adversarial: tampered identity and concurrent writes sent,server,297552,"{""tampered"": ""PERMISSION_DENIED"", ""concurrent"": [""ALLOW"", ""ALLOW"", ""ALLOW"", ""ALLOW"", ""ALLOW"", ""ALLOW"", ""ALLOW"", ""ALLOW""], ""operations"": [{""identity"": ""tampered"", ""key"": ""mismatch-probe"", ""sent_us"": 1794653811755134, ""returned_us"": 1794653811756917, ""answer"": ""PERMISSION_DENIED""}, {""identity"": ""own"","
+host@control,1794653812046630,adversarial: a file written past the enforcement point,server,0,data/adversarial/rogue.bin
+host@control,1794653817422976,"adversarial: listing taken during a write, taken again",server,0,try 1: server/state-server-ad751c18-vfltrainmodelrequest: the copied audit log is not the file the claim holds
+host@control,1794653822431053,"adversarial: listing taken during a write, taken again",server,0,try 2: server/state-server-ad751c18-vfltrainmodelrequest: the copied audit log is not the file the claim holds

@@ -1,0 +1,17 @@
+case,check,steward,start_clock,start_us,end_clock,end_us,value_us,bound_us,machines,result
+run 1,idle up after the job,server,kubelet@server,1794681454000000,log@server,1794681459243374,5243374,60000000,one: server,pass
+run 1,idle up after the job,clientone,kubelet@clientone,1794681454000000,log@clientone,1794681459549583,5549583,60000000,one: clientone,pass
+run 1,idle up after the job,clienttwo,kubelet@clienttwo,1794681454000000,log@clienttwo,1794681459441884,5441884,60000000,one: clienttwo,pass
+run 1,idle up after the job,clientthree,kubelet@clientthree,1794681454000000,log@clientthree,1794681460026665,6026665,60000000,one: clientthree,pass
+run 2,idle up after the job,server,kubelet@server,1794681533000000,log@server,1794681549259778,16259778,60000000,one: server,pass
+run 2,idle up after the job,clientone,kubelet@clientone,1794681533000000,log@clientone,1794681549571519,16571519,60000000,one: clientone,pass
+run 2,idle up after the job,clienttwo,kubelet@clienttwo,1794681533000000,log@clienttwo,1794681549452904,16452904,60000000,one: clienttwo,pass
+run 2,idle up after the job,clientthree,kubelet@clientthree,1794681533000000,log@clientthree,1794681550032916,17032916,60000000,one: clientthree,pass
+(c) hand-over,duration logged by the agent,server,agent@server,1794681521997627,agent@server,1794681522863511,865884,,one: server,pass
+(c) hand-over,hand-over line to the job's first record,server,agent@server,1794681522863511,gateway@server,1794681526111923,3248412,,one: server,pass
+(c) hand-over,duration logged by the agent,clientone,agent@clientone,1794681521995519,agent@clientone,1794681523062274,1066755,,one: clientone,pass
+(c) hand-over,hand-over line to the job's first record,clientone,agent@clientone,1794681523062274,gateway@clientone,1794681526841010,3778736,,one: clientone,pass
+(c) hand-over,duration logged by the agent,clienttwo,agent@clienttwo,1794681521995605,agent@clienttwo,1794681523017386,1021781,,one: clienttwo,pass
+(c) hand-over,hand-over line to the job's first record,clienttwo,agent@clienttwo,1794681523017386,gateway@clienttwo,1794681526448418,3431032,,one: clienttwo,pass
+(c) hand-over,duration logged by the agent,clientthree,agent@clientthree,1794681521996911,agent@clientthree,1794681522520262,523351,,one: clientthree,pass
+(c) hand-over,hand-over line to the job's first record,clientthree,agent@clientthree,1794681522520262,gateway@clientthree,1794681525797434,3277172,,one: clientthree,pass

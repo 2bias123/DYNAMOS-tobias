@@ -1,0 +1,2 @@
+n,median_c_minus_h_us,median_c_minus_h_ms,median_at_most_10_ms,ci95_high_us,ci95_high_ms,ci95_high_at_most_10_ms,quadruplets_above_10_ms,expectation_holds
+32,1365,1.4,yes,3164.5,3.2,yes,4,yes

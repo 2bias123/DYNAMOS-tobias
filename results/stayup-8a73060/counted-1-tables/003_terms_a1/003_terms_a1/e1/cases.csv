@@ -1,0 +1,73 @@
+row,case,steward,expected,observed,result
+runs,one run per set of terms,server,5 runs of job records,5,pass
+W1,"write, allowed false",server,"every write record DENY with reason 'allowed = false' on relation GUID-state-aware, at least one","write records: 3, 0 otherwise",pass
+R1,"read, allowed false",server,"every read record DENY with reason 'allowed = false' on relation GUID-state-aware, at least one","read records: 1, 0 otherwise",pass
+W1,"nothing destroyed, allowed false",server,no PURGED or DELETED record in the run,0,pass
+W1,"write, no state directives",server,"every write record DENY with reason 'stateDirectives absent' on relation GUID-state-aware, at least one","write records: 3, 0 otherwise",pass
+R1,"read, no state directives",server,"every read record DENY with reason 'stateDirectives absent' on relation GUID-state-aware, at least one","read records: 1, 0 otherwise",pass
+W1,"nothing destroyed, no state directives",server,no PURGED or DELETED record in the run,0,pass
+W1,"write, unknown onRevocation",server,"every write record DENY with reason 'invalid stateDirectives; fail closed' on relation GUID-state-aware, at least one","write records: 3, 0 otherwise",pass
+R1,"read, unknown onRevocation",server,"every read record DENY with reason 'invalid stateDirectives; fail closed' on relation GUID-state-aware, at least one","read records: 1, 0 otherwise",pass
+W1,"invalid directives recorded, unknown onRevocation",server,at least one invalid_directives record by the job's enforcement point,"1: unknown onRevocation ""shred""",pass
+W1,"nothing destroyed, unknown onRevocation",server,no PURGED or DELETED record in the run,0,pass
+W1,"write, negative retention",server,"every write record DENY with reason 'invalid stateDirectives; fail closed' on relation GUID-state-aware, at least one","write records: 3, 0 otherwise",pass
+R1,"read, negative retention",server,"every read record DENY with reason 'invalid stateDirectives; fail closed' on relation GUID-state-aware, at least one","read records: 1, 0 otherwise",pass
+W1,"invalid directives recorded, negative retention",server,at least one invalid_directives record by the job's enforcement point,1: negative retentionSeconds -1,pass
+W1,"nothing destroyed, negative retention",server,no PURGED or DELETED record in the run,0,pass
+W4,"write, resume disabled",server,"every write record ALLOW on allowed terms on relation GUID-state-aware, at least one","write records: 3, 0 otherwise",pass
+R2,"read, resume disabled",server,"every read record DENY with reason 'resume disabled' on relation GUID-state-aware, at least one","read records: 1, 0 otherwise",pass
+W4,"nothing destroyed, resume disabled",server,no PURGED or DELETED record in the run,0,pass
+runs,one run per set of terms,clientone,5 runs of job records,5,pass
+W1,"write, allowed false",clientone,"every write record DENY with reason 'allowed = false' on relation GUID-state-aware, at least one","write records: 3, 0 otherwise",pass
+R1,"read, allowed false",clientone,"every read record DENY with reason 'allowed = false' on relation GUID-state-aware, at least one","read records: 1, 0 otherwise",pass
+W1,"nothing destroyed, allowed false",clientone,no PURGED or DELETED record in the run,0,pass
+W1,"write, no state directives",clientone,"every write record DENY with reason 'stateDirectives absent' on relation GUID-state-aware, at least one","write records: 3, 0 otherwise",pass
+R1,"read, no state directives",clientone,"every read record DENY with reason 'stateDirectives absent' on relation GUID-state-aware, at least one","read records: 1, 0 otherwise",pass
+W1,"nothing destroyed, no state directives",clientone,no PURGED or DELETED record in the run,0,pass
+W1,"write, unknown onRevocation",clientone,"every write record DENY with reason 'invalid stateDirectives; fail closed' on relation GUID-state-aware, at least one","write records: 3, 0 otherwise",pass
+R1,"read, unknown onRevocation",clientone,"every read record DENY with reason 'invalid stateDirectives; fail closed' on relation GUID-state-aware, at least one","read records: 1, 0 otherwise",pass
+W1,"invalid directives recorded, unknown onRevocation",clientone,at least one invalid_directives record by the job's enforcement point,"1: unknown onRevocation ""shred""",pass
+W1,"nothing destroyed, unknown onRevocation",clientone,no PURGED or DELETED record in the run,0,pass
+W1,"write, negative retention",clientone,"every write record DENY with reason 'invalid stateDirectives; fail closed' on relation GUID-state-aware, at least one","write records: 3, 0 otherwise",pass
+R1,"read, negative retention",clientone,"every read record DENY with reason 'invalid stateDirectives; fail closed' on relation GUID-state-aware, at least one","read records: 1, 0 otherwise",pass
+W1,"invalid directives recorded, negative retention",clientone,at least one invalid_directives record by the job's enforcement point,1: negative retentionSeconds -1,pass
+W1,"nothing destroyed, negative retention",clientone,no PURGED or DELETED record in the run,0,pass
+W4,"write, resume disabled",clientone,"every write record ALLOW on allowed terms on relation GUID-state-aware, at least one","write records: 3, 0 otherwise",pass
+R2,"read, resume disabled",clientone,"every read record DENY with reason 'resume disabled' on relation GUID-state-aware, at least one","read records: 1, 0 otherwise",pass
+W4,"nothing destroyed, resume disabled",clientone,no PURGED or DELETED record in the run,0,pass
+runs,one run per set of terms,clienttwo,5 runs of job records,5,pass
+W1,"write, allowed false",clienttwo,"every write record DENY with reason 'allowed = false' on relation GUID-state-aware, at least one","write records: 3, 0 otherwise",pass
+R1,"read, allowed false",clienttwo,"every read record DENY with reason 'allowed = false' on relation GUID-state-aware, at least one","read records: 1, 0 otherwise",pass
+W1,"nothing destroyed, allowed false",clienttwo,no PURGED or DELETED record in the run,0,pass
+W1,"write, no state directives",clienttwo,"every write record DENY with reason 'stateDirectives absent' on relation GUID-state-aware, at least one","write records: 3, 0 otherwise",pass
+R1,"read, no state directives",clienttwo,"every read record DENY with reason 'stateDirectives absent' on relation GUID-state-aware, at least one","read records: 1, 0 otherwise",pass
+W1,"nothing destroyed, no state directives",clienttwo,no PURGED or DELETED record in the run,0,pass
+W1,"write, unknown onRevocation",clienttwo,"every write record DENY with reason 'invalid stateDirectives; fail closed' on relation GUID-state-aware, at least one","write records: 3, 0 otherwise",pass
+R1,"read, unknown onRevocation",clienttwo,"every read record DENY with reason 'invalid stateDirectives; fail closed' on relation GUID-state-aware, at least one","read records: 1, 0 otherwise",pass
+W1,"invalid directives recorded, unknown onRevocation",clienttwo,at least one invalid_directives record by the job's enforcement point,"1: unknown onRevocation ""shred""",pass
+W1,"nothing destroyed, unknown onRevocation",clienttwo,no PURGED or DELETED record in the run,0,pass
+W1,"write, negative retention",clienttwo,"every write record DENY with reason 'invalid stateDirectives; fail closed' on relation GUID-state-aware, at least one","write records: 3, 0 otherwise",pass
+R1,"read, negative retention",clienttwo,"every read record DENY with reason 'invalid stateDirectives; fail closed' on relation GUID-state-aware, at least one","read records: 1, 0 otherwise",pass
+W1,"invalid directives recorded, negative retention",clienttwo,at least one invalid_directives record by the job's enforcement point,1: negative retentionSeconds -1,pass
+W1,"nothing destroyed, negative retention",clienttwo,no PURGED or DELETED record in the run,0,pass
+W4,"write, resume disabled",clienttwo,"every write record ALLOW on allowed terms on relation GUID-state-aware, at least one","write records: 3, 0 otherwise",pass
+R2,"read, resume disabled",clienttwo,"every read record DENY with reason 'resume disabled' on relation GUID-state-aware, at least one","read records: 1, 0 otherwise",pass
+W4,"nothing destroyed, resume disabled",clienttwo,no PURGED or DELETED record in the run,0,pass
+runs,one run per set of terms,clientthree,5 runs of job records,5,pass
+W1,"write, allowed false",clientthree,"every write record DENY with reason 'allowed = false' on relation GUID-state-aware, at least one","write records: 3, 0 otherwise",pass
+R1,"read, allowed false",clientthree,"every read record DENY with reason 'allowed = false' on relation GUID-state-aware, at least one","read records: 1, 0 otherwise",pass
+W1,"nothing destroyed, allowed false",clientthree,no PURGED or DELETED record in the run,0,pass
+W1,"write, no state directives",clientthree,"every write record DENY with reason 'stateDirectives absent' on relation GUID-state-aware, at least one","write records: 3, 0 otherwise",pass
+R1,"read, no state directives",clientthree,"every read record DENY with reason 'stateDirectives absent' on relation GUID-state-aware, at least one","read records: 1, 0 otherwise",pass
+W1,"nothing destroyed, no state directives",clientthree,no PURGED or DELETED record in the run,0,pass
+W1,"write, unknown onRevocation",clientthree,"every write record DENY with reason 'invalid stateDirectives; fail closed' on relation GUID-state-aware, at least one","write records: 3, 0 otherwise",pass
+R1,"read, unknown onRevocation",clientthree,"every read record DENY with reason 'invalid stateDirectives; fail closed' on relation GUID-state-aware, at least one","read records: 1, 0 otherwise",pass
+W1,"invalid directives recorded, unknown onRevocation",clientthree,at least one invalid_directives record by the job's enforcement point,"1: unknown onRevocation ""shred""",pass
+W1,"nothing destroyed, unknown onRevocation",clientthree,no PURGED or DELETED record in the run,0,pass
+W1,"write, negative retention",clientthree,"every write record DENY with reason 'invalid stateDirectives; fail closed' on relation GUID-state-aware, at least one","write records: 3, 0 otherwise",pass
+R1,"read, negative retention",clientthree,"every read record DENY with reason 'invalid stateDirectives; fail closed' on relation GUID-state-aware, at least one","read records: 1, 0 otherwise",pass
+W1,"invalid directives recorded, negative retention",clientthree,at least one invalid_directives record by the job's enforcement point,1: negative retentionSeconds -1,pass
+W1,"nothing destroyed, negative retention",clientthree,no PURGED or DELETED record in the run,0,pass
+W4,"write, resume disabled",clientthree,"every write record ALLOW on allowed terms on relation GUID-state-aware, at least one","write records: 3, 0 otherwise",pass
+R2,"read, resume disabled",clientthree,"every read record DENY with reason 'resume disabled' on relation GUID-state-aware, at least one","read records: 1, 0 otherwise",pass
+W4,"nothing destroyed, resume disabled",clientthree,no PURGED or DELETED record in the run,0,pass

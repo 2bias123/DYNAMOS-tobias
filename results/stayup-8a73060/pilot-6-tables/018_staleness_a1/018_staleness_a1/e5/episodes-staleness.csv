@@ -1,0 +1,2 @@
+episode,clock,baseline_us,outage_us,stale_us,stale_cache_age_ms,flip_sent_us,held_until_us,recovery_us,purge_us,value_us,purge_source,blob_after_hold,blob_after_purge,machines,result
+1,host@control,1794756423451751,1794756423458861,1794756443824468,20863,1794756443896414,1794756453957949,1794756453958817,1794756462967723,9008906,fresh,1,0,one: control,pass

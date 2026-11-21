@@ -1,0 +1,2 @@
+row,case,steward,expected,observed,result
+staleness,episode 1,local,"a stale write DENY in the outage, nothing destroyed through it, one PURGED on a fresh view after the recovery, no blob left","PURGED 15334.3 ms after the recovery stamp, fresh; blobs 1 after the hold, 0 after the purge",pass

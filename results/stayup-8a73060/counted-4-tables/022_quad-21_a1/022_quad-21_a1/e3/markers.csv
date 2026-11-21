@@ -1,0 +1,5 @@
+marker,text,where,files,lines,hits,first_hit
+M1,STATE_LOCK_NOT_ACQUIRED,gateway,28,1133,0,
+M2,IDLE_GATEWAY_NOT_STOPPED,agent,82,90791,0,
+M3,IDLE_GATEWAY_NOT_RUNNING,agent,82,90791,0,
+M4,No policy gateway reachable,service,138,62355,0,

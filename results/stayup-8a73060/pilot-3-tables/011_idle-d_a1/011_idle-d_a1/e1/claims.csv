@@ -1,0 +1,5 @@
+namespace,claim,phase,selected_node,stamped,volume
+server,state-server-ad751c18-vfltrainmodelrequest,Bound,server,yes,pvc-e80616d7-99db-4fb2-a4a6-71d224b89a2e
+clientone,state-clientone-ad751c18-vfltrainmodelrequest,Bound,clientone,yes,pvc-6b95606e-90e7-495b-ad5b-38c85b883a0c
+clienttwo,state-clienttwo-ad751c18-vfltrainmodelrequest,Bound,clienttwo,yes,pvc-42a5a878-6cf1-4b54-bbd6-5c9a75c49905
+clientthree,state-clientthree-ad751c18-vfltrainmodelrequest,Bound,clientthree,yes,pvc-8c2e66f3-9b66-4e5b-a61a-7df2a978df97

@@ -1,0 +1,5 @@
+steward,claim,node,files,state_files,audit_bytes,audit_records
+server,state-server-ad751c18-vfltrainmodelrequest,server,3,1,32001,54
+clientone,state-clientone-ad751c18-vfltrainmodelrequest,clientone,3,1,32757,55
+clienttwo,state-clienttwo-ad751c18-vfltrainmodelrequest,clienttwo,3,1,32763,55
+clientthree,state-clientthree-ad751c18-vfltrainmodelrequest,clientthree,3,1,33091,55

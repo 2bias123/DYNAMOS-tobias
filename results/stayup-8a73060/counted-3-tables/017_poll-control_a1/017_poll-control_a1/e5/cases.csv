@@ -1,0 +1,101 @@
+row,case,steward,expected,observed,result
+poll,trial 1,server,"the end record decided at or after the send, http 200, send and record on one machine",purge/PURGED 4791.1 ms after the send; clocks one: server,pass
+poll,trial 2,server,"the end record decided at or after the send, http 200, send and record on one machine",purge/PURGED 3213.1 ms after the send; clocks one: server,pass
+poll,trial 3,server,"the end record decided at or after the send, http 200, send and record on one machine",purge/PURGED 2793.6 ms after the send; clocks one: server,pass
+poll,trial 4,server,"the end record decided at or after the send, http 200, send and record on one machine",purge/PURGED 2919.1 ms after the send; clocks one: server,pass
+poll,trial 5,server,"the end record decided at or after the send, http 200, send and record on one machine",purge/PURGED 3042.8 ms after the send; clocks one: server,pass
+poll,trial 6,server,"the end record decided at or after the send, http 200, send and record on one machine",purge/PURGED 2601.8 ms after the send; clocks one: server,pass
+poll,trial 7,server,"the end record decided at or after the send, http 200, send and record on one machine",purge/PURGED 2827.2 ms after the send; clocks one: server,pass
+poll,trial 8,server,"the end record decided at or after the send, http 200, send and record on one machine",purge/PURGED 2580.8 ms after the send; clocks one: server,pass
+poll,trial 9,server,"the end record decided at or after the send, http 200, send and record on one machine",purge/PURGED 3261.0 ms after the send; clocks one: server,pass
+poll,trial 10,server,"the end record decided at or after the send, http 200, send and record on one machine",purge/PURGED 3312.2 ms after the send; clocks one: server,pass
+poll,trial 11,server,"the end record decided at or after the send, http 200, send and record on one machine",purge/PURGED 3052.5 ms after the send; clocks one: server,pass
+poll,trial 12,server,"the end record decided at or after the send, http 200, send and record on one machine",purge/PURGED 2862.2 ms after the send; clocks one: server,pass
+poll,trial 13,server,"the end record decided at or after the send, http 200, send and record on one machine",purge/PURGED 2785.3 ms after the send; clocks one: server,pass
+poll,trial 14,server,"the end record decided at or after the send, http 200, send and record on one machine",purge/PURGED 2754.1 ms after the send; clocks one: server,pass
+poll,trial 15,server,"the end record decided at or after the send, http 200, send and record on one machine",purge/PURGED 2847.6 ms after the send; clocks one: server,pass
+poll,trial 16,server,"the end record decided at or after the send, http 200, send and record on one machine",purge/PURGED 2785.8 ms after the send; clocks one: server,pass
+poll,trial 17,server,"the end record decided at or after the send, http 200, send and record on one machine",purge/PURGED 2695.9 ms after the send; clocks one: server,pass
+poll,trial 18,server,"the end record decided at or after the send, http 200, send and record on one machine",purge/PURGED 2721.4 ms after the send; clocks one: server,pass
+poll,trial 19,server,"the end record decided at or after the send, http 200, send and record on one machine",purge/PURGED 2715.7 ms after the send; clocks one: server,pass
+poll,trial 20,server,"the end record decided at or after the send, http 200, send and record on one machine",purge/PURGED 3315.0 ms after the send; clocks one: server,pass
+poll,trial 21,server,"the end record decided at or after the send, http 200, send and record on one machine",purge/PURGED 3290.7 ms after the send; clocks one: server,pass
+poll,trial 22,server,"the end record decided at or after the send, http 200, send and record on one machine",purge/PURGED 3305.2 ms after the send; clocks one: server,pass
+poll,trial 23,server,"the end record decided at or after the send, http 200, send and record on one machine",purge/PURGED 3224.3 ms after the send; clocks one: server,pass
+poll,trial 24,server,"the end record decided at or after the send, http 200, send and record on one machine",purge/PURGED 3185.0 ms after the send; clocks one: server,pass
+poll,trial 25,server,"the end record decided at or after the send, http 200, send and record on one machine",purge/PURGED 3176.4 ms after the send; clocks one: server,pass
+poll,trial 26,server,"the end record decided at or after the send, http 200, send and record on one machine",purge/PURGED 3156.7 ms after the send; clocks one: server,pass
+poll,trial 27,server,"the end record decided at or after the send, http 200, send and record on one machine",purge/PURGED 2754.1 ms after the send; clocks one: server,pass
+poll,trial 28,server,"the end record decided at or after the send, http 200, send and record on one machine",purge/PURGED 2697.4 ms after the send; clocks one: server,pass
+poll,trial 29,server,"the end record decided at or after the send, http 200, send and record on one machine",purge/PURGED 2622.3 ms after the send; clocks one: server,pass
+poll,trial 30,server,"the end record decided at or after the send, http 200, send and record on one machine",purge/PURGED 2620.1 ms after the send; clocks one: server,pass
+poll,trial 31,server,"the end record decided at or after the send, http 200, send and record on one machine",purge/PURGED 2547.7 ms after the send; clocks one: server,pass
+poll,trial 32,server,"the end record decided at or after the send, http 200, send and record on one machine",purge/PURGED 3157.7 ms after the send; clocks one: server,pass
+poll,trial 33,server,"the end record decided at or after the send, http 200, send and record on one machine",purge/PURGED 3146.0 ms after the send; clocks one: server,pass
+poll,trial 34,server,"the end record decided at or after the send, http 200, send and record on one machine",purge/PURGED 3090.3 ms after the send; clocks one: server,pass
+poll,trial 35,server,"the end record decided at or after the send, http 200, send and record on one machine",purge/PURGED 3017.9 ms after the send; clocks one: server,pass
+poll,trial 36,server,"the end record decided at or after the send, http 200, send and record on one machine",purge/PURGED 2916.2 ms after the send; clocks one: server,pass
+poll,trial 37,server,"the end record decided at or after the send, http 200, send and record on one machine",purge/PURGED 2772.6 ms after the send; clocks one: server,pass
+poll,trial 38,server,"the end record decided at or after the send, http 200, send and record on one machine",purge/PURGED 2670.2 ms after the send; clocks one: server,pass
+poll,trial 39,server,"the end record decided at or after the send, http 200, send and record on one machine",purge/PURGED 2693.5 ms after the send; clocks one: server,pass
+poll,trial 40,server,"the end record decided at or after the send, http 200, send and record on one machine",purge/PURGED 2621.0 ms after the send; clocks one: server,pass
+poll,trial 41,server,"the end record decided at or after the send, http 200, send and record on one machine",purge/PURGED 3112.2 ms after the send; clocks one: server,pass
+poll,trial 42,server,"the end record decided at or after the send, http 200, send and record on one machine",purge/PURGED 2551.8 ms after the send; clocks one: server,pass
+poll,trial 43,server,"the end record decided at or after the send, http 200, send and record on one machine",purge/PURGED 2992.2 ms after the send; clocks one: server,pass
+poll,trial 44,server,"the end record decided at or after the send, http 200, send and record on one machine",purge/PURGED 3356.8 ms after the send; clocks one: server,pass
+poll,trial 45,server,"the end record decided at or after the send, http 200, send and record on one machine",purge/PURGED 3290.6 ms after the send; clocks one: server,pass
+poll,trial 46,server,"the end record decided at or after the send, http 200, send and record on one machine",purge/PURGED 3295.1 ms after the send; clocks one: server,pass
+poll,trial 47,server,"the end record decided at or after the send, http 200, send and record on one machine",purge/PURGED 3273.8 ms after the send; clocks one: server,pass
+poll,trial 48,server,"the end record decided at or after the send, http 200, send and record on one machine",purge/PURGED 3181.2 ms after the send; clocks one: server,pass
+poll,trial 49,server,"the end record decided at or after the send, http 200, send and record on one machine",purge/PURGED 2944.5 ms after the send; clocks one: server,pass
+poll,trial 50,server,"the end record decided at or after the send, http 200, send and record on one machine",purge/PURGED 2731.6 ms after the send; clocks one: server,pass
+complete log,trial 1,server,the end record read from the gateway's stdout is the first such record on the complete audit log,"first on the audit log 1794723652440319, from stdout 1794723652440319",pass
+complete log,trial 2,server,the end record read from the gateway's stdout is the first such record on the complete audit log,"first on the audit log 1794723662440109, from stdout 1794723662440109",pass
+complete log,trial 3,server,the end record read from the gateway's stdout is the first such record on the complete audit log,"first on the audit log 1794723672441524, from stdout 1794723672441524",pass
+complete log,trial 4,server,the end record read from the gateway's stdout is the first such record on the complete audit log,"first on the audit log 1794723682440020, from stdout 1794723682440020",pass
+complete log,trial 5,server,the end record read from the gateway's stdout is the first such record on the complete audit log,"first on the audit log 1794723692440825, from stdout 1794723692440825",pass
+complete log,trial 6,server,the end record read from the gateway's stdout is the first such record on the complete audit log,"first on the audit log 1794723702441070, from stdout 1794723702441070",pass
+complete log,trial 7,server,the end record read from the gateway's stdout is the first such record on the complete audit log,"first on the audit log 1794723712441288, from stdout 1794723712441288",pass
+complete log,trial 8,server,the end record read from the gateway's stdout is the first such record on the complete audit log,"first on the audit log 1794723722440533, from stdout 1794723722440533",pass
+complete log,trial 9,server,the end record read from the gateway's stdout is the first such record on the complete audit log,"first on the audit log 1794723732440723, from stdout 1794723732440723",pass
+complete log,trial 10,server,the end record read from the gateway's stdout is the first such record on the complete audit log,"first on the audit log 1794723742441045, from stdout 1794723742441045",pass
+complete log,trial 11,server,the end record read from the gateway's stdout is the first such record on the complete audit log,"first on the audit log 1794723752440985, from stdout 1794723752440985",pass
+complete log,trial 12,server,the end record read from the gateway's stdout is the first such record on the complete audit log,"first on the audit log 1794723762439977, from stdout 1794723762439977",pass
+complete log,trial 13,server,the end record read from the gateway's stdout is the first such record on the complete audit log,"first on the audit log 1794723772440419, from stdout 1794723772440419",pass
+complete log,trial 14,server,the end record read from the gateway's stdout is the first such record on the complete audit log,"first on the audit log 1794723782441294, from stdout 1794723782441294",pass
+complete log,trial 15,server,the end record read from the gateway's stdout is the first such record on the complete audit log,"first on the audit log 1794723792441159, from stdout 1794723792441159",pass
+complete log,trial 16,server,the end record read from the gateway's stdout is the first such record on the complete audit log,"first on the audit log 1794723802442537, from stdout 1794723802442537",pass
+complete log,trial 17,server,the end record read from the gateway's stdout is the first such record on the complete audit log,"first on the audit log 1794723812441977, from stdout 1794723812441977",pass
+complete log,trial 18,server,the end record read from the gateway's stdout is the first such record on the complete audit log,"first on the audit log 1794723822440817, from stdout 1794723822440817",pass
+complete log,trial 19,server,the end record read from the gateway's stdout is the first such record on the complete audit log,"first on the audit log 1794723832440680, from stdout 1794723832440680",pass
+complete log,trial 20,server,the end record read from the gateway's stdout is the first such record on the complete audit log,"first on the audit log 1794723842441147, from stdout 1794723842441147",pass
+complete log,trial 21,server,the end record read from the gateway's stdout is the first such record on the complete audit log,"first on the audit log 1794723852440377, from stdout 1794723852440377",pass
+complete log,trial 22,server,the end record read from the gateway's stdout is the first such record on the complete audit log,"first on the audit log 1794723862441757, from stdout 1794723862441757",pass
+complete log,trial 23,server,the end record read from the gateway's stdout is the first such record on the complete audit log,"first on the audit log 1794723872440502, from stdout 1794723872440502",pass
+complete log,trial 24,server,the end record read from the gateway's stdout is the first such record on the complete audit log,"first on the audit log 1794723882441076, from stdout 1794723882441076",pass
+complete log,trial 25,server,the end record read from the gateway's stdout is the first such record on the complete audit log,"first on the audit log 1794723892441345, from stdout 1794723892441345",pass
+complete log,trial 26,server,the end record read from the gateway's stdout is the first such record on the complete audit log,"first on the audit log 1794723902440620, from stdout 1794723902440620",pass
+complete log,trial 27,server,the end record read from the gateway's stdout is the first such record on the complete audit log,"first on the audit log 1794723912442979, from stdout 1794723912442979",pass
+complete log,trial 28,server,the end record read from the gateway's stdout is the first such record on the complete audit log,"first on the audit log 1794723922440914, from stdout 1794723922440914",pass
+complete log,trial 29,server,the end record read from the gateway's stdout is the first such record on the complete audit log,"first on the audit log 1794723932440502, from stdout 1794723932440502",pass
+complete log,trial 30,server,the end record read from the gateway's stdout is the first such record on the complete audit log,"first on the audit log 1794723942441260, from stdout 1794723942441260",pass
+complete log,trial 31,server,the end record read from the gateway's stdout is the first such record on the complete audit log,"first on the audit log 1794723952441105, from stdout 1794723952441105",pass
+complete log,trial 32,server,the end record read from the gateway's stdout is the first such record on the complete audit log,"first on the audit log 1794723962440927, from stdout 1794723962440927",pass
+complete log,trial 33,server,the end record read from the gateway's stdout is the first such record on the complete audit log,"first on the audit log 1794723972440372, from stdout 1794723972440372",pass
+complete log,trial 34,server,the end record read from the gateway's stdout is the first such record on the complete audit log,"first on the audit log 1794723982440498, from stdout 1794723982440498",pass
+complete log,trial 35,server,the end record read from the gateway's stdout is the first such record on the complete audit log,"first on the audit log 1794723992441592, from stdout 1794723992441592",pass
+complete log,trial 36,server,the end record read from the gateway's stdout is the first such record on the complete audit log,"first on the audit log 1794724002444397, from stdout 1794724002444397",pass
+complete log,trial 37,server,the end record read from the gateway's stdout is the first such record on the complete audit log,"first on the audit log 1794724012440787, from stdout 1794724012440787",pass
+complete log,trial 38,server,the end record read from the gateway's stdout is the first such record on the complete audit log,"first on the audit log 1794724022440822, from stdout 1794724022440822",pass
+complete log,trial 39,server,the end record read from the gateway's stdout is the first such record on the complete audit log,"first on the audit log 1794724032440910, from stdout 1794724032440910",pass
+complete log,trial 40,server,the end record read from the gateway's stdout is the first such record on the complete audit log,"first on the audit log 1794724042441527, from stdout 1794724042441527",pass
+complete log,trial 41,server,the end record read from the gateway's stdout is the first such record on the complete audit log,"first on the audit log 1794724052440600, from stdout 1794724052440600",pass
+complete log,trial 42,server,the end record read from the gateway's stdout is the first such record on the complete audit log,"first on the audit log 1794724062441107, from stdout 1794724062441107",pass
+complete log,trial 43,server,the end record read from the gateway's stdout is the first such record on the complete audit log,"first on the audit log 1794724072442708, from stdout 1794724072442708",pass
+complete log,trial 44,server,the end record read from the gateway's stdout is the first such record on the complete audit log,"first on the audit log 1794724082441190, from stdout 1794724082441190",pass
+complete log,trial 45,server,the end record read from the gateway's stdout is the first such record on the complete audit log,"first on the audit log 1794724092440678, from stdout 1794724092440678",pass
+complete log,trial 46,server,the end record read from the gateway's stdout is the first such record on the complete audit log,"first on the audit log 1794724102440952, from stdout 1794724102440952",pass
+complete log,trial 47,server,the end record read from the gateway's stdout is the first such record on the complete audit log,"first on the audit log 1794724112441082, from stdout 1794724112441082",pass
+complete log,trial 48,server,the end record read from the gateway's stdout is the first such record on the complete audit log,"first on the audit log 1794724122441362, from stdout 1794724122441362",pass
+complete log,trial 49,server,the end record read from the gateway's stdout is the first such record on the complete audit log,"first on the audit log 1794724132441748, from stdout 1794724132441748",pass
+complete log,trial 50,server,the end record read from the gateway's stdout is the first such record on the complete audit log,"first on the audit log 1794724142440786, from stdout 1794724142440786",pass

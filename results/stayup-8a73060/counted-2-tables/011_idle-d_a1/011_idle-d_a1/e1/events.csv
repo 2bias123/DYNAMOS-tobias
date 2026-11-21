@@ -1,0 +1,17 @@
+clock,at_us,event,subject,duration_us,detail
+host@control,1794681796289173,clean start,all,198112832,jobs of the four stewards deleted together in 33.2 s; agent mode none; agents switched: none; with the seven rollouts;every check holds
+host@control,1794681805424069,deploy gap: chain jobs deleted,server,0,none standing
+host@control,1794681805584937,deploy gap: chain jobs deleted,clientone,0,none standing
+host@control,1794681805758462,deploy gap: chain jobs deleted,clienttwo,0,none standing
+host@control,1794681805937005,deploy gap: chain jobs deleted,clientthree,0,none standing
+host@control,1794681806189985,deploy gap: chain pods gone,server,167803,
+host@control,1794681806190132,deploy gap: held,server,0,30 s after the harness's deletion at 1794681601327719
+host@control,1794681806375006,deploy gap: chain pods gone,clientone,184748,
+host@control,1794681806375289,deploy gap: held,clientone,0,30 s after the harness's deletion at 1794681601447662
+host@control,1794681806555236,deploy gap: chain pods gone,clienttwo,179806,
+host@control,1794681806555416,deploy gap: held,clienttwo,0,30 s after the harness's deletion at 1794681601571261
+host@control,1794681806715986,deploy gap: chain pods gone,clientthree,160471,
+host@control,1794681806716125,deploy gap: held,clientthree,0,30 s after the harness's deletion at 1794681601679272
+host@control,1794681806716149,trigger,api-gateway,2661,"request 14de2e90-de4f-4d70-88cf-4fa3288d172f, 3 rounds; time is the send"
+host@control,1794681831739646,run done,api-gateway,30517902,request 14de2e90-de4f-4d70-88cf-4fa3288d172f
+host@control,1794681882278470,(d) window,all,95000000,3 polls of 30 s plus 5 s

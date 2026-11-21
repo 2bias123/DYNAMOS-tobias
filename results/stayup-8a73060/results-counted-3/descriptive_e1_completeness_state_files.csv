@@ -1,0 +1,5 @@
+status,unit,steward,claim,state_files,write_allow_records,state_files_with_no_write_allow_record,state_files_with_exactly_one_write_allow_record,state_files_with_more_than_one_write_allow_record
+descriptive only; not a tested hypothesis; no verdict,adversarial,server,state-server-ad751c18-vfltrainmodelrequest,2,48,0,not countable,not countable
+descriptive only; not a tested hypothesis; no verdict,adversarial,clientone,state-clientone-ad751c18-vfltrainmodelrequest,1,40,0,not countable,not countable
+descriptive only; not a tested hypothesis; no verdict,adversarial,clienttwo,state-clienttwo-ad751c18-vfltrainmodelrequest,1,40,0,not countable,not countable
+descriptive only; not a tested hypothesis; no verdict,adversarial,clientthree,state-clientthree-ad751c18-vfltrainmodelrequest,1,40,0,not countable,not countable

@@ -1,0 +1,32 @@
+steward,clock,decided_us,op,decision,reason,state_class,state_key,policy_source,relation_id,job_id
+server,gateway@server,1794643054523218,subscribe,,subscription established,,,cached,,jake-jongejans-c16fec60server1
+server,gateway@server,1794643055391033,read,DENY,not found,vfl_server_model,latest,cached,GUID-state-aware,jake-jongejans-c16fec60server1
+server,gateway@server,1794643055392130,subscribe,,subscription established,,,cached,,jake-jongejans-c16fec60server1
+server,gateway@server,1794643058688749,write,ALLOW,,vfl_server_model,latest,cached,GUID-state-aware,jake-jongejans-c16fec60server1
+server,gateway@server,1794643060209824,write,ALLOW,,vfl_server_model,latest,cached,GUID-state-aware,jake-jongejans-c16fec60server1
+server,gateway@server,1794643060574575,write,ALLOW,,vfl_server_model,latest,cached,GUID-state-aware,jake-jongejans-c16fec60server1
+server,gateway@server,1794643060720322,shutdown,,ms_exit,,,,,jake-jongejans-c16fec60server1
+clientone,gateway@clientone,1794643055553142,subscribe,,subscription established,,,cached,,jake-jongejans-c16fec60clientone1
+clientone,gateway@clientone,1794643056538848,subscribe,,subscription established,,,cached,,jake-jongejans-c16fec60clientone1
+clientone,gateway@clientone,1794643057617558,read,DENY,not found,vfl_client_model,latest,cached,GUID-state-aware,jake-jongejans-c16fec60clientone1
+clientone,gateway@clientone,1794643059958649,write,ALLOW,,vfl_client_model,latest,cached,GUID-state-aware,jake-jongejans-c16fec60clientone1
+clientone,gateway@clientone,1794643060311635,write,ALLOW,,vfl_client_model,latest,cached,GUID-state-aware,jake-jongejans-c16fec60clientone1
+clientone,gateway@clientone,1794643060673818,write,ALLOW,,vfl_client_model,latest,cached,GUID-state-aware,jake-jongejans-c16fec60clientone1
+clientone,gateway@clientone,1794643060721330,shutdown,,ms_exit,,,,,jake-jongejans-c16fec60clientone1
+clientone,gateway@clientone,1794643060723128,shutdown,,ms_exit,,,,,jake-jongejans-c16fec60clientone1
+clienttwo,gateway@clienttwo,1794643053844202,subscribe,,subscription established,,,cached,,jake-jongejans-c16fec60clienttwo1
+clienttwo,gateway@clienttwo,1794643054783916,subscribe,,subscription established,,,cached,,jake-jongejans-c16fec60clienttwo1
+clienttwo,gateway@clienttwo,1794643055778244,read,DENY,not found,vfl_client_model,latest,cached,GUID-state-aware,jake-jongejans-c16fec60clienttwo1
+clienttwo,gateway@clienttwo,1794643059887127,write,ALLOW,,vfl_client_model,latest,cached,GUID-state-aware,jake-jongejans-c16fec60clienttwo1
+clienttwo,gateway@clienttwo,1794643060310348,write,ALLOW,,vfl_client_model,latest,cached,GUID-state-aware,jake-jongejans-c16fec60clienttwo1
+clienttwo,gateway@clienttwo,1794643060666219,write,ALLOW,,vfl_client_model,latest,cached,GUID-state-aware,jake-jongejans-c16fec60clienttwo1
+clienttwo,gateway@clienttwo,1794643060723852,shutdown,,ms_exit,,,,,jake-jongejans-c16fec60clienttwo1
+clienttwo,gateway@clienttwo,1794643060725961,shutdown,,ms_exit,,,,,jake-jongejans-c16fec60clienttwo1
+clientthree,gateway@clientthree,1794643055305392,subscribe,,subscription established,,,cached,,jake-jongejans-c16fec60clientthree1
+clientthree,gateway@clientthree,1794643056257371,subscribe,,subscription established,,,cached,,jake-jongejans-c16fec60clientthree1
+clientthree,gateway@clientthree,1794643057457336,read,DENY,not found,vfl_client_model,latest,cached,GUID-state-aware,jake-jongejans-c16fec60clientthree1
+clientthree,gateway@clientthree,1794643059845910,write,ALLOW,,vfl_client_model,latest,cached,GUID-state-aware,jake-jongejans-c16fec60clientthree1
+clientthree,gateway@clientthree,1794643060315749,write,ALLOW,,vfl_client_model,latest,cached,GUID-state-aware,jake-jongejans-c16fec60clientthree1
+clientthree,gateway@clientthree,1794643060667440,write,ALLOW,,vfl_client_model,latest,cached,GUID-state-aware,jake-jongejans-c16fec60clientthree1
+clientthree,gateway@clientthree,1794643060720357,shutdown,,ms_exit,,,,,jake-jongejans-c16fec60clientthree1
+clientthree,gateway@clientthree,1794643060721320,shutdown,,ms_exit,,,,,jake-jongejans-c16fec60clientthree1

@@ -1,0 +1,10 @@
+status,unit,steward,clock,sent_us,returned_us,operation,identity,state_class,state_key,expected_op,expected_decision,records_in_window,record_clocks
+descriptive only; not a tested hypothesis; no verdict,adversarial,server,sender@server,1794680476714814,1794680476716313,write,tampered,adversarial,mismatch-probe,identity_mismatch,,1,gateway@server
+descriptive only; not a tested hypothesis; no verdict,adversarial,server,sender@server,1794680476717566,1794680476721032,write,own,adversarial,concurrent-slot,write,ALLOW,4,gateway@server
+descriptive only; not a tested hypothesis; no verdict,adversarial,server,sender@server,1794680476717987,1794680476722616,write,own,adversarial,concurrent-slot,write,ALLOW,6,gateway@server
+descriptive only; not a tested hypothesis; no verdict,adversarial,server,sender@server,1794680476719969,1794680476722809,write,own,adversarial,concurrent-slot,write,ALLOW,3,gateway@server
+descriptive only; not a tested hypothesis; no verdict,adversarial,server,sender@server,1794680476719247,1794680476723039,write,own,adversarial,concurrent-slot,write,ALLOW,5,gateway@server
+descriptive only; not a tested hypothesis; no verdict,adversarial,server,sender@server,1794680476718399,1794680476723157,write,own,adversarial,concurrent-slot,write,ALLOW,6,gateway@server
+descriptive only; not a tested hypothesis; no verdict,adversarial,server,sender@server,1794680476720478,1794680476723641,write,own,adversarial,concurrent-slot,write,ALLOW,4,gateway@server
+descriptive only; not a tested hypothesis; no verdict,adversarial,server,sender@server,1794680476720887,1794680476723785,write,own,adversarial,concurrent-slot,write,ALLOW,4,gateway@server
+descriptive only; not a tested hypothesis; no verdict,adversarial,server,sender@server,1794680476721367,1794680476724520,write,own,adversarial,concurrent-slot,write,ALLOW,4,gateway@server

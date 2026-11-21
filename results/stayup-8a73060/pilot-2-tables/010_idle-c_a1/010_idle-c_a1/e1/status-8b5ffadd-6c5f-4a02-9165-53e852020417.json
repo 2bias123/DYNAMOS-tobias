@@ -1,0 +1,30 @@
+{
+    "metadata": {
+        "policy_reintroduction": -1,
+        "policy_removal": -1,
+        "total_rounds": 3,
+        "training_backtrack": 0
+    },
+    "request_id": "8b5ffadd-6c5f-4a02-9165-53e852020417",
+    "results": [
+        {
+            "accuracy": -2.1119117736816406,
+            "clients": 3,
+            "timestamp": "2026-11-14T03:10:36Z",
+            "train_round": 0
+        },
+        {
+            "accuracy": -2.110189199447632,
+            "clients": 3,
+            "timestamp": "2026-11-14T03:10:36Z",
+            "train_round": 1
+        },
+        {
+            "accuracy": -2.100903034210205,
+            "clients": 3,
+            "timestamp": "2026-11-14T03:10:36Z",
+            "train_round": 2
+        }
+    ],
+    "status": "done"
+}

@@ -1,0 +1,7 @@
+row,case,steward,expected,observed,result
+watch,trial 1,server,"the end record decided at or after the send, http 200, send and record on one machine",write/DENY 38.6 ms after the send; clocks one: server,pass
+watch,trial 2,server,"the end record decided at or after the send, http 200, send and record on one machine",write/DENY 42.9 ms after the send; clocks one: server,pass
+watch,trial 3,server,"the end record decided at or after the send, http 200, send and record on one machine",write/DENY 37.0 ms after the send; clocks one: server,pass
+complete log,trial 1,server,the end record read from the gateway's stdout is the first such record on the complete audit log,"first on the audit log 1794672978186569, from stdout 1794672978186569",pass
+complete log,trial 2,server,the end record read from the gateway's stdout is the first such record on the complete audit log,"first on the audit log 1794672980595572, from stdout 1794672980595572",pass
+complete log,trial 3,server,the end record read from the gateway's stdout is the first such record on the complete audit log,"first on the audit log 1794672982989023, from stdout 1794672982989023",pass

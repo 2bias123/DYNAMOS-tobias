@@ -1,0 +1,5 @@
+unit,case,check,steward,start_clock,start_us,end_clock,end_us,value_us,value_ms,result
+idle-a,(a) revocation,PURGED vfl_server_model/latest,server,sender@server,1794680787849143,gateway@server,1794680787881582,32439,32.4,pass
+idle-a,(a) revocation,PURGED vfl_client_model/latest,clientone,sender@clientone,1794680788364611,gateway@clientone,1794680788399249,34638,34.6,pass
+idle-a,(a) revocation,PURGED vfl_client_model/latest,clienttwo,sender@clienttwo,1794680788879900,gateway@clienttwo,1794680788915050,35150,35.2,pass
+idle-a,(a) revocation,PURGED vfl_client_model/latest,clientthree,sender@clientthree,1794680789389240,gateway@clientthree,1794680789422019,32779,32.8,pass

@@ -1,0 +1,188 @@
+# e3 quad-03, attempt 1
+
+- outcome: pass
+
+## What ran
+
+- cases.csv: 67 rows
+- claims.csv: 0 rows
+- env/clocks.csv: 14 rows
+- env/gates.csv: 272 rows
+- events.csv: 79 rows
+- markers.csv: 4 rows
+- pods.csv: 89 rows
+- rounds.csv: 40 rows
+- verdict.csv: 414 rows
+- writes.csv: 120 rows
+
+## Checks
+
+- check missing values: pass
+- check cases.csv config c · chain pod · server: pass
+- check cases.csv config c · connected · server: pass
+- check cases.csv config c · mode banner · server: pass
+- check cases.csv config c · write spans · server: pass
+- check cases.csv config c · chain pod · clientone: pass
+- check cases.csv config c · connected · clientone: pass
+- check cases.csv config c · mode banner · clientone: pass
+- check cases.csv config c · write spans · clientone: pass
+- check cases.csv config c · chain pod · clienttwo: pass
+- check cases.csv config c · connected · clienttwo: pass
+- check cases.csv config c · mode banner · clienttwo: pass
+- check cases.csv config c · write spans · clienttwo: pass
+- check cases.csv config c · chain pod · clientthree: pass
+- check cases.csv config c · connected · clientthree: pass
+- check cases.csv config c · mode banner · clientthree: pass
+- check cases.csv config c · write spans · clientthree: pass
+- check cases.csv config c · decisions recorded · server: pass
+- check cases.csv config c · clean-slate read · server: pass
+- check cases.csv config c · state files · server: pass
+- check cases.csv config h · chain pod · server: pass
+- check cases.csv config h · connected · server: pass
+- check cases.csv config h · mode banner · server: pass
+- check cases.csv config h · write spans · server: pass
+- check cases.csv config h · chain pod · clientone: pass
+- check cases.csv config h · connected · clientone: pass
+- check cases.csv config h · mode banner · clientone: pass
+- check cases.csv config h · write spans · clientone: pass
+- check cases.csv config h · chain pod · clienttwo: pass
+- check cases.csv config h · connected · clienttwo: pass
+- check cases.csv config h · mode banner · clienttwo: pass
+- check cases.csv config h · write spans · clienttwo: pass
+- check cases.csv config h · chain pod · clientthree: pass
+- check cases.csv config h · connected · clientthree: pass
+- check cases.csv config h · mode banner · clientthree: pass
+- check cases.csv config h · write spans · clientthree: pass
+- check cases.csv config h · no decision records · server: pass
+- check cases.csv config h · state files · server: pass
+- check cases.csv config h · no idle job · all: pass
+- check cases.csv config b · chain pod · server: pass
+- check cases.csv config b · connected · server: pass
+- check cases.csv config b · mode banner · server: pass
+- check cases.csv config b · write spans · server: pass
+- check cases.csv config b · chain pod · clientone: pass
+- check cases.csv config b · connected · clientone: pass
+- check cases.csv config b · mode banner · clientone: pass
+- check cases.csv config b · write spans · clientone: pass
+- check cases.csv config b · chain pod · clienttwo: pass
+- check cases.csv config b · connected · clienttwo: pass
+- check cases.csv config b · mode banner · clienttwo: pass
+- check cases.csv config b · write spans · clienttwo: pass
+- check cases.csv config b · chain pod · clientthree: pass
+- check cases.csv config b · connected · clientthree: pass
+- check cases.csv config b · mode banner · clientthree: pass
+- check cases.csv config b · write spans · clientthree: pass
+- check cases.csv config b · decisions recorded · server: pass
+- check cases.csv config b · clean-slate read · server: pass
+- check cases.csv config b · state files · server: pass
+- check cases.csv config b · no idle job · all: pass
+- check cases.csv config a · chain pod · server: pass
+- check cases.csv config a · no gateway · server: pass
+- check cases.csv config a · chain pod · clientone: pass
+- check cases.csv config a · no gateway · clientone: pass
+- check cases.csv config a · chain pod · clienttwo: pass
+- check cases.csv config a · no gateway · clienttwo: pass
+- check cases.csv config a · chain pod · clientthree: pass
+- check cases.csv config a · no gateway · clientthree: pass
+- check cases.csv config a · no state claim · all: pass
+- check env/gates.csv node Ready · after config c's clean start: pass (6 rows, 0 failing)
+- check env/gates.csv disk free on / · after config c's clean start: pass (6 rows, 0 failing)
+- check env/gates.csv disk free for archives · after config c's clean start: pass (1 rows, 0 failing)
+- check env/gates.csv disk free for state claims · after config c's clean start: pass (4 rows, 0 failing)
+- check env/gates.csv lease · after config c's clean start: pass (1 rows, 0 failing)
+- check env/gates.csv stop date · after config c's clean start: pass (1 rows, 0 failing; also not a counted unit)
+- check env/gates.csv chain images on the node · after config c's clean start: pass (24 rows, 0 failing)
+- check env/gates.csv digest · after config c's clean start: pass (20 rows, 0 failing)
+- check env/gates.csv digest at the registry · after config c's clean start: pass (5 rows, 0 failing)
+- check env/gates.csv node Ready · after config h's clean start: pass (6 rows, 0 failing)
+- check env/gates.csv disk free on / · after config h's clean start: pass (6 rows, 0 failing)
+- check env/gates.csv disk free for archives · after config h's clean start: pass (1 rows, 0 failing)
+- check env/gates.csv disk free for state claims · after config h's clean start: pass (4 rows, 0 failing)
+- check env/gates.csv lease · after config h's clean start: pass (1 rows, 0 failing)
+- check env/gates.csv stop date · after config h's clean start: pass (1 rows, 0 failing; also not a counted unit)
+- check env/gates.csv chain images on the node · after config h's clean start: pass (24 rows, 0 failing)
+- check env/gates.csv digest · after config h's clean start: pass (20 rows, 0 failing)
+- check env/gates.csv digest at the registry · after config h's clean start: pass (5 rows, 0 failing)
+- check env/gates.csv node Ready · after config b's clean start: pass (6 rows, 0 failing)
+- check env/gates.csv disk free on / · after config b's clean start: pass (6 rows, 0 failing)
+- check env/gates.csv disk free for archives · after config b's clean start: pass (1 rows, 0 failing)
+- check env/gates.csv disk free for state claims · after config b's clean start: pass (4 rows, 0 failing)
+- check env/gates.csv lease · after config b's clean start: pass (1 rows, 0 failing)
+- check env/gates.csv stop date · after config b's clean start: pass (1 rows, 0 failing; also not a counted unit)
+- check env/gates.csv chain images on the node · after config b's clean start: pass (24 rows, 0 failing)
+- check env/gates.csv digest · after config b's clean start: pass (20 rows, 0 failing)
+- check env/gates.csv digest at the registry · after config b's clean start: pass (5 rows, 0 failing)
+- check env/gates.csv node Ready · after config a's clean start: pass (6 rows, 0 failing)
+- check env/gates.csv disk free on / · after config a's clean start: pass (6 rows, 0 failing)
+- check env/gates.csv disk free for archives · after config a's clean start: pass (1 rows, 0 failing)
+- check env/gates.csv disk free for state claims · after config a's clean start: pass (4 rows, 0 failing)
+- check env/gates.csv lease · after config a's clean start: pass (1 rows, 0 failing)
+- check env/gates.csv stop date · after config a's clean start: pass (1 rows, 0 failing; also not a counted unit)
+- check env/gates.csv chain images on the node · after config a's clean start: pass (24 rows, 0 failing)
+- check env/gates.csv digest · after config a's clean start: pass (20 rows, 0 failing)
+- check env/gates.csv digest at the registry · after config a's clean start: pass (5 rows, 0 failing)
+- check marker M1 (STATE_LOCK_NOT_ACQUIRED, gateway): pass (0 hits in 32 files)
+- check marker M2 (IDLE_GATEWAY_NOT_STOPPED, agent): pass (0 hits in 36 files)
+- check marker M3 (IDLE_GATEWAY_NOT_RUNNING, agent): pass (0 hits in 36 files)
+- check marker M4 (No policy gateway reachable, service): pass (0 hits in 136 files)
+- check verdict.csv class · request path: pass (15 rows, 0 failing)
+- check verdict.csv node · request path: pass (15 rows, 0 failing)
+- check verdict.csv digest · request path: pass (30 rows, 0 failing)
+- check verdict.csv class · agent: pass (36 rows, 0 failing)
+- check verdict.csv node · agent: pass (36 rows, 0 failing)
+- check verdict.csv digest · agent: pass (72 rows, 0 failing)
+- check verdict.csv class · chain: pass (20 rows, 0 failing)
+- check verdict.csv node · chain: pass (20 rows, 0 failing)
+- check verdict.csv digest · chain: pass (116 rows, 0 failing)
+- check verdict.csv class · idle: pass (16 rows, 0 failing)
+- check verdict.csv node · idle: pass (16 rows, 0 failing)
+- check verdict.csv digest · idle: pass (16 rows, 0 failing)
+- check verdict.csv class · inspector: pass (2 rows, 0 failing)
+- check verdict.csv node · inspector: pass (2 rows, 0 failing)
+- check verdict.csv digest · inspector: pass (2 rows, 0 failing)
+- check verdict: pass
+
+## Values
+
+Intervals from the CSVs' µs values, in ms rounded to 0.1 ms; the median of an even n is the mean of the middle two.
+
+- events.csv duration_us (quadruplet): n=1, minimum 0.0 ms, median 0.0 ms, maximum 0.0 ms
+- events.csv duration_us (clean start): n=4, minimum 110933.4 ms, median 175094.4 ms, maximum 193694.5 ms
+- events.csv duration_us (deploy gap: chain jobs deleted): n=16, minimum 0.0 ms, median 0.0 ms, maximum 0.0 ms
+- events.csv duration_us (deploy gap: chain pods gone): n=16, minimum 136.1 ms, median 151.1 ms, maximum 223.6 ms
+- events.csv duration_us (deploy gap: held): n=16, minimum 0.0 ms, median 0.0 ms, maximum 0.0 ms
+- events.csv duration_us (trigger): n=4, minimum 2.2 ms, median 2.3 ms, maximum 3.1 ms
+- events.csv duration_us (config c: run done): n=1, minimum 33918.7 ms, median 33918.7 ms, maximum 33918.7 ms
+- events.csv duration_us (config c: hand-over): n=4, minimum 48.3 ms, median 59.4 ms, maximum 96.6 ms
+- events.csv duration_us (config c: idle gap): n=4, minimum 3898.7 ms, median 4045.6 ms, maximum 4610.4 ms
+- events.csv duration_us (config h: run done): n=1, minimum 33537.7 ms, median 33537.7 ms, maximum 33537.7 ms
+- events.csv duration_us (config h: hand-over): n=4, minimum 16.3 ms, median 48.3 ms, maximum 59.5 ms
+- events.csv duration_us (config b: run done): n=1, minimum 33579.4 ms, median 33579.4 ms, maximum 33579.4 ms
+- events.csv duration_us (config b: hand-over): n=4, minimum 16.0 ms, median 22.4 ms, maximum 55.4 ms
+- events.csv duration_us (config a: requiresGateway dropped): n=1, minimum 0.0 ms, median 0.0 ms, maximum 0.0 ms
+- events.csv duration_us (config a: run done): n=1, minimum 18620.9 ms, median 18620.9 ms, maximum 18620.9 ms
+- events.csv duration_us (config a: chain metadata put back): n=1, minimum 0.0 ms, median 0.0 ms, maximum 0.0 ms
+- rounds.csv duration_us (c): n=10, minimum 266.2 ms, median 292.9 ms, maximum 22442.6 ms
+- rounds.csv duration_us (h): n=10, minimum 270.4 ms, median 283.7 ms, maximum 23792.2 ms
+- rounds.csv duration_us (b): n=10, minimum 282.5 ms, median 307.0 ms, maximum 22483.6 ms
+- rounds.csv duration_us (a): n=10, minimum 252.9 ms, median 274.4 ms, maximum 7826.3 ms
+- rounds.csv reverify_us (c): n=10, minimum 29.4 ms, median 31.4 ms, maximum 35.3 ms
+- rounds.csv reverify_us (h): n=10, minimum 29.2 ms, median 30.5 ms, maximum 34.4 ms
+- rounds.csv reverify_us (b): n=10, minimum 29.3 ms, median 31.3 ms, maximum 34.9 ms
+- rounds.csv reverify_us (a): n=10, minimum 30.2 ms, median 34.0 ms, maximum 43.2 ms
+- rounds.csv train_us (c): n=10, minimum 231.3 ms, median 262.0 ms, maximum 22408.7 ms
+- rounds.csv train_us (h): n=10, minimum 236.0 ms, median 252.4 ms, maximum 23759.9 ms
+- rounds.csv train_us (b): n=10, minimum 250.6 ms, median 275.4 ms, maximum 22448.8 ms
+- rounds.csv train_us (a): n=10, minimum 219.3 ms, median 238.7 ms, maximum 7787.0 ms
+- writes.csv total_us (c): n=40, minimum 1.1 ms, median 2.0 ms, maximum 6.0 ms
+- writes.csv total_us (h): n=40, minimum 0.2 ms, median 0.4 ms, maximum 1.1 ms
+- writes.csv total_us (b): n=40, minimum 0.8 ms, median 1.6 ms, maximum 4.8 ms
+- writes.csv persist_us (c): n=40, minimum 0.2 ms, median 0.4 ms, maximum 0.8 ms
+- writes.csv persist_us (h): n=40, minimum 0.2 ms, median 0.4 ms, maximum 1.0 ms
+- writes.csv persist_us (b): n=40, minimum 0.0 ms, median 0.0 ms, maximum 0.0 ms
+- writes.csv audit_us (c): n=40, minimum 0.8 ms, median 1.6 ms, maximum 5.2 ms
+- writes.csv audit_us (h): n=40, minimum 0.0 ms, median 0.0 ms, maximum 0.0 ms
+- writes.csv audit_us (b): n=40, minimum 0.8 ms, median 1.6 ms, maximum 4.8 ms
+- writes.csv decide_us (c): n=40, minimum 0.0 ms, median 0.0 ms, maximum 0.0 ms
+- writes.csv decide_us (h): n=40, minimum 0.0 ms, median 0.0 ms, maximum 0.0 ms
+- writes.csv decide_us (b): n=40, minimum 0.0 ms, median 0.0 ms, maximum 0.0 ms

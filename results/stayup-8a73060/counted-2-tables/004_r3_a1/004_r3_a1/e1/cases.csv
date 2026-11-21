@@ -1,0 +1,17 @@
+row,case,steward,expected,observed,result
+runs,two runs,server,2 runs of job records,2,pass
+outside,read of an absent object,server,"run 1's read records DENY 'not found' on the seeded relation, at least one","read records: 1, 0 otherwise",pass
+R3,read within retention,server,"run 2's first read ALLOW on the seeded relation, its written time that of run 1's last write of the same state","ALLOW ('vfl_server_model', 'latest') on GUID-state-aware, written 1794679490, run 1's last write 1794679490",pass
+completeness,every state file has a write ALLOW record,server,at least one state file and one write ALLOW record; every state file data/<class>/<key>.bin with a write ALLOW record of its class and key,"1 state files, each with a write ALLOW record",pass
+runs,two runs,clientone,2 runs of job records,2,pass
+outside,read of an absent object,clientone,"run 1's read records DENY 'not found' on the seeded relation, at least one","read records: 1, 0 otherwise",pass
+R3,read within retention,clientone,"run 2's first read ALLOW on the seeded relation, its written time that of run 1's last write of the same state","ALLOW ('vfl_client_model', 'latest') on GUID-state-aware, written 1794679490, run 1's last write 1794679490",pass
+completeness,every state file has a write ALLOW record,clientone,at least one state file and one write ALLOW record; every state file data/<class>/<key>.bin with a write ALLOW record of its class and key,"1 state files, each with a write ALLOW record",pass
+runs,two runs,clienttwo,2 runs of job records,2,pass
+outside,read of an absent object,clienttwo,"run 1's read records DENY 'not found' on the seeded relation, at least one","read records: 1, 0 otherwise",pass
+R3,read within retention,clienttwo,"run 2's first read ALLOW on the seeded relation, its written time that of run 1's last write of the same state","ALLOW ('vfl_client_model', 'latest') on GUID-state-aware, written 1794679490, run 1's last write 1794679490",pass
+completeness,every state file has a write ALLOW record,clienttwo,at least one state file and one write ALLOW record; every state file data/<class>/<key>.bin with a write ALLOW record of its class and key,"1 state files, each with a write ALLOW record",pass
+runs,two runs,clientthree,2 runs of job records,2,pass
+outside,read of an absent object,clientthree,"run 1's read records DENY 'not found' on the seeded relation, at least one","read records: 1, 0 otherwise",pass
+R3,read within retention,clientthree,"run 2's first read ALLOW on the seeded relation, its written time that of run 1's last write of the same state","ALLOW ('vfl_client_model', 'latest') on GUID-state-aware, written 1794679490, run 1's last write 1794679490",pass
+completeness,every state file has a write ALLOW record,clientthree,at least one state file and one write ALLOW record; every state file data/<class>/<key>.bin with a write ALLOW record of its class and key,"1 state files, each with a write ALLOW record",pass

@@ -1,0 +1,32 @@
+clock,at_us,event,subject,duration_us,detail
+host@control,1794682989574019,clean start,all,178445163,jobs of the four stewards deleted together in 33.9 s; agent mode none; agents switched: none; with the seven rollouts;every check holds
+sender@server,1794682994698511,re-enable sent,server,0,trial 1: http 200
+host@control,1794682997434592,deploy gap: chain jobs deleted,server,0,none standing
+host@control,1794682997578545,deploy gap: chain jobs deleted,clientone,0,none standing
+host@control,1794682997740229,deploy gap: chain jobs deleted,clienttwo,0,none standing
+host@control,1794682997908228,deploy gap: chain jobs deleted,clientthree,0,none standing
+host@control,1794682998166824,deploy gap: chain pods gone,server,165869,
+host@control,1794682998168359,deploy gap: held,server,0,30 s after the harness's deletion at 1794682815234534
+host@control,1794682998334920,deploy gap: chain pods gone,clientone,166467,
+host@control,1794682998335051,deploy gap: held,clientone,0,30 s after the harness's deletion at 1794682815375030
+host@control,1794682998502975,deploy gap: chain pods gone,clienttwo,167835,
+host@control,1794682998503100,deploy gap: held,clienttwo,0,30 s after the harness's deletion at 1794682815499690
+host@control,1794682998667096,deploy gap: chain pods gone,clientthree,163914,
+host@control,1794682998667223,deploy gap: held,clientthree,0,30 s after the harness's deletion at 1794682815629399
+host@control,1794682998667245,trigger,api-gateway,2642,"request 5ba94de8-1e73-4e04-ae23-37851afa2816, 1200 rounds; time is the send"
+host@control,1794683014275076,chain up,server,0,"request 5ba94de8-1e73-4e04-ae23-37851afa2816, 1200 rounds, pod/jake-jongejans-0e7fb4a9server1-wtjd9 on server"
+sender@server,1794683016322096,flip sent,server,38778,trial 1: http 200; time is the send
+sender@server,1794683016901530,re-enable sent,server,0,trial 2: http 200
+sender@server,1794683018557404,flip sent,server,35424,trial 2: http 200; time is the send
+sender@server,1794683019172896,re-enable sent,server,0,trial 3: http 200
+sender@server,1794683020811333,flip sent,server,37330,trial 3: http 200; time is the send
+sender@server,1794683021433371,re-enable sent,server,0,trial 4: http 200
+sender@server,1794683023158722,flip sent,server,36319,trial 4: http 200; time is the send
+sender@server,1794683023830292,re-enable sent,server,0,trial 5: http 200
+sender@server,1794683025557811,flip sent,server,33746,trial 5: http 200; time is the send
+sender@server,1794683026214564,re-enable sent,server,0,trial 6: http 200
+sender@server,1794683027927314,flip sent,server,32757,trial 6: http 200; time is the send
+sender@server,1794683028524416,re-enable sent,server,0,trial 7: http 200
+sender@server,1794683030256375,flip sent,server,51246,trial 7: http 200; time is the send
+sender@server,1794683030892943,re-enable sent,server,0,trial 8: http 200
+host@control,1794683066536144,chain boots,server,0,1 for 50 trials

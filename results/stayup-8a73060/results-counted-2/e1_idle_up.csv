@@ -1,0 +1,21 @@
+unit,case,check,steward,start_clock,start_us,end_clock,end_us,value_us,value_ms,result
+idle-a,run,idle up after the job,server,kubelet@server,1794680779000000,log@server,1794680785715872,6715872,6715.9,pass
+idle-a,run,idle up after the job,clientone,kubelet@clientone,1794680779000000,log@clientone,1794680785622548,6622548,6622.5,pass
+idle-a,run,idle up after the job,clienttwo,kubelet@clienttwo,1794680779000000,log@clienttwo,1794680786380858,7380858,7380.9,pass
+idle-a,run,idle up after the job,clientthree,kubelet@clientthree,1794680779000000,log@clientthree,1794680786553644,7553644,7553.6,pass
+idle-b,run,idle up after the job,server,kubelet@server,1794681064000000,log@server,1794681093401875,29401875,29401.9,pass
+idle-b,run,idle up after the job,clientone,kubelet@clientone,1794681064000000,log@clientone,1794681093326354,29326354,29326.4,pass
+idle-b,run,idle up after the job,clienttwo,kubelet@clienttwo,1794681064000000,log@clienttwo,1794681093103172,29103172,29103.2,pass
+idle-b,run,idle up after the job,clientthree,kubelet@clientthree,1794681064000000,log@clientthree,1794681093219884,29219884,29219.9,pass
+idle-c,run 1,idle up after the job,server,kubelet@server,1794681454000000,log@server,1794681459243374,5243374,5243.4,pass
+idle-c,run 1,idle up after the job,clientone,kubelet@clientone,1794681454000000,log@clientone,1794681459549583,5549583,5549.6,pass
+idle-c,run 1,idle up after the job,clienttwo,kubelet@clienttwo,1794681454000000,log@clienttwo,1794681459441884,5441884,5441.9,pass
+idle-c,run 1,idle up after the job,clientthree,kubelet@clientthree,1794681454000000,log@clientthree,1794681460026665,6026665,6026.7,pass
+idle-c,run 2,idle up after the job,server,kubelet@server,1794681533000000,log@server,1794681549259778,16259778,16259.8,pass
+idle-c,run 2,idle up after the job,clientone,kubelet@clientone,1794681533000000,log@clientone,1794681549571519,16571519,16571.5,pass
+idle-c,run 2,idle up after the job,clienttwo,kubelet@clienttwo,1794681533000000,log@clienttwo,1794681549452904,16452904,16452.9,pass
+idle-c,run 2,idle up after the job,clientthree,kubelet@clientthree,1794681533000000,log@clientthree,1794681550032916,17032916,17032.9,pass
+idle-d,run,idle up after the job,server,kubelet@server,1794681831000000,log@server,1794681859117860,28117860,28117.9,pass
+idle-d,run,idle up after the job,clientone,kubelet@clientone,1794681831000000,log@clientone,1794681858475388,27475388,27475.4,pass
+idle-d,run,idle up after the job,clienttwo,kubelet@clienttwo,1794681831000000,log@clienttwo,1794681859473868,28473868,28473.9,pass
+idle-d,run,idle up after the job,clientthree,kubelet@clientthree,1794681831000000,log@clientthree,1794681858888128,27888128,27888.1,pass

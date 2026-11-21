@@ -1,0 +1,5 @@
+experiment,unit,quantity,n,min_us,median_us,max_us,min_ms,median_ms,max_ms
+e2,watch,watch: first write DENY decided minus send,50,31466,40775.5,54023,31.5,40.8,54.0
+e2,watch,watch: return minus send,50,28623,33987,42377,28.6,34.0,42.4
+e2,poll,poll: first write DENY decided minus send,50,25059956,28330658,28606818,25060.0,28330.7,28606.8
+e2,poll,poll: return minus send,50,29322,31686,42661,29.3,31.7,42.7

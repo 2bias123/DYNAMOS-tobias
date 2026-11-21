@@ -1,0 +1,4 @@
+trial,pod,reenable_us,allowed_us,sent_clock,sent_us,returned_us,end_clock,end_us,value_us,rtt_us,end_op,end_decision,end_reason,policy_source,relation_id,purge_records,machines,result
+1,harness-standalone,1794627753942446,1794627754181688,sender@server,1794627756079918,1794627756111705,gateway@server,1794627756114855,34937,31787,purge,PURGED,revoked; onRevocation=purge,fresh,GUID-state-aware,1,one: server,pass
+2,harness-standalone,1794627756744128,1794627757193687,sender@server,1794627758944727,1794627758976834,gateway@server,1794627758978061,33334,32107,purge,PURGED,revoked; onRevocation=purge,fresh,GUID-state-aware,1,one: server,pass
+3,harness-standalone,1794627760170859,1794627760205675,sender@server,1794627761756012,1794627761788215,gateway@server,1794627761788408,32396,32203,purge,PURGED,revoked; onRevocation=purge,fresh,GUID-state-aware,1,one: server,pass

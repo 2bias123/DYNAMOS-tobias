@@ -1,0 +1,23 @@
+steward,clock,decided_us,op,decision,reason,state_class,state_key,policy_source,relation_id,job_id
+server,gateway@control,1794627985815618,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-staleness
+server,gateway@control,1794627985857901,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-staleness
+server,gateway@control,1794627986876811,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-staleness
+server,gateway@control,1794627987896988,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-staleness
+server,gateway@control,1794627988916244,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-staleness
+server,gateway@control,1794627989936418,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-staleness
+server,gateway@control,1794627990957185,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-staleness
+server,gateway@control,1794627991981098,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-staleness
+server,gateway@control,1794627993001948,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-staleness
+server,gateway@control,1794627994023349,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-staleness
+server,gateway@control,1794627995047736,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-staleness
+server,gateway@control,1794627996070307,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-staleness
+server,gateway@control,1794627997090779,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-staleness
+server,gateway@control,1794627998110920,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-staleness
+server,gateway@control,1794627999129084,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-staleness
+server,gateway@control,1794628000192146,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-staleness
+server,gateway@control,1794628001223405,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-staleness
+server,gateway@control,1794628002244245,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-staleness
+server,gateway@control,1794628003277644,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-staleness
+server,gateway@control,1794628004297778,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-staleness
+server,gateway@control,1794628005317960,write,DENY,cache stale; fail closed,e5_probe,probe,stale,,e5-staleness
+server,gateway@control,1794628030283158,purge,PURGED,revoked; onRevocation=purge,e5_probe,probe,fresh,GUID-state-aware,e5-staleness

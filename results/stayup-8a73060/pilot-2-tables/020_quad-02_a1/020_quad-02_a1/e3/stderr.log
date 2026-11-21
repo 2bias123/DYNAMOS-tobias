@@ -1,0 +1,13 @@
+e3 quad: Failed: run fe938381-c50b-4ac9-bc5b-8330bd1e1cb5: status failed: {
+    "metadata": {
+        "policy_reintroduction": -1,
+        "policy_removal": -1,
+        "total_rounds": 10,
+        "training_backtrack": 0
+    },
+    "request_id": "fe938381-c50b-4ac9-bc5b-8330bd1e1cb5",
+    "results": [
+        {
+            "accuracy": 0,
+            "clients": 3,
+         (in full in status-fe938381-c50b-4ac9-bc5b-8330bd1e1cb5.json)

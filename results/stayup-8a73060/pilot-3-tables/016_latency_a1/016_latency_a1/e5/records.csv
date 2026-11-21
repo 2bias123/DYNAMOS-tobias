@@ -1,0 +1,27 @@
+steward,clock,decided_us,op,decision,reason,state_class,state_key,policy_source,relation_id,job_id
+server,gateway@server,1794644591396225,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794644591898766,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794644592401081,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794644592903413,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794644593405946,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794644593908546,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794644594411016,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794644594456990,purge,PURGED,revoked; onRevocation=purge,e5_probe,probe,fresh,GUID-state-aware,e5-latency
+server,gateway@server,1794644594913293,write,DENY,allowed = false,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794644595416104,write,DENY,allowed = false,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794644595926757,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794644596429888,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794644596933023,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794644597435566,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794644597937928,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794644597993967,purge,PURGED,revoked; onRevocation=purge,e5_probe,probe,fresh,GUID-state-aware,e5-latency
+server,gateway@server,1794644598441526,write,DENY,allowed = false,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794644598943722,write,DENY,allowed = false,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794644599445826,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794644599947959,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794644600452359,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794644600954710,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794644601456818,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794644601496626,purge,PURGED,revoked; onRevocation=purge,e5_probe,probe,fresh,GUID-state-aware,e5-latency
+server,gateway@server,1794644601959394,write,DENY,allowed = false,e5_probe,probe,cached,GUID-state-aware,e5-latency
+server,gateway@server,1794644602461421,write,DENY,allowed = false,e5_probe,probe,cached,GUID-state-aware,e5-latency

@@ -1,0 +1,13 @@
+row,case,steward,expected,observed,result
+D1,job form: one PURGED per state file,server,"one purge PURGED record per state file the job wrote, each with job fields and on fresh terms, while the job's enforcement point was still serving",1 PURGED for 1 state files written,pass
+D1,no write allowed after the purge,server,no write ALLOW record after the first PURGED,0,pass
+D1,no state left,server,no state file on the claim at the unit's end,0 state files,pass
+D1,job form: one PURGED per state file,clientone,"one purge PURGED record per state file the job wrote, each with job fields and on fresh terms, while the job's enforcement point was still serving",1 PURGED for 1 state files written,pass
+D1,no write allowed after the purge,clientone,no write ALLOW record after the first PURGED,0,pass
+D1,no state left,clientone,no state file on the claim at the unit's end,0 state files,pass
+D1,job form: one PURGED per state file,clienttwo,"one purge PURGED record per state file the job wrote, each with job fields and on fresh terms, while the job's enforcement point was still serving",1 PURGED for 1 state files written,pass
+D1,no write allowed after the purge,clienttwo,no write ALLOW record after the first PURGED,0,pass
+D1,no state left,clienttwo,no state file on the claim at the unit's end,0 state files,pass
+D1,job form: one PURGED per state file,clientthree,"one purge PURGED record per state file the job wrote, each with job fields and on fresh terms, while the job's enforcement point was still serving",1 PURGED for 1 state files written,pass
+D1,no write allowed after the purge,clientthree,no write ALLOW record after the first PURGED,0,pass
+D1,no state left,clientthree,no state file on the claim at the unit's end,0 state files,pass

@@ -1,0 +1,24 @@
+clock,at_us,event,subject,duration_us,detail
+host@control,1794627366934893,clean start,all,192537524,jobs of the four stewards deleted together in 33.4 s; agent mode none; agents switched: none; with the seven rollouts;every check holds
+sender@server,1794627372373062,re-enable sent,server,0,trial 1: http 200
+host@control,1794627374863809,deploy gap: chain jobs deleted,server,0,none standing
+host@control,1794627375079553,deploy gap: chain jobs deleted,clientone,0,none standing
+host@control,1794627375340746,deploy gap: chain jobs deleted,clienttwo,0,none standing
+host@control,1794627375550437,deploy gap: chain jobs deleted,clientthree,0,none standing
+host@control,1794627375834153,deploy gap: chain pods gone,server,204783,
+host@control,1794627375834341,deploy gap: held,server,0,30 s after the harness's deletion at 1794627177921301
+host@control,1794627376057383,deploy gap: chain pods gone,clientone,222864,
+host@control,1794627376057529,deploy gap: held,clientone,0,30 s after the harness's deletion at 1794627178031549
+host@control,1794627376220264,deploy gap: chain pods gone,clienttwo,162642,
+host@control,1794627376220378,deploy gap: held,clienttwo,0,30 s after the harness's deletion at 1794627178150016
+host@control,1794627376512543,deploy gap: chain pods gone,clientthree,292071,
+host@control,1794627376512764,deploy gap: held,clientthree,0,30 s after the harness's deletion at 1794627178266579
+host@control,1794627376512790,trigger,api-gateway,2883,"request 74d8c8f4-b396-48fe-b87c-0d9c7655b055, 100 rounds; time is the send"
+host@control,1794627395199166,chain up,server,0,"request 74d8c8f4-b396-48fe-b87c-0d9c7655b055, 100 rounds, pod/jake-jongejans-e1810c3cserver1-tzbzz on server"
+sender@server,1794627397251150,flip sent,server,35174,trial 1: http 200; time is the send
+sender@server,1794627397871780,re-enable sent,server,0,trial 2: http 200
+sender@server,1794627399577809,flip sent,server,32461,trial 2: http 200; time is the send
+sender@server,1794627400167526,re-enable sent,server,0,trial 3: http 200
+sender@server,1794627401866252,flip sent,server,35355,trial 3: http 200; time is the send
+sender@server,1794627402470178,re-enable sent,server,0,after the last trial: http 200
+host@control,1794627402542909,chain boots,server,0,1 for 3 trials

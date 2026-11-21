@@ -1,0 +1,41 @@
+steward,clock,decided_us,op,decision,reason,state_class,state_key,policy_source,relation_id,job_id
+server,gateway@server,1794756304798475,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-poll
+server,gateway@server,1794756305301349,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-poll
+server,gateway@server,1794756305804173,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-poll
+server,gateway@server,1794756306307132,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-poll
+server,gateway@server,1794756306809534,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-poll
+server,gateway@server,1794756307312239,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-poll
+server,gateway@server,1794756307814780,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-poll
+server,gateway@server,1794756308317435,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-poll
+server,gateway@server,1794756308821034,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-poll
+server,gateway@server,1794756309324011,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-poll
+server,gateway@server,1794756309826768,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-poll
+server,gateway@server,1794756310329641,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-poll
+server,gateway@server,1794756310832241,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-poll
+server,gateway@server,1794756311335272,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-poll
+server,gateway@server,1794756311838335,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-poll
+server,gateway@server,1794756312341336,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-poll
+server,gateway@server,1794756312731459,purge,PURGED,revoked; onRevocation=purge,e5_probe,probe,fresh,GUID-state-aware,e5-poll
+server,gateway@server,1794756312844002,write,DENY,allowed = false,e5_probe,probe,cached,GUID-state-aware,e5-poll
+server,gateway@server,1794756313346358,write,DENY,allowed = false,e5_probe,probe,cached,GUID-state-aware,e5-poll
+server,gateway@server,1794756313849200,write,DENY,allowed = false,e5_probe,probe,cached,GUID-state-aware,e5-poll
+server,gateway@server,1794756314351800,write,DENY,allowed = false,e5_probe,probe,cached,GUID-state-aware,e5-poll
+server,gateway@server,1794756314854425,write,DENY,allowed = false,e5_probe,probe,cached,GUID-state-aware,e5-poll
+server,gateway@server,1794756315357411,write,DENY,allowed = false,e5_probe,probe,cached,GUID-state-aware,e5-poll
+server,gateway@server,1794756315860853,write,DENY,allowed = false,e5_probe,probe,cached,GUID-state-aware,e5-poll
+server,gateway@server,1794756316364118,write,DENY,allowed = false,e5_probe,probe,cached,GUID-state-aware,e5-poll
+server,gateway@server,1794756316866832,write,DENY,allowed = false,e5_probe,probe,cached,GUID-state-aware,e5-poll
+server,gateway@server,1794756317368787,write,DENY,allowed = false,e5_probe,probe,cached,GUID-state-aware,e5-poll
+server,gateway@server,1794756317870692,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-poll
+server,gateway@server,1794756318372964,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-poll
+server,gateway@server,1794756318875598,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-poll
+server,gateway@server,1794756319378330,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-poll
+server,gateway@server,1794756319881001,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-poll
+server,gateway@server,1794756320383241,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-poll
+server,gateway@server,1794756320886225,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-poll
+server,gateway@server,1794756321388721,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-poll
+server,gateway@server,1794756321892919,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-poll
+server,gateway@server,1794756322395507,write,ALLOW,,e5_probe,probe,cached,GUID-state-aware,e5-poll
+server,gateway@server,1794756322729670,purge,PURGED,revoked; onRevocation=purge,e5_probe,probe,fresh,GUID-state-aware,e5-poll
+server,gateway@server,1794756322898040,write,DENY,allowed = false,e5_probe,probe,cached,GUID-state-aware,e5-poll
+server,gateway@server,1794756323400722,write,DENY,allowed = false,e5_probe,probe,cached,GUID-state-aware,e5-poll

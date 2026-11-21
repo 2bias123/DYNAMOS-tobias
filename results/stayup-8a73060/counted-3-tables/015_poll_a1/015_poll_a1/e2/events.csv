@@ -1,0 +1,104 @@
+clock,at_us,event,subject,duration_us,detail
+host@control,1794720298479027,clean start,all,71983062,jobs of the four stewards deleted together in 3.0 s; agent mode none; agents switched: none; with the seven rollouts;every check holds
+host@control,1794720305543446,standalone gateway up,server,0,"pod/harness-standalone, serving form as e2-poll, watch off, poll 30 s, emptyDir state, on server"
+sender@server,1794720306700246,re-enable sent,server,0,trial 1: http 200
+sender@server,1794720308900759,flip sent,server,39205,trial 1: http 200; time is the send
+sender@server,1794720334661198,re-enable sent,server,0,trial 2: http 200
+sender@server,1794720365832698,flip sent,server,31399,trial 2: http 200; time is the send
+sender@server,1794720395058683,re-enable sent,server,0,trial 3: http 200
+sender@server,1794720425759735,flip sent,server,31015,trial 3: http 200; time is the send
+sender@server,1794720454783411,re-enable sent,server,0,trial 4: http 200
+sender@server,1794720486368742,flip sent,server,34204,trial 4: http 200; time is the send
+sender@server,1794720515054259,re-enable sent,server,0,trial 5: http 200
+sender@server,1794720546241184,flip sent,server,31324,trial 5: http 200; time is the send
+sender@server,1794720575514245,re-enable sent,server,0,trial 6: http 200
+sender@server,1794720606326431,flip sent,server,32453,trial 6: http 200; time is the send
+sender@server,1794720635399307,re-enable sent,server,0,trial 7: http 200
+sender@server,1794720665454586,flip sent,server,30322,trial 7: http 200; time is the send
+sender@server,1794720694421468,re-enable sent,server,0,trial 8: http 200
+sender@server,1794720725427113,flip sent,server,31099,trial 8: http 200; time is the send
+sender@server,1794720754576107,re-enable sent,server,0,trial 9: http 200
+sender@server,1794720786180957,flip sent,server,37013,trial 9: http 200; time is the send
+sender@server,1794720814731041,re-enable sent,server,0,trial 10: http 200
+sender@server,1794720846582941,flip sent,server,31783,trial 10: http 200; time is the send
+sender@server,1794720874690621,re-enable sent,server,0,trial 11: http 200
+sender@server,1794720906023721,flip sent,server,31093,trial 11: http 200; time is the send
+sender@server,1794720935082120,re-enable sent,server,0,trial 12: http 200
+sender@server,1794720966048831,flip sent,server,33378,trial 12: http 200; time is the send
+sender@server,1794720995385900,re-enable sent,server,0,trial 13: http 200
+sender@server,1794721025595173,flip sent,server,32495,trial 13: http 200; time is the send
+sender@server,1794721054800768,re-enable sent,server,0,trial 14: http 200
+sender@server,1794721085609166,flip sent,server,33930,trial 14: http 200; time is the send
+sender@server,1794721114859734,re-enable sent,server,0,trial 15: http 200
+sender@server,1794721145634060,flip sent,server,33452,trial 15: http 200; time is the send
+sender@server,1794721174833875,re-enable sent,server,0,trial 16: http 200
+sender@server,1794721205627570,flip sent,server,33658,trial 16: http 200; time is the send
+sender@server,1794721235004813,re-enable sent,server,0,trial 17: http 200
+sender@server,1794721266241972,flip sent,server,30869,trial 17: http 200; time is the send
+sender@server,1794721294899854,re-enable sent,server,0,trial 18: http 200
+sender@server,1794721325974932,flip sent,server,30947,trial 18: http 200; time is the send
+sender@server,1794721355409440,re-enable sent,server,0,trial 19: http 200
+sender@server,1794721386320018,flip sent,server,31081,trial 19: http 200; time is the send
+sender@server,1794721414417265,re-enable sent,server,0,trial 20: http 200
+sender@server,1794721445198233,flip sent,server,32733,trial 20: http 200; time is the send
+sender@server,1794721474505647,re-enable sent,server,0,trial 21: http 200
+sender@server,1794721505469291,flip sent,server,31700,trial 21: http 200; time is the send
+sender@server,1794721534463201,re-enable sent,server,0,trial 22: http 200
+sender@server,1794721565505994,flip sent,server,30859,trial 22: http 200; time is the send
+sender@server,1794721595056420,re-enable sent,server,0,trial 23: http 200
+sender@server,1794721625610215,flip sent,server,32332,trial 23: http 200; time is the send
+sender@server,1794721655063248,re-enable sent,server,0,trial 24: http 200
+sender@server,1794721686204017,flip sent,server,31442,trial 24: http 200; time is the send
+sender@server,1794721714912250,re-enable sent,server,0,trial 25: http 200
+sender@server,1794721746004879,flip sent,server,30699,trial 25: http 200; time is the send
+sender@server,1794721775305960,re-enable sent,server,0,trial 26: http 200
+sender@server,1794721806168440,flip sent,server,32135,trial 26: http 200; time is the send
+sender@server,1794721835589975,re-enable sent,server,0,trial 27: http 200
+sender@server,1794721865546438,flip sent,server,31907,trial 27: http 200; time is the send
+sender@server,1794721894393360,re-enable sent,server,0,trial 28: http 200
+sender@server,1794721925436138,flip sent,server,30500,trial 28: http 200; time is the send
+sender@server,1794721954869086,re-enable sent,server,0,trial 29: http 200
+sender@server,1794721985653527,flip sent,server,30998,trial 29: http 200; time is the send
+sender@server,1794722014927845,re-enable sent,server,0,trial 30: http 200
+sender@server,1794722045580407,flip sent,server,31191,trial 30: http 200; time is the send
+sender@server,1794722074832978,re-enable sent,server,0,trial 31: http 200
+sender@server,1794722105763891,flip sent,server,31769,trial 31: http 200; time is the send
+sender@server,1794722135082398,re-enable sent,server,0,trial 32: http 200
+sender@server,1794722166305243,flip sent,server,31565,trial 32: http 200; time is the send
+sender@server,1794722195292476,re-enable sent,server,0,trial 33: http 200
+sender@server,1794722226287409,flip sent,server,33606,trial 33: http 200; time is the send
+sender@server,1794722255027565,re-enable sent,server,0,trial 34: http 200
+sender@server,1794722286708856,flip sent,server,29322,trial 34: http 200; time is the send
+sender@server,1794722314646585,re-enable sent,server,0,trial 35: http 200
+sender@server,1794722345312635,flip sent,server,31839,trial 35: http 200; time is the send
+sender@server,1794722374857599,re-enable sent,server,0,trial 36: http 200
+sender@server,1794722405925115,flip sent,server,31076,trial 36: http 200; time is the send
+sender@server,1794722434712390,re-enable sent,server,0,trial 37: http 200
+sender@server,1794722466086810,flip sent,server,34069,trial 37: http 200; time is the send
+sender@server,1794722495002952,re-enable sent,server,0,trial 38: http 200
+sender@server,1794722526094117,flip sent,server,33182,trial 38: http 200; time is the send
+sender@server,1794722554781091,re-enable sent,server,0,trial 39: http 200
+sender@server,1794722586291422,flip sent,server,33083,trial 39: http 200; time is the send
+sender@server,1794722615067130,re-enable sent,server,0,trial 40: http 200
+sender@server,1794722646056461,flip sent,server,30880,trial 40: http 200; time is the send
+sender@server,1794722674999322,re-enable sent,server,0,trial 41: http 200
+sender@server,1794722706509750,flip sent,server,31872,trial 41: http 200; time is the send
+sender@server,1794722735552203,re-enable sent,server,0,trial 42: http 200
+sender@server,1794722765272934,flip sent,server,31520,trial 42: http 200; time is the send
+sender@server,1794722794544155,re-enable sent,server,0,trial 43: http 200
+sender@server,1794722825297531,flip sent,server,31544,trial 43: http 200; time is the send
+sender@server,1794722854741831,re-enable sent,server,0,trial 44: http 200
+sender@server,1794722885503831,flip sent,server,30957,trial 44: http 200; time is the send
+sender@server,1794722914778054,re-enable sent,server,0,trial 45: http 200
+sender@server,1794722945711208,flip sent,server,31802,trial 45: http 200; time is the send
+sender@server,1794722975006242,re-enable sent,server,0,trial 46: http 200
+sender@server,1794723005907438,flip sent,server,31387,trial 46: http 200; time is the send
+sender@server,1794723034754911,re-enable sent,server,0,trial 47: http 200
+sender@server,1794723065721553,flip sent,server,42661,trial 47: http 200; time is the send
+sender@server,1794723095175218,re-enable sent,server,0,trial 48: http 200
+sender@server,1794723126104066,flip sent,server,32995,trial 48: http 200; time is the send
+sender@server,1794723155084123,re-enable sent,server,0,trial 49: http 200
+sender@server,1794723186488928,flip sent,server,31544,trial 49: http 200; time is the send
+sender@server,1794723215235581,re-enable sent,server,0,trial 50: http 200
+sender@server,1794723246626043,flip sent,server,31672,trial 50: http 200; time is the send
+sender@server,1794723274204398,re-enable sent,server,0,after the last trial: http 200

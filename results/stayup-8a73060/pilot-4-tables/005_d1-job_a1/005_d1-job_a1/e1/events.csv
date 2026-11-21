@@ -1,0 +1,21 @@
+clock,at_us,event,subject,duration_us,detail
+host@control,1794669840907762,clean start,all,204861286,jobs of the four stewards deleted together in 33.1 s; agent mode none; agents switched: none; with the seven rollouts;every check holds
+host@control,1794669849386204,deploy gap: chain jobs deleted,server,0,none standing
+host@control,1794669849524130,deploy gap: chain jobs deleted,clientone,0,none standing
+host@control,1794669849669183,deploy gap: chain jobs deleted,clienttwo,0,none standing
+host@control,1794669849805694,deploy gap: chain jobs deleted,clientthree,0,none standing
+host@control,1794669850014567,deploy gap: chain pods gone,server,141299,
+host@control,1794669850014767,deploy gap: held,server,0,30 s after the harness's deletion at 1794669638947354
+host@control,1794669850169456,deploy gap: chain pods gone,clientone,154607,
+host@control,1794669850169586,deploy gap: held,clientone,0,30 s after the harness's deletion at 1794669639055934
+host@control,1794669850316840,deploy gap: chain pods gone,clienttwo,147175,
+host@control,1794669850316970,deploy gap: held,clienttwo,0,30 s after the harness's deletion at 1794669639174830
+host@control,1794669850460918,deploy gap: chain pods gone,clientthree,143847,
+host@control,1794669850461039,deploy gap: held,clientthree,0,30 s after the harness's deletion at 1794669639314713
+host@control,1794669850461061,trigger,api-gateway,2854,"request c36d2be8-e7b2-46b7-99fd-89b13f31b1c9, 30 rounds; time is the send"
+host@control,1794669874289685,d1: every steward's job has written,all,0,jake-jongejans-1c3bb682server1-zt5df jake-jongejans-1c3bb682clientone1-5vhxt jake-jongejans-1c3bb682clienttwo1-fmcb8 jake-jongejans-1c3bb682clientthree1-zmcb5
+host@control,1794669874289996,d1: revocation with purge during the job,server,7150,http 200; time is the send
+host@control,1794669874297252,d1: revocation with purge during the job,clientone,4631,http 200; time is the send
+host@control,1794669874301954,d1: revocation with purge during the job,clienttwo,5272,http 200; time is the send
+host@control,1794669874307465,d1: revocation with purge during the job,clientthree,5238,http 200; time is the send
+host@control,1794669885459104,run done,api-gateway,0,request c36d2be8-e7b2-46b7-99fd-89b13f31b1c9

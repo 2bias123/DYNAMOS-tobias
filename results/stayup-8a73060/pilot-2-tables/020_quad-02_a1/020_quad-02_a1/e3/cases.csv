@@ -1,0 +1,40 @@
+row,case,steward,expected,observed,result
+config b,chain pod,server,the enforcement point and its state volume,containers anonymize-test differential-p-test vfl-train-model-demo vfl-train-demo sidecar policy-checkpoint-gateway; volumes shared-data gateway-state kube-api-access-cfhj6,pass
+config b,connected,server,'Successfully connected to gateway' in vfl-train-model-demo,present,pass
+config b,mode banner,server,"'Pass-through mode: decisions and audit only, state writes skipped'","Pass-through mode: decisions and audit only, state writes skipped",pass
+config b,write spans,server,"10 'Write timing' spans, each with no persist time","10 spans; decide 12 µs, audit 17721 µs, persist 0 µs in all",pass
+config b,chain pod,clientone,the enforcement point and its state volume,containers anonymize-test differential-p-test vfl-train-model-demo vfl-train-demo sidecar policy-checkpoint-gateway; volumes shared-data gateway-state kube-api-access-lrs5c,pass
+config b,connected,clientone,'Successfully connected to gateway' in vfl-train-demo,present,pass
+config b,mode banner,clientone,"'Pass-through mode: decisions and audit only, state writes skipped'","Pass-through mode: decisions and audit only, state writes skipped",pass
+config b,write spans,clientone,"10 'Write timing' spans, each with no persist time","10 spans; decide 29 µs, audit 19996 µs, persist 0 µs in all",pass
+config b,chain pod,clienttwo,the enforcement point and its state volume,containers anonymize-test differential-p-test vfl-train-model-demo vfl-train-demo sidecar policy-checkpoint-gateway; volumes shared-data gateway-state kube-api-access-zgfgh,pass
+config b,connected,clienttwo,'Successfully connected to gateway' in vfl-train-demo,present,pass
+config b,mode banner,clienttwo,"'Pass-through mode: decisions and audit only, state writes skipped'","Pass-through mode: decisions and audit only, state writes skipped",pass
+config b,write spans,clienttwo,"10 'Write timing' spans, each with no persist time","10 spans; decide 19 µs, audit 12608 µs, persist 0 µs in all",pass
+config b,chain pod,clientthree,the enforcement point and its state volume,containers anonymize-test differential-p-test vfl-train-model-demo vfl-train-demo sidecar policy-checkpoint-gateway; volumes shared-data gateway-state kube-api-access-xfcwx,pass
+config b,connected,clientthree,'Successfully connected to gateway' in vfl-train-demo,present,pass
+config b,mode banner,clientthree,"'Pass-through mode: decisions and audit only, state writes skipped'","Pass-through mode: decisions and audit only, state writes skipped",pass
+config b,write spans,clientthree,"10 'Write timing' spans, each with no persist time","10 spans; decide 17 µs, audit 16597 µs, persist 0 µs in all",pass
+config b,decisions recorded,server,"10 write ALLOW records by the job, nothing else","10 write records, 10 ALLOW",pass
+config b,clean-slate read,server,the first read record DENY 'not found',DENY 'not found',pass
+config b,state files,server,none,0 state files,pass
+config b,no idle job,all,no idle Job: the agents start none in this mode,"server 0, clientone 0, clienttwo 0, clientthree 0",pass
+config c,chain pod,server,the enforcement point and its state volume,containers anonymize-test differential-p-test vfl-train-model-demo vfl-train-demo sidecar policy-checkpoint-gateway; volumes shared-data gateway-state kube-api-access-glgz9,pass
+config c,connected,server,'Successfully connected to gateway' in vfl-train-model-demo,present,pass
+config c,mode banner,server,no pass-through or store-only banner,none,pass
+config c,write spans,server,10 'Write timing' spans,"10 spans; decide 20 µs, audit 13451 µs, persist 3166 µs in all",pass
+config c,chain pod,clientone,the enforcement point and its state volume,containers anonymize-test differential-p-test vfl-train-model-demo vfl-train-demo sidecar policy-checkpoint-gateway; volumes shared-data gateway-state kube-api-access-tq69h,pass
+config c,connected,clientone,'Successfully connected to gateway' in vfl-train-demo,present,pass
+config c,mode banner,clientone,no pass-through or store-only banner,none,pass
+config c,write spans,clientone,10 'Write timing' spans,"10 spans; decide 115 µs, audit 14868 µs, persist 5877 µs in all",pass
+config c,chain pod,clienttwo,the enforcement point and its state volume,containers anonymize-test differential-p-test vfl-train-model-demo vfl-train-demo sidecar policy-checkpoint-gateway; volumes shared-data gateway-state kube-api-access-c4bfk,pass
+config c,connected,clienttwo,'Successfully connected to gateway' in vfl-train-demo,present,pass
+config c,mode banner,clienttwo,no pass-through or store-only banner,none,pass
+config c,write spans,clienttwo,10 'Write timing' spans,"10 spans; decide 19 µs, audit 22352 µs, persist 3853 µs in all",pass
+config c,chain pod,clientthree,the enforcement point and its state volume,containers anonymize-test differential-p-test vfl-train-model-demo vfl-train-demo sidecar policy-checkpoint-gateway; volumes shared-data gateway-state kube-api-access-j6qww,pass
+config c,connected,clientthree,'Successfully connected to gateway' in vfl-train-demo,present,pass
+config c,mode banner,clientthree,no pass-through or store-only banner,none,pass
+config c,write spans,clientthree,10 'Write timing' spans,"10 spans; decide 20 µs, audit 17655 µs, persist 6018 µs in all",pass
+config c,decisions recorded,server,"10 write ALLOW records by the job, nothing else","10 write records, 10 ALLOW",pass
+config c,clean-slate read,server,the first read record DENY 'not found',DENY 'not found',pass
+config c,state files,server,at least one,1 state files,pass

@@ -1,0 +1,5 @@
+config h (store-only): rounds 1 to 49, median 382.6 ms
+config a (no gateway): rounds 1 to 49, median 390.6 ms
+config c (full enforcement): rounds 1 to 49, median 393.2 ms
+config b (pass-through): rounds 1 to 49, median 372.6 ms
+E3 q04 passed: order h a c b, 67 checks

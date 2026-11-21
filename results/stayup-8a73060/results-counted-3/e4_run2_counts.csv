@@ -1,0 +1,12 @@
+count,n
+form idle,4
+"DEFERRED, server",0
+"DEFERRED, clientone",0
+"DEFERRED, clienttwo",0
+"DEFERRED, clientthree",0
+"CANCELLED, server",0
+"CANCELLED, clientone",0
+"CANCELLED, clienttwo",0
+"CANCELLED, clientthree",0
+"DEFERRED, all stewards",0
+"CANCELLED, all stewards",0

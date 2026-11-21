@@ -1,0 +1,36 @@
+steward,clock,decided_us,op,decision,reason,state_class,state_key,policy_source,relation_id,job_id
+server,gateway@server,1794681056207280,subscribe,,subscription established,,,cached,,jake-jongejans-c4f95ab6server1
+server,gateway@server,1794681057305106,read,DENY,not found,vfl_server_model,latest,cached,GUID-state-aware,jake-jongejans-c4f95ab6server1
+server,gateway@server,1794681057306182,subscribe,,subscription established,,,cached,,jake-jongejans-c4f95ab6server1
+server,gateway@server,1794681060454394,write,ALLOW,,vfl_server_model,latest,cached,GUID-state-aware,jake-jongejans-c4f95ab6server1
+server,gateway@server,1794681061994347,write,ALLOW,,vfl_server_model,latest,cached,GUID-state-aware,jake-jongejans-c4f95ab6server1
+server,gateway@server,1794681062284991,write,ALLOW,,vfl_server_model,latest,cached,GUID-state-aware,jake-jongejans-c4f95ab6server1
+server,gateway@server,1794681062440579,shutdown,,ms_exit,,,,,jake-jongejans-c4f95ab6server1
+server,gateway@server,1794681183405930,expired,DELETED,retention exceeded,vfl_server_model,latest,fresh,GUID-state-aware,
+clientone,gateway@clientone,1794681057749186,subscribe,,subscription established,,,cached,,jake-jongejans-c4f95ab6clientone1
+clientone,gateway@clientone,1794681058447181,subscribe,,subscription established,,,cached,,jake-jongejans-c4f95ab6clientone1
+clientone,gateway@clientone,1794681059585136,read,DENY,not found,vfl_client_model,latest,cached,GUID-state-aware,jake-jongejans-c4f95ab6clientone1
+clientone,gateway@clientone,1794681061799560,write,ALLOW,,vfl_client_model,latest,cached,GUID-state-aware,jake-jongejans-c4f95ab6clientone1
+clientone,gateway@clientone,1794681062090071,write,ALLOW,,vfl_client_model,latest,cached,GUID-state-aware,jake-jongejans-c4f95ab6clientone1
+clientone,gateway@clientone,1794681062373226,write,ALLOW,,vfl_client_model,latest,cached,GUID-state-aware,jake-jongejans-c4f95ab6clientone1
+clientone,gateway@clientone,1794681062445858,shutdown,,ms_exit,,,,,jake-jongejans-c4f95ab6clientone1
+clientone,gateway@clientone,1794681062447274,shutdown,,ms_exit,,,,,jake-jongejans-c4f95ab6clientone1
+clientone,gateway@clientone,1794681183331249,expired,DELETED,retention exceeded,vfl_client_model,latest,fresh,GUID-state-aware,
+clienttwo,gateway@clienttwo,1794681055708002,subscribe,,subscription established,,,cached,,jake-jongejans-c4f95ab6clienttwo1
+clienttwo,gateway@clienttwo,1794681056585936,subscribe,,subscription established,,,cached,,jake-jongejans-c4f95ab6clienttwo1
+clienttwo,gateway@clienttwo,1794681057760549,read,DENY,not found,vfl_client_model,latest,cached,GUID-state-aware,jake-jongejans-c4f95ab6clienttwo1
+clienttwo,gateway@clienttwo,1794681061685097,write,ALLOW,,vfl_client_model,latest,cached,GUID-state-aware,jake-jongejans-c4f95ab6clienttwo1
+clienttwo,gateway@clienttwo,1794681062101007,write,ALLOW,,vfl_client_model,latest,cached,GUID-state-aware,jake-jongejans-c4f95ab6clienttwo1
+clienttwo,gateway@clienttwo,1794681062379582,write,ALLOW,,vfl_client_model,latest,cached,GUID-state-aware,jake-jongejans-c4f95ab6clienttwo1
+clienttwo,gateway@clienttwo,1794681062442089,shutdown,,ms_exit,,,,,jake-jongejans-c4f95ab6clienttwo1
+clienttwo,gateway@clienttwo,1794681062443461,shutdown,,ms_exit,,,,,jake-jongejans-c4f95ab6clienttwo1
+clienttwo,gateway@clienttwo,1794681183108363,expired,DELETED,retention exceeded,vfl_client_model,latest,fresh,GUID-state-aware,
+clientthree,gateway@clientthree,1794681055818247,subscribe,,subscription established,,,cached,,jake-jongejans-c4f95ab6clientthree1
+clientthree,gateway@clientthree,1794681056673995,subscribe,,subscription established,,,cached,,jake-jongejans-c4f95ab6clientthree1
+clientthree,gateway@clientthree,1794681057705657,read,DENY,not found,vfl_client_model,latest,cached,GUID-state-aware,jake-jongejans-c4f95ab6clientthree1
+clientthree,gateway@clientthree,1794681061615313,write,ALLOW,,vfl_client_model,latest,cached,GUID-state-aware,jake-jongejans-c4f95ab6clientthree1
+clientthree,gateway@clientthree,1794681062089896,write,ALLOW,,vfl_client_model,latest,cached,GUID-state-aware,jake-jongejans-c4f95ab6clientthree1
+clientthree,gateway@clientthree,1794681062400222,write,ALLOW,,vfl_client_model,latest,cached,GUID-state-aware,jake-jongejans-c4f95ab6clientthree1
+clientthree,gateway@clientthree,1794681062442649,shutdown,,ms_exit,,,,,jake-jongejans-c4f95ab6clientthree1
+clientthree,gateway@clientthree,1794681062443871,shutdown,,ms_exit,,,,,jake-jongejans-c4f95ab6clientthree1
+clientthree,gateway@clientthree,1794681183225158,expired,DELETED,retention exceeded,vfl_client_model,latest,fresh,GUID-state-aware,

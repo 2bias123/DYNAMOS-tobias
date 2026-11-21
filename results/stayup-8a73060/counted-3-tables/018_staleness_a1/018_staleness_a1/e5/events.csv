@@ -1,0 +1,22 @@
+clock,at_us,event,subject,duration_us,detail
+host@control,1794724238476207,clean start,all,70123429,jobs of the four stewards deleted together in 1.6 s; agent mode none; agents switched: none; with the seven rollouts;every check holds
+host@control,1794724243785348,outage: etcd forward stopped,local,0,episode 1
+sender@control,1794724264205553,flip sent during the outage,local,0,episode 1: http 200
+host@control,1794724274250117,recovery: etcd forward relaunched,local,201143,episode 1: time is the stamp before the relaunch
+sender@control,1794724289593716,re-enable sent,local,0,episode 1: http 200
+host@control,1794724290420502,outage: etcd forward stopped,local,0,episode 2
+sender@control,1794724310906284,flip sent during the outage,local,0,episode 2: http 200
+host@control,1794724320955005,recovery: etcd forward relaunched,local,201814,episode 2: time is the stamp before the relaunch
+sender@control,1794724336095527,re-enable sent,local,0,episode 2: http 200
+host@control,1794724336938647,outage: etcd forward stopped,local,0,episode 3
+sender@control,1794724357426018,flip sent during the outage,local,0,episode 3: http 200
+host@control,1794724367469341,recovery: etcd forward relaunched,local,200888,episode 3: time is the stamp before the relaunch
+sender@control,1794724387615944,re-enable sent,local,0,episode 3: http 200
+host@control,1794724388436504,outage: etcd forward stopped,local,0,episode 4
+sender@control,1794724408873013,flip sent during the outage,local,0,episode 4: http 200
+host@control,1794724418917017,recovery: etcd forward relaunched,local,203279,episode 4: time is the stamp before the relaunch
+sender@control,1794724434064759,re-enable sent,local,0,episode 4: http 200
+host@control,1794724434898095,outage: etcd forward stopped,local,0,episode 5
+sender@control,1794724455317580,flip sent during the outage,local,0,episode 5: http 200
+host@control,1794724465361500,recovery: etcd forward relaunched,local,200895,episode 5: time is the stamp before the relaunch
+sender@control,1794724481711580,re-enable sent,local,0,episode 5: http 200

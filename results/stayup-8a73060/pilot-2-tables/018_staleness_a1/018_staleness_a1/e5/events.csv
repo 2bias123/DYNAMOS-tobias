@@ -1,0 +1,6 @@
+clock,at_us,event,subject,duration_us,detail
+host@control,1794627980362790,clean start,all,69640887,jobs of the four stewards deleted together in 1.4 s; agent mode none; agents switched: none; with the seven rollouts;every check holds
+host@control,1794627985826446,outage: etcd forward stopped,local,0,episode 1
+sender@control,1794628005377261,flip sent during the outage,local,0,episode 1: http 200
+host@control,1794628015429041,recovery: etcd forward relaunched,local,202732,episode 1: time is the stamp before the relaunch
+sender@control,1794628031590521,re-enable sent,local,0,episode 1: http 200

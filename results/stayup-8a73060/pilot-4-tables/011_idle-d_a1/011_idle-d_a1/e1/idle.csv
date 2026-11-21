@@ -1,0 +1,9 @@
+case,check,steward,start_clock,start_us,end_clock,end_us,value_us,bound_us,machines,result
+run,idle up after the job,server,kubelet@server,1794671759000000,log@server,1794671789059855,30059855,60000000,one: server,pass
+run,idle up after the job,clientone,kubelet@clientone,1794671759000000,log@clientone,1794671788399483,29399483,60000000,one: clientone,pass
+run,idle up after the job,clienttwo,kubelet@clienttwo,1794671759000000,log@clienttwo,1794671788684160,29684160,60000000,one: clienttwo,pass
+run,idle up after the job,clientthree,kubelet@clientthree,1794671759000000,log@clientthree,1794671788959762,29959762,60000000,one: clientthree,pass
+(d) nothing due,window,server,host@control,1794671812319789,host@control,1794671907319872,95000083,,one: control,pass
+(d) nothing due,window,clientone,host@control,1794671812319789,host@control,1794671907319872,95000083,,one: control,pass
+(d) nothing due,window,clienttwo,host@control,1794671812319789,host@control,1794671907319872,95000083,,one: control,pass
+(d) nothing due,window,clientthree,host@control,1794671812319789,host@control,1794671907319872,95000083,,one: control,pass

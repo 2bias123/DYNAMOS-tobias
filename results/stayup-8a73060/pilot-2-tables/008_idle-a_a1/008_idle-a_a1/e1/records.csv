@@ -1,0 +1,36 @@
+steward,clock,decided_us,op,decision,reason,state_class,state_key,policy_source,relation_id,job_id
+server,gateway@server,1794625159435104,subscribe,,subscription established,,,cached,,jake-jongejans-4ff4823cserver1
+server,gateway@server,1794625160417904,read,DENY,not found,vfl_server_model,latest,cached,GUID-state-aware,jake-jongejans-4ff4823cserver1
+server,gateway@server,1794625160419160,subscribe,,subscription established,,,cached,,jake-jongejans-4ff4823cserver1
+server,gateway@server,1794625163066449,write,ALLOW,,vfl_server_model,latest,cached,GUID-state-aware,jake-jongejans-4ff4823cserver1
+server,gateway@server,1794625164607867,write,ALLOW,,vfl_server_model,latest,cached,GUID-state-aware,jake-jongejans-4ff4823cserver1
+server,gateway@server,1794625164907894,write,ALLOW,,vfl_server_model,latest,cached,GUID-state-aware,jake-jongejans-4ff4823cserver1
+server,gateway@server,1794625165057800,shutdown,,ms_exit,,,,,jake-jongejans-4ff4823cserver1
+server,gateway@server,1794625196393463,purge,PURGED,revoked; onRevocation=purge,vfl_server_model,latest,fresh,GUID-state-aware,
+clientone,gateway@clientone,1794625155036654,subscribe,,subscription established,,,cached,,jake-jongejans-4ff4823cclientone1
+clientone,gateway@clientone,1794625155933509,subscribe,,subscription established,,,cached,,jake-jongejans-4ff4823cclientone1
+clientone,gateway@clientone,1794625157149593,read,DENY,not found,vfl_client_model,latest,cached,GUID-state-aware,jake-jongejans-4ff4823cclientone1
+clientone,gateway@clientone,1794625164259154,write,ALLOW,,vfl_client_model,latest,cached,GUID-state-aware,jake-jongejans-4ff4823cclientone1
+clientone,gateway@clientone,1794625164710039,write,ALLOW,,vfl_client_model,latest,cached,GUID-state-aware,jake-jongejans-4ff4823cclientone1
+clientone,gateway@clientone,1794625165015757,write,ALLOW,,vfl_client_model,latest,cached,GUID-state-aware,jake-jongejans-4ff4823cclientone1
+clientone,gateway@clientone,1794625165059431,shutdown,,ms_exit,,,,,jake-jongejans-4ff4823cclientone1
+clientone,gateway@clientone,1794625165061086,shutdown,,ms_exit,,,,,jake-jongejans-4ff4823cclientone1
+clientone,gateway@clientone,1794625196918369,purge,PURGED,revoked; onRevocation=purge,vfl_client_model,latest,fresh,GUID-state-aware,
+clienttwo,gateway@clienttwo,1794625157703621,subscribe,,subscription established,,,cached,,jake-jongejans-4ff4823cclienttwo1
+clienttwo,gateway@clienttwo,1794625158589930,subscribe,,subscription established,,,cached,,jake-jongejans-4ff4823cclienttwo1
+clienttwo,gateway@clienttwo,1794625159769998,read,DENY,not found,vfl_client_model,latest,cached,GUID-state-aware,jake-jongejans-4ff4823cclienttwo1
+clienttwo,gateway@clienttwo,1794625164219179,write,ALLOW,,vfl_client_model,latest,cached,GUID-state-aware,jake-jongejans-4ff4823cclienttwo1
+clienttwo,gateway@clienttwo,1794625164718488,write,ALLOW,,vfl_client_model,latest,cached,GUID-state-aware,jake-jongejans-4ff4823cclienttwo1
+clienttwo,gateway@clienttwo,1794625165005468,write,ALLOW,,vfl_client_model,latest,cached,GUID-state-aware,jake-jongejans-4ff4823cclienttwo1
+clienttwo,gateway@clienttwo,1794625165054991,shutdown,,ms_exit,,,,,jake-jongejans-4ff4823cclienttwo1
+clienttwo,gateway@clienttwo,1794625165056159,shutdown,,ms_exit,,,,,jake-jongejans-4ff4823cclienttwo1
+clienttwo,gateway@clienttwo,1794625197399431,purge,PURGED,revoked; onRevocation=purge,vfl_client_model,latest,fresh,GUID-state-aware,
+clientthree,gateway@clientthree,1794625156318716,subscribe,,subscription established,,,cached,,jake-jongejans-4ff4823cclientthree1
+clientthree,gateway@clientthree,1794625157039070,subscribe,,subscription established,,,cached,,jake-jongejans-4ff4823cclientthree1
+clientthree,gateway@clientthree,1794625158071991,read,DENY,not found,vfl_client_model,latest,cached,GUID-state-aware,jake-jongejans-4ff4823cclientthree1
+clientthree,gateway@clientthree,1794625164404439,write,ALLOW,,vfl_client_model,latest,cached,GUID-state-aware,jake-jongejans-4ff4823cclientthree1
+clientthree,gateway@clientthree,1794625164710787,write,ALLOW,,vfl_client_model,latest,cached,GUID-state-aware,jake-jongejans-4ff4823cclientthree1
+clientthree,gateway@clientthree,1794625165013461,write,ALLOW,,vfl_client_model,latest,cached,GUID-state-aware,jake-jongejans-4ff4823cclientthree1
+clientthree,gateway@clientthree,1794625165059534,shutdown,,ms_exit,,,,,jake-jongejans-4ff4823cclientthree1
+clientthree,gateway@clientthree,1794625165060959,shutdown,,ms_exit,,,,,jake-jongejans-4ff4823cclientthree1
+clientthree,gateway@clientthree,1794625197882069,purge,PURGED,revoked; onRevocation=purge,vfl_client_model,latest,fresh,GUID-state-aware,

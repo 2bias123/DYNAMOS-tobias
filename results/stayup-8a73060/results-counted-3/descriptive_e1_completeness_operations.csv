@@ -1,0 +1,5 @@
+status,unit,steward,operations,operations_with_exactly_one_record,operations_with_no_record,operations_with_more_than_one_record,records_of_the_operations_kinds,records_matched_by_no_operation
+descriptive only; not a tested hypothesis; no verdict,adversarial,server,9,1,0,8,9,0
+descriptive only; not a tested hypothesis; no verdict,adversarial,clientone,0,0,0,0,0,0
+descriptive only; not a tested hypothesis; no verdict,adversarial,clienttwo,0,0,0,0,0,0
+descriptive only; not a tested hypothesis; no verdict,adversarial,clientthree,0,0,0,0,0,0

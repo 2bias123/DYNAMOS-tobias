@@ -1,0 +1,5 @@
+unit,steward,clock,state_class,state_key,last_write_us,deleted_us,value_us,value_ms,form,result
+idle-b,server,gateway@server,vfl_server_model,latest,1794681062284991,1794681183405930,121120939,121120.9,idle,pass
+idle-b,clientone,gateway@clientone,vfl_client_model,latest,1794681062373226,1794681183331249,120958023,120958.0,idle,pass
+idle-b,clienttwo,gateway@clienttwo,vfl_client_model,latest,1794681062379582,1794681183108363,120728781,120728.8,idle,pass
+idle-b,clientthree,gateway@clientthree,vfl_client_model,latest,1794681062400222,1794681183225158,120824936,120824.9,idle,pass

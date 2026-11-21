@@ -1,0 +1,20 @@
+clock,at_us,event,subject,duration_us,detail
+host@control,1794680444449968,clean start,all,204503918,jobs of the four stewards deleted together in 32.9 s; agent mode none; agents switched: none; with the seven rollouts;every check holds
+host@control,1794680451505973,deploy gap: chain jobs deleted,server,0,none standing
+host@control,1794680451706055,deploy gap: chain jobs deleted,clientone,0,none standing
+host@control,1794680451911535,deploy gap: chain jobs deleted,clienttwo,0,none standing
+host@control,1794680452086695,deploy gap: chain jobs deleted,clientthree,0,none standing
+host@control,1794680452336291,deploy gap: chain pods gone,server,168239,
+host@control,1794680452339487,deploy gap: held,server,0,30 s after the harness's deletion at 1794680242892027
+host@control,1794680452535414,deploy gap: chain pods gone,clientone,195748,
+host@control,1794680452535560,deploy gap: held,clientone,0,30 s after the harness's deletion at 1794680243001993
+host@control,1794680452719885,deploy gap: chain pods gone,clienttwo,184175,
+host@control,1794680452720056,deploy gap: held,clienttwo,0,30 s after the harness's deletion at 1794680243111636
+host@control,1794680452890657,deploy gap: chain pods gone,clientthree,170471,
+host@control,1794680452890816,deploy gap: held,clientthree,0,30 s after the harness's deletion at 1794680243214171
+host@control,1794680452890842,trigger,api-gateway,2831,"request 0222d0ae-cddd-4ff6-99d9-62843bff9524, 40 rounds; time is the send"
+host@control,1794680476472869,adversarial: chain up,server,0,pod/jake-jongejans-cbae4f23server1-rhjrm
+host@control,1794680476753905,adversarial: tampered identity and concurrent writes sent,server,280885,"{""tampered"": ""PERMISSION_DENIED"", ""concurrent"": [""ALLOW"", ""ALLOW"", ""ALLOW"", ""ALLOW"", ""ALLOW"", ""ALLOW"", ""ALLOW"", ""ALLOW""], ""operations"": [{""identity"": ""tampered"", ""key"": ""mismatch-probe"", ""sent_us"": 1794680476714814, ""returned_us"": 1794680476716313, ""answer"": ""PERMISSION_DENIED""}, {""identity"": ""own"","
+host@control,1794680477004308,adversarial: a file written past the enforcement point,server,0,data/adversarial/rogue.bin
+host@control,1794680482298114,adversarial: the planted file removed,server,0,
+host@control,1794680492306952,run done,api-gateway,0,request 0222d0ae-cddd-4ff6-99d9-62843bff9524

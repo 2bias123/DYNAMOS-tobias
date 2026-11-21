@@ -1,0 +1,7 @@
+round,clock,closed_us,accuracy,at_flip,write_clock,write_us,decision,reason
+0,api-gateway,1794626941000000,-2.1119115352630615,before,gateway@server,1794626940189701,ALLOW,
+1,api-gateway,1794626941000000,-2.1099283695220947,before,gateway@server,1794626941672264,ALLOW,
+2,api-gateway,1794626942000000,-2.0994315147399902,before,gateway@server,1794626941950080,ALLOW,
+3,api-gateway,1794626942000000,-2.0685343742370605,after,gateway@server,1794626942231750,DENY,allowed = false
+4,api-gateway,1794626942000000,-1.9951739311218262,after,gateway@server,1794626942535149,DENY,allowed = false
+5,api-gateway,1794626942000000,-1.8486907482147217,after,gateway@server,1794626942814754,DENY,allowed = false
